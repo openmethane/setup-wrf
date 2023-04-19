@@ -3,9 +3,9 @@
     "run_name" : "baseWrfRun",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
-    "start_date" : "2016-01-14 00:00:00 UTC",
+    "start_date" : "2019-05-01 00:00:00 UTC",
     # The end time of the last simulation (same format as above)
-    "end_date" : "2016-01-15 00:00:00 UTC",
+    "end_date" : "2019-05-03 00:00:00 UTC",
     # Is this a restart run? (bool -> true/false, yes/no)
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     "restart" : "false",
@@ -17,7 +17,7 @@
     "run_as_one_job" : "true",
     # Submit the WRF runs at the end of the script? (bool -> true/false, yes/no)
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
-    "submit_wrf_now" : "false",
+    "submit_wrf_now" : "true",
     # Submit the WPS component to the queue? (bool -> true/false, yes/no)
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     "submit_wps_component" : "false",
@@ -26,7 +26,7 @@
     "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
 
     # top-level directory for the WRF and WPS outputs
-    "run_dir" : "/scratch/${PROJECT}/${USER}/data/WRF/${run_name}",
+    "run_dir" : "/scratch/q90/sa6589/WRF/${run_name}",
 
     # filename of the template run-script
     "run_script_template" : "run_script_template.sh",
@@ -39,18 +39,18 @@
     "only_edit_namelists" : "false",
 
     # should we use the RTG high resolution SSTs?
-    "use_high_res_sst_data" : "false",
+    "use_high_res_sst_data" : "true",
     
     # the top-level WPS directory
-    "wps_dir" : "${HOME}/programs/WRFV_4.1.1/WPS",
+    "wps_dir" : "${HOME}/WRF/WPS",
     # the top-level directory containing the WRF executables and data-tables
-    "wrf_dir" : "${HOME}/programs/WRFV_4.1.1/WRFV3",
+    "wrf_dir" : "${HOME}/WRF/WRF",
     # this directory (the directory with template namelists)
-    "nml_dir" : "${HOME}/projects/runWRF/${run_name}",
+    "nml_dir" : "${HOME}/WRF/WRF/test/${run_name}",
     # scripts to copy from directory ${nml_dir} to each day
     "scripts_to_copy_from_nml_dir":"add_remove_var.txt,nccopy_compress_output.sh,load_wrf_env.sh",
     # output location for the met_em files
-    "metem_dir" : "/scratch/${PROJECT}/${USER}/data/WRF/${run_name}/METEM",
+    "metem_dir" : "${run_dir}/METEM",
 
     # template namelist for WPS
     "namelist_wps" : "${nml_dir}/namelist.wps",
@@ -69,19 +69,19 @@
     # path to the link_grib.csh script
     "linkgrib_script" : "${wps_dir}/link_grib.csh",
     # path to the wrf.exe program
-    "wrf_exe" : "${wrf_dir}/main/wrf.exe",
+    "wrf_exe" : "/scratch/q90/sa6589/WRF/WRF/main/wrf.exe",
     # path to the real.exe program
     "real_exe" : "${wrf_dir}/main/real.exe",
 
     # delete met_em files once they have been used
-    "delete_metem_files" : "true",
+    "delete_metem_files" : "false",
 
     # analysis source - can be "ERAI" or "FNL"
     "analysis_source" : "FNL",
 
     # if analysis_source is "FNL", you will need a login for CISL/rda.ucar.edu
-    "rda_ucar_edu_email" : "me@example.com",
-    "rda_ucar_edu_pword" : "password",
+    "rda_ucar_edu_email" : "***REMOVED***",
+    "rda_ucar_edu_pword" : "***REMOVED***",
     # if analysis_source is "FNL", it's a good idea to take a subset of the grib2 files
     "regional_subset_of_grib_data" : "true",
 
@@ -101,7 +101,7 @@
     "analysis_pattern_surface" : "/g/data/ub4/erai/grib/oper_an_sfc/fullres/ei_oper_an_sfc_075x075_90N0E90S35925E_%Y%m*",
     
     # VTable file for the SST analysis files
-    # "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.ERA-interim.pl",
+   # "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.ERA-interim.pl",
     "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
     # directory containing WRF input tables and data-files
     "wrf_run_dir" : "${wrf_dir}/run",
