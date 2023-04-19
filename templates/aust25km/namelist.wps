@@ -1,0 +1,43 @@
+&share
+ wrf_core = 'ARW',
+ max_dom = 4,
+ start_date = 'SDATE','SDATE','SDATE','SDATE',
+ end_date   = 'EDATE','EDATE','EDATE','EDATE',
+ interval_seconds = 21600,
+ io_form_geogrid = 2,
+ debug_level = 0,
+/
+
+&geogrid
+ parent_id         = 0,1,2,3,
+ parent_grid_ratio = 1,3,3,3,
+ i_parent_start    = 1,55,36,42,
+ j_parent_start    = 1,8,22,43,
+ e_we          = 100,103,127,112,
+ e_sn          = 91,97,127,112,
+ geog_data_res     = 'usgs_10m+default','usgs_30s+default','usgs_30s+default','usgs_30s+default',
+ dx = 54000,
+ dy = 54000,
+ map_proj =  'lambert',
+ ref_lat   = -32.322,
+ ref_lon   = 129.746,
+ truelat1  = -39.125,  
+ truelat2  = -37.6645,
+ stand_lon = 133.746,
+ geog_data_path = '/g/data/sx70/data/WPS_GEOG_20190418'
+ ref_x = 44.5,
+ ref_y = 35.0,
+/
+
+&ungrib
+out_format = 'WPS',
+prefix = 'ERA',
+pmin = 5000, 
+/
+
+&metgrid
+fg_name = 'ERA',
+ io_form_metgrid = 2,
+/
+
+
