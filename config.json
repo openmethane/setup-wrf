@@ -1,11 +1,16 @@
+# naming convention should be: CAPS = environment variable, lower-case = internal
 {
+    # overall base directory for project
+    "project_root": "${HOME}/openmethane-beta",
+    # base dir for set up scripts
+    "setup_root" : "${project_root}/setup_wrf",
     # Project name
-    "run_name" : "baseWrfRun",
+    "run_name" : "aust25km",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
-    "start_date" : "2019-05-01 00:00:00 UTC",
+    "start_date" : "2022-06-30 00:00:00 UTC",
     # The end time of the last simulation (same format as above)
-    "end_date" : "2019-05-03 00:00:00 UTC",
+    "end_date" : "2022-07-03 00:00:00 UTC",
     # Is this a restart run? (bool -> true/false, yes/no)
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     "restart" : "false",
@@ -26,7 +31,7 @@
     "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
 
     # top-level directory for the WRF and WPS outputs
-    "run_dir" : "/scratch/q90/sa6589/WRF/${run_name}",
+    "run_dir" : "/scratch/q90/pjr563/openmethane-beta/wrf/${run_name}",
 
     # filename of the template run-script
     "run_script_template" : "run_script_template.sh",
@@ -42,15 +47,15 @@
     "use_high_res_sst_data" : "true",
     
     # the top-level WPS directory
-    "wps_dir" : "${HOME}/WRF/WPS",
+    "wps_dir" : "${project_root}/wrf/coecms/WPS",
     # the top-level directory containing the WRF executables and data-tables
-    "wrf_dir" : "${HOME}/WRF/WRF",
+    "wrf_dir" : "${project_root}/wrf/coecms/WRF",
     # this directory (the directory with template namelists)
-    "nml_dir" : "${HOME}/WRF/WRF/test/${run_name}",
+    "nml_dir" : "${setup_root}/templates/${run_name}",
     # scripts to copy from directory ${nml_dir} to each day
     "scripts_to_copy_from_nml_dir":"add_remove_var.txt,nccopy_compress_output.sh,load_wrf_env.sh",
     # output location for the met_em files
-    "metem_dir" : "${run_dir}/METEM",
+    "metem_dir" : "${run_dir}/metem",
 
     # template namelist for WPS
     "namelist_wps" : "${nml_dir}/namelist.wps",
@@ -69,7 +74,7 @@
     # path to the link_grib.csh script
     "linkgrib_script" : "${wps_dir}/link_grib.csh",
     # path to the wrf.exe program
-    "wrf_exe" : "/scratch/q90/sa6589/WRF/WRF/main/wrf.exe",
+    "wrf_exe" : "${wrf_dir}/main/wrf.exe",
     # path to the real.exe program
     "real_exe" : "${wrf_dir}/main/real.exe",
 
@@ -104,7 +109,7 @@
    # "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.ERA-interim.pl",
     "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
     # directory containing WRF input tables and data-files
-    "wrf_run_dir" : "${wrf_dir}/run",
+    "wrf_run_dir" : "${run_dir}/run",
     # pattern to match to get the WRF input tables and data-files (within the folder ${wrf_run_dir}
     "wrf_run_tables_pattern" : "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)"
 }
