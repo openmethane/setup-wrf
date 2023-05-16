@@ -109,7 +109,7 @@
    # "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.ERA-interim.pl",
     "analysis_vtable" : "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
     # directory containing WRF input tables and data-files
-    "wrf_run_dir" : "${run_dir}/run",
+    "wrf_run_dir" : "${wrf_dir}/run",
     # pattern to match to get the WRF input tables and data-files (within the folder ${wrf_run_dir}
     "wrf_run_tables_pattern" : "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)"
 }
