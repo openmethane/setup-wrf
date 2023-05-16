@@ -2,7 +2,7 @@
 #PBS -N ${RUNNAME}
 #PBS -l walltime=48:00:00
 #PBS -l mem=128GB
-#PBS -l ncpus=64
+#PBS -l ncpus=96
 #PBS -j oe
 #PBS -q normal
 #PBS -l wd
