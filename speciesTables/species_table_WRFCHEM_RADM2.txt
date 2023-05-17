@@ -1,0 +1,94 @@
+# conversionTable = {'WRFCHEMNAME' : [ 'E_ISO', 'E_SO2', 'E_NO', 'E_CO', 'E_ETH', 'E_HC3', 'E_HC5', 'E_HC8', 'E_XYL', 'E_OL2', 'E_OLT', 'E_OLI', 'E_TOL', 'E_CSL', 'E_HCHO', 'E_ALD', 'E_KET', 'E_ORA2', 'E_NH3', 'E_NO2', 'E_PM_10', 'E_PM25I', 'E_PM25J', 'E_ECI', 'E_ECJ', 'E_ORGI', 'E_ORGJ', 'E_SO4I', 'E_SO4J', 'E_NO3I', 'E_NO3J', 'E_NAAJ', 'E_NAAI'],
+#                    'CMAQNAME' :    ['ISOP',   'SO2',   'NO',   'CO',   'ETH',   'HC3',   'HC5',   'HC8',   'XYO',   'ETE',   'OLT',   'OLI',   'TOL',   'CSL',   'HCHO',   'ALD',    'KET',  'ORA2',   'NH3',   'NO2',   'PMC',      'AOTHRI', 'AOTHRJ',  'AECI',  'AECJ',  'APOCI',  'APOCJ',  'ASO4I',  'ASO4J',  'ANO3I',  'ANO3J',  'ANAJ',   'ANAI'],
+#                    'isAerosol':    [False,     False,   False,   False,  False,   False,   False,  False,   False,   False,   False,   False,   False,   False,    False,   False,    False,  False,    False,   False,   True,        True,    True,      True,    True,    True,      True,    True,     True,      True,    True,     True,     True]}
+# otherAE = ['PSO4', 'PNO3', 'PCL', 'PNH4', 'PNA', 'PMG', 'PK', 'PCA', 'POC', 'PNCOM', 'PEC', 'PFE', 'PAL', 'PSI', 'PTI', 'PMN', 'PH2O', 'PMOTHR']
+# otherGC = ['HONO', 'ACD', 'ACT', 'UALD', 'MEK', 'HKET', 'MACR', 'MVK', 'GLY', 'MGLY', 'BALD', 'SULF', 'DIEN', 'ACE', 'ORA1', 'BEN', 'PHEN', 'XYM', 'XYP', 'ISO', 'API', 'LIM', 'MOH', 'EOH', 'ROH', 'ETEG', 'SESQ']
+#
+# for i in range(len(conversionTable['WRFCHEMNAME'])):
+#   print "{} ; {} ; - ; - ; {} ; False ; ".format(conversionTable['WRFCHEMNAME'][i], conversionTable['CMAQNAME'][i], conversionTable['isAerosol'][i])
+#
+# for i in range(len(otherAE)):
+#   print "{} ; {} ; - ; - ; {} ; False ; ".format('-', otherAE[i], True)
+#
+# for i in range(len(otherGC)):
+#   print "{} ; {} ; - ; - ; {} ; False ; ".format('-', otherGC[i], False)
+#
+WRFCHEMNAME ; CMAQNAME ; fraction ; molwgt ; isAerosol ; isVOC ; comments
+E_ISO ; ISOP ; - ; - ; False ; False ; 
+E_SO2 ; SO2 ; - ; - ; False ; False ; 
+E_NO ; NO ; - ; - ; False ; False ; 
+E_CO ; CO ; - ; - ; False ; False ; 
+E_ETH ; ETH ; - ; - ; False ; False ; 
+E_HC3 ; HC3 ; - ; - ; False ; False ; 
+E_HC5 ; HC5 ; - ; - ; False ; False ; 
+E_HC8 ; HC8 ; - ; - ; False ; False ; 
+E_XYL ; XYO ; - ; - ; False ; False ; 
+E_OL2 ; ETE ; - ; - ; False ; False ; 
+E_OLT ; OLT ; - ; - ; False ; False ; 
+E_OLI ; OLI ; - ; - ; False ; False ; 
+E_TOL ; TOL ; - ; - ; False ; False ; 
+E_CSL ; CSL ; - ; - ; False ; False ; 
+E_HCHO ; HCHO ; - ; - ; False ; False ; 
+E_ALD ; ALD ; - ; - ; False ; False ; 
+E_KET ; KET ; - ; - ; False ; False ; 
+E_ORA2 ; ORA2 ; - ; - ; False ; False ; 
+E_NH3 ; NH3 ; - ; - ; False ; False ; 
+E_NO2 ; NO2 ; - ; - ; False ; False ; 
+E_PM_10 ; PMC ; - ; - ; True ; False ; 
+E_PM25I ; AOTHRI ; - ; - ; True ; False ; 
+E_PM25J ; AOTHRJ ; - ; - ; True ; False ; 
+E_ECI ; AECI ; - ; - ; True ; False ; 
+E_ECJ ; AECJ ; - ; - ; True ; False ; 
+E_ORGI ; APOCI ; - ; - ; True ; False ; 
+E_ORGJ ; APOCJ ; - ; - ; True ; False ; 
+E_SO4I ; ASO4I ; - ; - ; True ; False ; 
+E_SO4J ; ASO4J ; - ; - ; True ; False ; 
+E_NO3I ; ANO3I ; - ; - ; True ; False ; 
+E_NO3J ; ANO3J ; - ; - ; True ; False ; 
+E_NAAJ ; ANAJ ; - ; - ; True ; False ; 
+E_NAAI ; ANAI ; - ; - ; True ; False ; 
+- ; PSO4 ; - ; - ; True ; False ; 
+- ; PNO3 ; - ; - ; True ; False ; 
+- ; PCL ; - ; - ; True ; False ; 
+- ; PNH4 ; - ; - ; True ; False ; 
+- ; PNA ; - ; - ; True ; False ; 
+- ; PMG ; - ; - ; True ; False ; 
+- ; PK ; - ; - ; True ; False ; 
+- ; PCA ; - ; - ; True ; False ; 
+- ; POC ; - ; - ; True ; False ; 
+- ; PNCOM ; - ; - ; True ; False ; 
+- ; PEC ; - ; - ; True ; False ; 
+- ; PFE ; - ; - ; True ; False ; 
+- ; PAL ; - ; - ; True ; False ; 
+- ; PSI ; - ; - ; True ; False ; 
+- ; PTI ; - ; - ; True ; False ; 
+- ; PMN ; - ; - ; True ; False ; 
+- ; PH2O ; - ; - ; True ; False ; 
+- ; PMOTHR ; - ; - ; True ; False ; 
+- ; HONO ; - ; - ; False ; False ; 
+- ; ACD ; - ; - ; False ; False ; 
+- ; ACT ; - ; - ; False ; False ; 
+- ; UALD ; - ; - ; False ; False ; 
+- ; MEK ; - ; - ; False ; False ; 
+- ; HKET ; - ; - ; False ; False ; 
+- ; MACR ; - ; - ; False ; False ; 
+- ; MVK ; - ; - ; False ; False ; 
+- ; GLY ; - ; - ; False ; False ; 
+- ; MGLY ; - ; - ; False ; False ; 
+- ; BALD ; - ; - ; False ; False ; 
+- ; SULF ; - ; - ; False ; False ; 
+- ; DIEN ; - ; - ; False ; False ; 
+- ; ACE ; - ; - ; False ; False ; 
+- ; ORA1 ; - ; - ; False ; False ; 
+- ; BEN ; - ; - ; False ; False ; 
+- ; PHEN ; - ; - ; False ; False ; 
+- ; XYM ; - ; - ; False ; False ; 
+- ; XYP ; - ; - ; False ; False ; 
+- ; ISO ; - ; - ; False ; False ; 
+- ; API ; - ; - ; False ; False ; 
+- ; LIM ; - ; - ; False ; False ; 
+- ; MOH ; - ; - ; False ; False ; 
+- ; EOH ; - ; - ; False ; False ; 
+- ; ROH ; - ; - ; False ; False ; 
+- ; ETEG ; - ; - ; False ; False ; 
+- ; SESQ ; - ; - ; False ; False ; 

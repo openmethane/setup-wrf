@@ -1,0 +1,107 @@
+# import numpy
+# conversionTable = {'WRFCHEMNAME' : ['E_ISO', 'E_SO2', 'E_NO', 'E_CO',   'E_NO2','E_NH3', 'E_PM25I', 'E_PM25J', 'E_ECI', 'E_ECJ', 'E_ORGI', 'E_ORGJ', 'E_SO4I', 'E_SO4J', 'E_NO3I', 'E_NO3J', 'E_NAAJ', 'E_NAAI'],
+#                    'CMAQNAME' :    ['ISOP',   'SO2',   'NO',   'CO',    'NO2',  'NH3',    'AOTHRI', 'AOTHRJ',  'AECI',  'AECJ',  'APOCI',  'APOCJ',  'ASO4I',  'ASO4J',  'ANO3I',  'ANO3J',  'ANAJ',   'ANAI'],
+#                    'isAerosol':    [False,     False,   False,   False, False,   False,    True,    True,      True,    True,    True,      True,    True,     True,      True,    True,     True,     True]}
+# organicsTable = {'fraction': [0.8, 3., 5.2, 4.7, 1.6, 1.6, 3.8, 1.6, 2.4, 18.2, 4.05, 4.05, 4.9, 3.6],
+#                  'molwgt': [44. , 78. , 28. , 30. , 46. , 30. , 48. , 32. , 27. , 14. , 204., 136., 92. , 106.],
+#                  'CMAQNAME': ['ALDX', 'BENZENE', 'ETH', 'ETHA', 'ETOH', 'FORM', 'IOLE', 'MEOH', 'OLE', 'PAR', 'TERP', 'TOL', 'XYL']}
+# organicsTable['fraction'] = numpy.array(organicsTable['fraction'])
+# organicsTable['molwgt']   = numpy.array(organicsTable['molwgt'])
+# ## account for the fact that the percentages only add up to about 60%
+# organicsTable['fraction'] = organicsTable['fraction']/(organicsTable['fraction'].sum())
+# ## normalise by molecular weight
+# #                                   [g/g]                   [g/mole]                 [g/g]                   [g/mole]                
+# #                                                [mole/g]                                    [mole/g]                
+# organicsTable['fraction'] = (organicsTable['fraction']/organicsTable['molwgt'])/( (organicsTable['fraction']/organicsTable['molwgt']).sum() )
+# ##   [mole/moles] [moles/hr/km2]
+# ##   fraction    * molar_emissions
+# WRF_CHEM_VOC_spec = ['E_HC3', 'E_HC5', 'E_HC8', 'E_XYL', 'E_OL2', 'E_OLT', 'E_OLI', 'E_CSL', 'E_ALD', 'E_KET', 'E_ORA2', 'E_ETH', 'E_TOL', 'E_HCHO']
+# otherAE = ['PSO4', 'PNO3', 'PCL', 'PNH4', 'PNA', 'PMG', 'PK', 'PCA', 'POC', 'PNCOM', 'PEC', 'PFE', 'PAL', 'PSI', 'PTI', 'PMN', 'PH2O', 'PMOTHR', 'PMC']
+# otherGC = ['HONO', 'ALD2', 'SULF', 'CL2', 'HCL', 'SESQ']
+#
+# for i in range(len(conversionTable['WRFCHEMNAME'])):
+#   print "{} ; {} ; - ; - ; {} ; False ; ".format(conversionTable['WRFCHEMNAME'][i], conversionTable['CMAQNAME'][i], conversionTable['isAerosol'][i])
+#
+# for i in range(len(organicsTable['CMAQNAME'])):
+#   print " - ; {} ; {} ; {} ; False ; True ; ".format(organicsTable['CMAQNAME'][i], organicsTable['fraction'][i], organicsTable['molwgt'][i])
+#  
+# for i in range(len(WRF_CHEM_VOC_spec)):
+#   print "{} ; - ; - ; - ; False ; True ; ".format(WRF_CHEM_VOC_spec[i])
+#  
+# for i in range(len(otherAE)):
+#   print "{} ; {} ; - ; - ; True ; False ;  ".format('-', otherAE[i])
+#
+# for i in range(len(otherGC)):
+#   print "{} ; {} ; - ; - ; False ; False ;  ".format('-', otherGC[i])
+#  
+WRFCHEMNAME ; CMAQNAME ; fraction ; molwgt ; isAerosol ; isVOC ; comments
+E_ISO ; ISOP ; - ; - ; False ; False ; 
+E_SO2 ; SO2 ; - ; - ; False ; False ; 
+E_NO ; NO ; - ; - ; False ; False ; 
+E_CO ; CO ; - ; - ; False ; False ; 
+E_NO2 ; NO2 ; - ; - ; False ; False ; 
+E_NH3 ; NH3 ; - ; - ; False ; False ; 
+E_PM25I ; AOTHRI ; - ; - ; True ; False ; 
+E_PM25J ; AOTHRJ ; - ; - ; True ; False ; 
+E_ECI ; AECI ; - ; - ; True ; False ; 
+E_ECJ ; AECJ ; - ; - ; True ; False ; 
+E_ORGI ; APOCI ; - ; - ; True ; False ; 
+E_ORGJ ; APOCJ ; - ; - ; True ; False ; 
+E_SO4I ; ASO4I ; - ; - ; True ; False ; 
+E_SO4J ; ASO4J ; - ; - ; True ; False ; 
+E_NO3I ; ANO3I ; - ; - ; True ; False ; 
+E_NO3J ; ANO3J ; - ; - ; True ; False ; 
+E_NAAJ ; ANAJ ; - ; - ; True ; False ; 
+E_NAAI ; ANAI ; - ; - ; True ; False ; 
+ - ; ALDX ; 0.00848804052404 ; 44.0 ; False ; True ; 
+ - ; BENZENE ; 0.0179554703393 ; 78.0 ; False ; True ; 
+ - ; ETH ; 0.086699271067 ; 28.0 ; False ; True ; 
+ - ; ETHA ; 0.0731386158488 ; 30.0 ; False ; True ; 
+ - ; ETOH ; 0.0162379905677 ; 46.0 ; False ; True ; 
+ - ; FORM ; 0.0248982522039 ; 30.0 ; False ; True ; 
+ - ; IOLE ; 0.0369583431151 ; 48.0 ; False ; True ; 
+ - ; MEOH ; 0.0233421114411 ; 32.0 ; False ; True ; 
+ - ; OLE ; 0.0414970870064 ; 27.0 ; False ; True ; 
+ - ; PAR ; 0.606894897469 ; 14.0 ; False ; True ; 
+ - ; TERP ; 0.0092681913075 ; 204.0 ; False ; True ; 
+ - ; TOL ; 0.0139022869613 ; 136.0 ; False ; True ; 
+ - ; XYL ; 0.0248644230568 ; 92.0 ; False ; True ; 
+E_HC3 ; - ; - ; - ; False ; True ; 
+E_HC5 ; - ; - ; - ; False ; True ; 
+E_HC8 ; - ; - ; - ; False ; True ; 
+E_XYL ; - ; - ; - ; False ; True ; 
+E_OL2 ; - ; - ; - ; False ; True ; 
+E_OLT ; - ; - ; - ; False ; True ; 
+E_OLI ; - ; - ; - ; False ; True ; 
+E_CSL ; - ; - ; - ; False ; True ; 
+E_ALD ; - ; - ; - ; False ; True ; 
+E_KET ; - ; - ; - ; False ; True ; 
+E_ORA2 ; - ; - ; - ; False ; True ; 
+E_ETH ; - ; - ; - ; False ; True ; 
+E_TOL ; - ; - ; - ; False ; True ; 
+E_HCHO ; - ; - ; - ; False ; True ; 
+- ; PSO4 ; - ; - ; True ; False ;  
+- ; PNO3 ; - ; - ; True ; False ;  
+- ; PCL ; - ; - ; True ; False ;  
+- ; PNH4 ; - ; - ; True ; False ;  
+- ; PNA ; - ; - ; True ; False ;  
+- ; PMG ; - ; - ; True ; False ;  
+- ; PK ; - ; - ; True ; False ;  
+- ; PCA ; - ; - ; True ; False ;  
+- ; POC ; - ; - ; True ; False ;  
+- ; PNCOM ; - ; - ; True ; False ;  
+- ; PEC ; - ; - ; True ; False ;  
+- ; PFE ; - ; - ; True ; False ;  
+- ; PAL ; - ; - ; True ; False ;  
+- ; PSI ; - ; - ; True ; False ;  
+- ; PTI ; - ; - ; True ; False ;  
+- ; PMN ; - ; - ; True ; False ;  
+- ; PH2O ; - ; - ; True ; False ;  
+- ; PMOTHR ; - ; - ; True ; False ;  
+- ; PMC ; - ; - ; True ; False ;  
+- ; HONO ; - ; - ; False ; False ;  
+- ; ALD2 ; - ; - ; False ; False ;  
+- ; SULF ; - ; - ; False ; False ;  
+- ; CL2 ; - ; - ; False ; False ;  
+- ; HCL ; - ; - ; False ; False ;  
+- ; SESQ ; - ; - ; False ; False ;  

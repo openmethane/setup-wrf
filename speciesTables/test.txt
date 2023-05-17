@@ -1,0 +1,761 @@
+netcdf WACCM_Australia {
+dimensions:
+	time = UNLIMITED ; // (21 currently)
+	lev = 88 ;
+	lat = 85 ;
+	lon = 81 ;
+	chars = 8 ;
+	ilev = 89 ;
+	nbnd = 2 ;
+variables:
+	float ALKNIT(time, lev, lat, lon) ;
+		ALKNIT:mdims = 1 ;
+		ALKNIT:units = "mol/mol" ;
+		ALKNIT:mixing_ratio = "dry" ;
+		ALKNIT:long_name = "ALKNIT concentration" ;
+	float AODVISdn(time, lat, lon) ;
+		AODVISdn:_FillValue = 1.e+36f ;
+		AODVISdn:missing_value = 1.e+36f ;
+		AODVISdn:long_name = "Aerosol optical depth 550 nm, day night" ;
+	float BCARY(time, lev, lat, lon) ;
+		BCARY:mdims = 1 ;
+		BCARY:units = "mol/mol" ;
+		BCARY:mixing_ratio = "dry" ;
+		BCARY:long_name = "BCARY concentration" ;
+	float BENZENE(time, lev, lat, lon) ;
+		BENZENE:mdims = 1 ;
+		BENZENE:units = "mol/mol" ;
+		BENZENE:mixing_ratio = "dry" ;
+		BENZENE:long_name = "BENZENE concentration" ;
+	float BIGALD(time, lev, lat, lon) ;
+		BIGALD:mdims = 1 ;
+		BIGALD:units = "mol/mol" ;
+		BIGALD:mixing_ratio = "dry" ;
+		BIGALD:long_name = "BIGALD concentration" ;
+	float BIGALD1(time, lev, lat, lon) ;
+		BIGALD1:mdims = 1 ;
+		BIGALD1:units = "mol/mol" ;
+		BIGALD1:mixing_ratio = "dry" ;
+		BIGALD1:long_name = "BIGALD1 concentration" ;
+	float BIGALD2(time, lev, lat, lon) ;
+		BIGALD2:mdims = 1 ;
+		BIGALD2:units = "mol/mol" ;
+		BIGALD2:mixing_ratio = "dry" ;
+		BIGALD2:long_name = "BIGALD2 concentration" ;
+	float BIGALD3(time, lev, lat, lon) ;
+		BIGALD3:mdims = 1 ;
+		BIGALD3:units = "mol/mol" ;
+		BIGALD3:mixing_ratio = "dry" ;
+		BIGALD3:long_name = "BIGALD3 concentration" ;
+	float BIGALD4(time, lev, lat, lon) ;
+		BIGALD4:mdims = 1 ;
+		BIGALD4:units = "mol/mol" ;
+		BIGALD4:mixing_ratio = "dry" ;
+		BIGALD4:long_name = "BIGALD4 concentration" ;
+	float BIGALK(time, lev, lat, lon) ;
+		BIGALK:mdims = 1 ;
+		BIGALK:units = "mol/mol" ;
+		BIGALK:mixing_ratio = "dry" ;
+		BIGALK:long_name = "BIGALK concentration" ;
+	float BIGENE(time, lev, lat, lon) ;
+		BIGENE:mdims = 1 ;
+		BIGENE:units = "mol/mol" ;
+		BIGENE:mixing_ratio = "dry" ;
+		BIGENE:long_name = "BIGENE concentration" ;
+	float C2H2(time, lev, lat, lon) ;
+		C2H2:mdims = 1 ;
+		C2H2:units = "mol/mol" ;
+		C2H2:mixing_ratio = "dry" ;
+		C2H2:long_name = "C2H2 concentration" ;
+	float C2H4(time, lev, lat, lon) ;
+		C2H4:mdims = 1 ;
+		C2H4:units = "mol/mol" ;
+		C2H4:mixing_ratio = "dry" ;
+		C2H4:long_name = "C2H4 concentration" ;
+	float C2H5OH(time, lev, lat, lon) ;
+		C2H5OH:mdims = 1 ;
+		C2H5OH:units = "mol/mol" ;
+		C2H5OH:mixing_ratio = "dry" ;
+		C2H5OH:long_name = "C2H5OH concentration" ;
+	float C2H6(time, lev, lat, lon) ;
+		C2H6:mdims = 1 ;
+		C2H6:units = "mol/mol" ;
+		C2H6:mixing_ratio = "dry" ;
+		C2H6:long_name = "C2H6 concentration" ;
+	float C3H6(time, lev, lat, lon) ;
+		C3H6:mdims = 1 ;
+		C3H6:units = "mol/mol" ;
+		C3H6:mixing_ratio = "dry" ;
+		C3H6:long_name = "C3H6 concentration" ;
+	float C3H8(time, lev, lat, lon) ;
+		C3H8:mdims = 1 ;
+		C3H8:units = "mol/mol" ;
+		C3H8:mixing_ratio = "dry" ;
+		C3H8:long_name = "C3H8 concentration" ;
+	float CH2O(time, lev, lat, lon) ;
+		CH2O:mdims = 1 ;
+		CH2O:units = "mol/mol" ;
+		CH2O:mixing_ratio = "dry" ;
+		CH2O:long_name = "CH2O concentration" ;
+	float CH3CHO(time, lev, lat, lon) ;
+		CH3CHO:mdims = 1 ;
+		CH3CHO:units = "mol/mol" ;
+		CH3CHO:mixing_ratio = "dry" ;
+		CH3CHO:long_name = "CH3CHO concentration" ;
+	float CH3CN(time, lev, lat, lon) ;
+		CH3CN:mdims = 1 ;
+		CH3CN:units = "mol/mol" ;
+		CH3CN:mixing_ratio = "dry" ;
+		CH3CN:long_name = "CH3CN concentration" ;
+	float CH3COCH3(time, lev, lat, lon) ;
+		CH3COCH3:mdims = 1 ;
+		CH3COCH3:units = "mol/mol" ;
+		CH3COCH3:mixing_ratio = "dry" ;
+		CH3COCH3:long_name = "CH3COCH3 concentration" ;
+	float CH3COCHO(time, lev, lat, lon) ;
+		CH3COCHO:mdims = 1 ;
+		CH3COCHO:units = "mol/mol" ;
+		CH3COCHO:mixing_ratio = "dry" ;
+		CH3COCHO:long_name = "CH3COCHO concentration" ;
+	float CH3COOH(time, lev, lat, lon) ;
+		CH3COOH:mdims = 1 ;
+		CH3COOH:units = "mol/mol" ;
+		CH3COOH:mixing_ratio = "dry" ;
+		CH3COOH:long_name = "CH3COOH concentration" ;
+	float CH3OH(time, lev, lat, lon) ;
+		CH3OH:mdims = 1 ;
+		CH3OH:units = "mol/mol" ;
+		CH3OH:mixing_ratio = "dry" ;
+		CH3OH:long_name = "CH3OH concentration" ;
+	float CH3OOH(time, lev, lat, lon) ;
+		CH3OOH:mdims = 1 ;
+		CH3OOH:units = "mol/mol" ;
+		CH3OOH:mixing_ratio = "dry" ;
+		CH3OOH:long_name = "CH3OOH concentration" ;
+	float CH4(time, lev, lat, lon) ;
+		CH4:mdims = 1 ;
+		CH4:units = "mol/mol" ;
+		CH4:mixing_ratio = "dry" ;
+		CH4:long_name = "CH4 concentration" ;
+	float CHBR3(time, lev, lat, lon) ;
+		CHBR3:mdims = 1 ;
+		CHBR3:units = "mol/mol" ;
+		CHBR3:mixing_ratio = "dry" ;
+		CHBR3:long_name = "CHBR3 concentration" ;
+	float CO(time, lev, lat, lon) ;
+		CO:mdims = 1 ;
+		CO:units = "mol/mol" ;
+		CO:mixing_ratio = "dry" ;
+		CO:long_name = "CO concentration" ;
+	float CO01(time, lev, lat, lon) ;
+		CO01:mdims = 1 ;
+		CO01:units = "mol/mol" ;
+		CO01:mixing_ratio = "dry" ;
+		CO01:long_name = "CO01 concentration" ;
+	float CO02(time, lev, lat, lon) ;
+		CO02:mdims = 1 ;
+		CO02:units = "mol/mol" ;
+		CO02:mixing_ratio = "dry" ;
+		CO02:long_name = "CO02 concentration" ;
+	float CO03(time, lev, lat, lon) ;
+		CO03:mdims = 1 ;
+		CO03:units = "mol/mol" ;
+		CO03:mixing_ratio = "dry" ;
+		CO03:long_name = "CO03 concentration" ;
+	float CO04(time, lev, lat, lon) ;
+		CO04:mdims = 1 ;
+		CO04:units = "mol/mol" ;
+		CO04:mixing_ratio = "dry" ;
+		CO04:long_name = "CO04 concentration" ;
+	float CO05(time, lev, lat, lon) ;
+		CO05:mdims = 1 ;
+		CO05:units = "mol/mol" ;
+		CO05:mixing_ratio = "dry" ;
+		CO05:long_name = "CO05 concentration" ;
+	float CO06(time, lev, lat, lon) ;
+		CO06:mdims = 1 ;
+		CO06:units = "mol/mol" ;
+		CO06:mixing_ratio = "dry" ;
+		CO06:long_name = "CO06 concentration" ;
+	float CO07(time, lev, lat, lon) ;
+		CO07:mdims = 1 ;
+		CO07:units = "mol/mol" ;
+		CO07:mixing_ratio = "dry" ;
+		CO07:long_name = "CO07 concentration" ;
+	float CO08(time, lev, lat, lon) ;
+		CO08:mdims = 1 ;
+		CO08:units = "mol/mol" ;
+		CO08:mixing_ratio = "dry" ;
+		CO08:long_name = "CO08 concentration" ;
+	float CO09(time, lev, lat, lon) ;
+		CO09:mdims = 1 ;
+		CO09:units = "mol/mol" ;
+		CO09:mixing_ratio = "dry" ;
+		CO09:long_name = "CO09 concentration" ;
+	float CRESOL(time, lev, lat, lon) ;
+		CRESOL:mdims = 1 ;
+		CRESOL:units = "mol/mol" ;
+		CRESOL:mixing_ratio = "dry" ;
+		CRESOL:long_name = "CRESOL concentration" ;
+	float DMS(time, lev, lat, lon) ;
+		DMS:mdims = 1 ;
+		DMS:units = "mol/mol" ;
+		DMS:mixing_ratio = "dry" ;
+		DMS:long_name = "DMS concentration" ;
+	float GLYOXAL(time, lev, lat, lon) ;
+		GLYOXAL:mdims = 1 ;
+		GLYOXAL:units = "mol/mol" ;
+		GLYOXAL:mixing_ratio = "dry" ;
+		GLYOXAL:long_name = "GLYOXAL concentration" ;
+	float H2O(time, lev, lat, lon) ;
+		H2O:mdims = 1 ;
+		H2O:units = "mol/mol" ;
+		H2O:long_name = "water vapor concentration" ;
+	float H2O2(time, lev, lat, lon) ;
+		H2O2:mdims = 1 ;
+		H2O2:units = "mol/mol" ;
+		H2O2:mixing_ratio = "dry" ;
+		H2O2:long_name = "H2O2 concentration" ;
+	float HCN(time, lev, lat, lon) ;
+		HCN:mdims = 1 ;
+		HCN:units = "mol/mol" ;
+		HCN:mixing_ratio = "dry" ;
+		HCN:long_name = "HCN concentration" ;
+	float HCOOH(time, lev, lat, lon) ;
+		HCOOH:mdims = 1 ;
+		HCOOH:units = "mol/mol" ;
+		HCOOH:mixing_ratio = "dry" ;
+		HCOOH:long_name = "HCOOH concentration" ;
+	float HNO3(time, lev, lat, lon) ;
+		HNO3:mdims = 1 ;
+		HNO3:units = "mol/mol" ;
+		HNO3:mixing_ratio = "dry" ;
+		HNO3:long_name = "HNO3 concentration" ;
+	float HO2(time, lev, lat, lon) ;
+		HO2:mdims = 1 ;
+		HO2:units = "mol/mol" ;
+		HO2:long_name = "HO2 concentration" ;
+	float HO2NO2(time, lev, lat, lon) ;
+		HO2NO2:mdims = 1 ;
+		HO2NO2:units = "mol/mol" ;
+		HO2NO2:mixing_ratio = "dry" ;
+		HO2NO2:long_name = "HO2NO2 concentration" ;
+	float HONITR(time, lev, lat, lon) ;
+		HONITR:mdims = 1 ;
+		HONITR:units = "mol/mol" ;
+		HONITR:mixing_ratio = "dry" ;
+		HONITR:long_name = "HONITR concentration" ;
+	float HYAC(time, lev, lat, lon) ;
+		HYAC:mdims = 1 ;
+		HYAC:units = "mol/mol" ;
+		HYAC:mixing_ratio = "dry" ;
+		HYAC:long_name = "HYAC concentration" ;
+	float ISOP(time, lev, lat, lon) ;
+		ISOP:mdims = 1 ;
+		ISOP:units = "mol/mol" ;
+		ISOP:mixing_ratio = "dry" ;
+		ISOP:long_name = "ISOP concentration" ;
+	float ISOPNITA(time, lev, lat, lon) ;
+		ISOPNITA:mdims = 1 ;
+		ISOPNITA:units = "mol/mol" ;
+		ISOPNITA:mixing_ratio = "dry" ;
+		ISOPNITA:long_name = "ISOPNITA concentration" ;
+	float ISOPNITB(time, lev, lat, lon) ;
+		ISOPNITB:mdims = 1 ;
+		ISOPNITB:units = "mol/mol" ;
+		ISOPNITB:mixing_ratio = "dry" ;
+		ISOPNITB:long_name = "ISOPNITB concentration" ;
+	float MACR(time, lev, lat, lon) ;
+		MACR:mdims = 1 ;
+		MACR:units = "mol/mol" ;
+		MACR:mixing_ratio = "dry" ;
+		MACR:long_name = "MACR concentration" ;
+	float MEK(time, lev, lat, lon) ;
+		MEK:mdims = 1 ;
+		MEK:units = "mol/mol" ;
+		MEK:mixing_ratio = "dry" ;
+		MEK:long_name = "MEK concentration" ;
+	float MPAN(time, lev, lat, lon) ;
+		MPAN:mdims = 1 ;
+		MPAN:units = "mol/mol" ;
+		MPAN:mixing_ratio = "dry" ;
+		MPAN:long_name = "MPAN concentration" ;
+	float MTERP(time, lev, lat, lon) ;
+		MTERP:mdims = 1 ;
+		MTERP:units = "mol/mol" ;
+		MTERP:mixing_ratio = "dry" ;
+		MTERP:long_name = "MTERP concentration" ;
+	float MVK(time, lev, lat, lon) ;
+		MVK:mdims = 1 ;
+		MVK:units = "mol/mol" ;
+		MVK:mixing_ratio = "dry" ;
+		MVK:long_name = "MVK concentration" ;
+	float M_dens(time, lev, lat, lon) ;
+		M_dens:mdims = 1 ;
+		M_dens:units = "molecules/cm3" ;
+		M_dens:long_name = "invariant density" ;
+	float N2O(time, lev, lat, lon) ;
+		N2O:mdims = 1 ;
+		N2O:units = "mol/mol" ;
+		N2O:mixing_ratio = "dry" ;
+		N2O:long_name = "N2O concentration" ;
+	float N2O5(time, lev, lat, lon) ;
+		N2O5:mdims = 1 ;
+		N2O5:units = "mol/mol" ;
+		N2O5:mixing_ratio = "dry" ;
+		N2O5:long_name = "N2O5 concentration" ;
+	float NH3(time, lev, lat, lon) ;
+		NH3:mdims = 1 ;
+		NH3:units = "mol/mol" ;
+		NH3:mixing_ratio = "dry" ;
+		NH3:long_name = "NH3 concentration" ;
+	float NH4(time, lev, lat, lon) ;
+		NH4:mdims = 1 ;
+		NH4:units = "mol/mol" ;
+		NH4:mixing_ratio = "dry" ;
+		NH4:long_name = "NH4 concentration" ;
+	float NO(time, lev, lat, lon) ;
+		NO:mdims = 1 ;
+		NO:units = "mol/mol" ;
+		NO:mixing_ratio = "dry" ;
+		NO:long_name = "NO concentration" ;
+	float NO2(time, lev, lat, lon) ;
+		NO2:mdims = 1 ;
+		NO2:units = "mol/mol" ;
+		NO2:mixing_ratio = "dry" ;
+		NO2:long_name = "NO2 concentration" ;
+	float NO3(time, lev, lat, lon) ;
+		NO3:mdims = 1 ;
+		NO3:units = "mol/mol" ;
+		NO3:mixing_ratio = "dry" ;
+		NO3:long_name = "NO3 concentration" ;
+	float NOA(time, lev, lat, lon) ;
+		NOA:mdims = 1 ;
+		NOA:units = "mol/mol" ;
+		NOA:mixing_ratio = "dry" ;
+		NOA:long_name = "NOA concentration" ;
+	float O3(time, lev, lat, lon) ;
+		O3:mdims = 1 ;
+		O3:units = "mol/mol" ;
+		O3:mixing_ratio = "dry" ;
+		O3:long_name = "O3 concentration" ;
+	float O3S(time, lev, lat, lon) ;
+		O3S:mdims = 1 ;
+		O3S:units = "mol/mol" ;
+		O3S:mixing_ratio = "dry" ;
+		O3S:long_name = "O3S concentration" ;
+	float OH(time, lev, lat, lon) ;
+		OH:mdims = 1 ;
+		OH:units = "mol/mol" ;
+		OH:long_name = "OH concentration" ;
+	float ONITR(time, lev, lat, lon) ;
+		ONITR:mdims = 1 ;
+		ONITR:units = "mol/mol" ;
+		ONITR:mixing_ratio = "dry" ;
+		ONITR:long_name = "ONITR concentration" ;
+	double P0 ;
+		P0:long_name = "reference pressure" ;
+		P0:units = "Pa" ;
+	float PAN(time, lev, lat, lon) ;
+		PAN:mdims = 1 ;
+		PAN:units = "mol/mol" ;
+		PAN:mixing_ratio = "dry" ;
+		PAN:long_name = "PAN concentration" ;
+	float PBZNIT(time, lev, lat, lon) ;
+		PBZNIT:mdims = 1 ;
+		PBZNIT:units = "mol/mol" ;
+		PBZNIT:mixing_ratio = "dry" ;
+		PBZNIT:long_name = "PBZNIT concentration" ;
+	float PHENOL(time, lev, lat, lon) ;
+		PHENOL:mdims = 1 ;
+		PHENOL:units = "mol/mol" ;
+		PHENOL:mixing_ratio = "dry" ;
+		PHENOL:long_name = "PHENOL concentration" ;
+	float PM25(time, lev, lat, lon) ;
+		PM25:mdims = 1 ;
+		PM25:units = "kg/m3" ;
+		PM25:long_name = "PM2.5 concentration" ;
+	float PM25_SRF(time, lat, lon) ;
+		PM25_SRF:units = "kg/m3" ;
+		PM25_SRF:long_name = "surface PM2.5 concentration" ;
+	float PS(time, lat, lon) ;
+		PS:units = "Pa" ;
+		PS:long_name = "Surface pressure" ;
+	float Q(time, lev, lat, lon) ;
+		Q:mdims = 1 ;
+		Q:units = "kg/kg" ;
+		Q:mixing_ratio = "wet" ;
+		Q:long_name = "Specific humidity" ;
+	float SO2(time, lev, lat, lon) ;
+		SO2:mdims = 1 ;
+		SO2:units = "mol/mol" ;
+		SO2:mixing_ratio = "dry" ;
+		SO2:long_name = "SO2 concentration" ;
+	float T(time, lev, lat, lon) ;
+		T:mdims = 1 ;
+		T:units = "K" ;
+		T:long_name = "Temperature" ;
+	float TERPNIT(time, lev, lat, lon) ;
+		TERPNIT:mdims = 1 ;
+		TERPNIT:units = "mol/mol" ;
+		TERPNIT:mixing_ratio = "dry" ;
+		TERPNIT:long_name = "TERPNIT concentration" ;
+	float TOLUENE(time, lev, lat, lon) ;
+		TOLUENE:mdims = 1 ;
+		TOLUENE:units = "mol/mol" ;
+		TOLUENE:mixing_ratio = "dry" ;
+		TOLUENE:long_name = "TOLUENE concentration" ;
+	float TROP_P(time, lat, lon) ;
+		TROP_P:_FillValue = 1.e+36f ;
+		TROP_P:missing_value = 1.e+36f ;
+		TROP_P:units = "Pa" ;
+		TROP_P:long_name = "Tropopause Pressure" ;
+	float U(time, lev, lat, lon) ;
+		U:mdims = 1 ;
+		U:units = "m/s" ;
+		U:long_name = "Zonal wind" ;
+	float V(time, lev, lat, lon) ;
+		V:mdims = 1 ;
+		V:units = "m/s" ;
+		V:long_name = "Meridional wind" ;
+	float XYLENES(time, lev, lat, lon) ;
+		XYLENES:mdims = 1 ;
+		XYLENES:units = "mol/mol" ;
+		XYLENES:mixing_ratio = "dry" ;
+		XYLENES:long_name = "XYLENES concentration" ;
+	float Z3(time, lev, lat, lon) ;
+		Z3:mdims = 1 ;
+		Z3:units = "m" ;
+		Z3:long_name = "Geopotential Height (above sea level)" ;
+	double ap(time) ;
+		ap:long_name = "Daily planetary A geomagnetic index" ;
+	float bc_a1(time, lev, lat, lon) ;
+		bc_a1:mdims = 1 ;
+		bc_a1:units = "kg/kg" ;
+		bc_a1:mixing_ratio = "dry" ;
+		bc_a1:long_name = "bc_a1 concentration" ;
+	float bc_a4(time, lev, lat, lon) ;
+		bc_a4:mdims = 1 ;
+		bc_a4:units = "kg/kg" ;
+		bc_a4:mixing_ratio = "dry" ;
+		bc_a4:long_name = "bc_a4 concentration" ;
+	double ch4vmr(time) ;
+		ch4vmr:long_name = "ch4 volume mixing ratio" ;
+	double co2vmr(time) ;
+		co2vmr:long_name = "co2 volume mixing ratio" ;
+	int date(time) ;
+		date:long_name = "current date (YYYYMMDD)" ;
+	char date_written(time, chars) ;
+	int datesec(time) ;
+		datesec:long_name = "current seconds of current date" ;
+	float dst_a1(time, lev, lat, lon) ;
+		dst_a1:mdims = 1 ;
+		dst_a1:units = "kg/kg" ;
+		dst_a1:mixing_ratio = "dry" ;
+		dst_a1:long_name = "dst_a1 concentration" ;
+	float dst_a2(time, lev, lat, lon) ;
+		dst_a2:mdims = 1 ;
+		dst_a2:units = "kg/kg" ;
+		dst_a2:mixing_ratio = "dry" ;
+		dst_a2:long_name = "dst_a2 concentration" ;
+	float dst_a3(time, lev, lat, lon) ;
+		dst_a3:mdims = 1 ;
+		dst_a3:units = "kg/kg" ;
+		dst_a3:mixing_ratio = "dry" ;
+		dst_a3:long_name = "dst_a3 concentration" ;
+	double f107(time) ;
+		f107:long_name = "10.7 cm solar radio flux (F10.7)" ;
+		f107:units = "10^-22 W m^-2 Hz^-1" ;
+	double f107a(time) ;
+		f107a:long_name = "81-day centered mean of 10.7 cm solar radio flux (F10.7)" ;
+	double f107p(time) ;
+		f107p:long_name = "Pervious day 10.7 cm solar radio flux (F10.7)" ;
+	double f11vmr(time) ;
+		f11vmr:long_name = "f11 volume mixing ratio" ;
+	double f12vmr(time) ;
+		f12vmr:long_name = "f12 volume mixing ratio" ;
+	double gw(lat) ;
+		gw:_FillValue = -900. ;
+		gw:long_name = "latitude weights" ;
+	double hyai(ilev) ;
+		hyai:long_name = "hybrid A coefficient at layer interfaces" ;
+	double hyam(lev) ;
+		hyam:long_name = "hybrid A coefficient at layer midpoints" ;
+	double hybi(ilev) ;
+		hybi:long_name = "hybrid B coefficient at layer interfaces" ;
+	double hybm(lev) ;
+		hybm:long_name = "hybrid B coefficient at layer midpoints" ;
+	double ilev(ilev) ;
+		ilev:long_name = "hybrid level at interfaces (1000*(A+B))" ;
+		ilev:units = "hPa" ;
+		ilev:positive = "down" ;
+		ilev:standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+		ilev:formula_terms = "a: hyai b: hybi p0: P0 ps: PS" ;
+	double kp(time) ;
+		kp:long_name = "Daily planetary K geomagnetic index" ;
+	double lat(lat) ;
+		lat:_FillValue = -900. ;
+		lat:long_name = "latitude" ;
+		lat:units = "degrees_north" ;
+	double lev(lev) ;
+		lev:long_name = "hybrid level at midpoints (1000*(A+B))" ;
+		lev:units = "hPa" ;
+		lev:positive = "down" ;
+		lev:standard_name = "atmosphere_hybrid_sigma_pressure_coordinate" ;
+		lev:formula_terms = "a: hyam b: hybm p0: P0 ps: PS" ;
+	double lon(lon) ;
+		lon:_FillValue = -900. ;
+		lon:long_name = "longitude" ;
+		lon:units = "degrees_east" ;
+	int mdt ;
+		mdt:long_name = "timestep" ;
+		mdt:units = "s" ;
+	double n2ovmr(time) ;
+		n2ovmr:long_name = "n2o volume mixing ratio" ;
+	int nbdate ;
+		nbdate:long_name = "base date (YYYYMMDD)" ;
+	int nbsec ;
+		nbsec:long_name = "seconds of base date" ;
+	float ncl_a1(time, lev, lat, lon) ;
+		ncl_a1:mdims = 1 ;
+		ncl_a1:units = "kg/kg" ;
+		ncl_a1:mixing_ratio = "dry" ;
+		ncl_a1:long_name = "ncl_a1 concentration" ;
+	float ncl_a2(time, lev, lat, lon) ;
+		ncl_a2:mdims = 1 ;
+		ncl_a2:units = "kg/kg" ;
+		ncl_a2:mixing_ratio = "dry" ;
+		ncl_a2:long_name = "ncl_a2 concentration" ;
+	float ncl_a3(time, lev, lat, lon) ;
+		ncl_a3:mdims = 1 ;
+		ncl_a3:units = "kg/kg" ;
+		ncl_a3:mixing_ratio = "dry" ;
+		ncl_a3:long_name = "ncl_a3 concentration" ;
+	int ndbase ;
+		ndbase:long_name = "base day" ;
+	int ndcur(time) ;
+		ndcur:long_name = "current day (from base day)" ;
+	int nsbase ;
+		nsbase:long_name = "seconds of base day" ;
+	int nscur(time) ;
+		nscur:long_name = "current seconds of current day" ;
+	int nsteph(time) ;
+		nsteph:long_name = "current timestep" ;
+	float num_a1(time, lev, lat, lon) ;
+		num_a1:mdims = 1 ;
+		num_a1:units = " 1/kg" ;
+		num_a1:mixing_ratio = "dry" ;
+		num_a1:long_name = "num_a1 concentration" ;
+	float num_a2(time, lev, lat, lon) ;
+		num_a2:mdims = 1 ;
+		num_a2:units = " 1/kg" ;
+		num_a2:mixing_ratio = "dry" ;
+		num_a2:long_name = "num_a2 concentration" ;
+	float num_a3(time, lev, lat, lon) ;
+		num_a3:mdims = 1 ;
+		num_a3:units = " 1/kg" ;
+		num_a3:mixing_ratio = "dry" ;
+		num_a3:long_name = "num_a3 concentration" ;
+	float pom_a1(time, lev, lat, lon) ;
+		pom_a1:mdims = 1 ;
+		pom_a1:units = "kg/kg" ;
+		pom_a1:mixing_ratio = "dry" ;
+		pom_a1:long_name = "pom_a1 concentration" ;
+	float pom_a4(time, lev, lat, lon) ;
+		pom_a4:mdims = 1 ;
+		pom_a4:units = "kg/kg" ;
+		pom_a4:mixing_ratio = "dry" ;
+		pom_a4:long_name = "pom_a4 concentration" ;
+	float so4_a1(time, lev, lat, lon) ;
+		so4_a1:mdims = 1 ;
+		so4_a1:units = "kg/kg" ;
+		so4_a1:mixing_ratio = "dry" ;
+		so4_a1:long_name = "so4_a1 concentration" ;
+	float so4_a2(time, lev, lat, lon) ;
+		so4_a2:mdims = 1 ;
+		so4_a2:units = "kg/kg" ;
+		so4_a2:mixing_ratio = "dry" ;
+		so4_a2:long_name = "so4_a2 concentration" ;
+	float so4_a3(time, lev, lat, lon) ;
+		so4_a3:mdims = 1 ;
+		so4_a3:units = "kg/kg" ;
+		so4_a3:mixing_ratio = "dry" ;
+		so4_a3:long_name = "so4_a3 concentration" ;
+	float soa1_a1(time, lev, lat, lon) ;
+		soa1_a1:mdims = 1 ;
+		soa1_a1:units = "kg/kg" ;
+		soa1_a1:mixing_ratio = "dry" ;
+		soa1_a1:long_name = "soa1_a1 concentration" ;
+	float soa1_a2(time, lev, lat, lon) ;
+		soa1_a2:mdims = 1 ;
+		soa1_a2:units = "kg/kg" ;
+		soa1_a2:mixing_ratio = "dry" ;
+		soa1_a2:long_name = "soa1_a2 concentration" ;
+	float soa2_a1(time, lev, lat, lon) ;
+		soa2_a1:mdims = 1 ;
+		soa2_a1:units = "kg/kg" ;
+		soa2_a1:mixing_ratio = "dry" ;
+		soa2_a1:long_name = "soa2_a1 concentration" ;
+	float soa2_a2(time, lev, lat, lon) ;
+		soa2_a2:mdims = 1 ;
+		soa2_a2:units = "kg/kg" ;
+		soa2_a2:mixing_ratio = "dry" ;
+		soa2_a2:long_name = "soa2_a2 concentration" ;
+	float soa3_a1(time, lev, lat, lon) ;
+		soa3_a1:mdims = 1 ;
+		soa3_a1:units = "kg/kg" ;
+		soa3_a1:mixing_ratio = "dry" ;
+		soa3_a1:long_name = "soa3_a1 concentration" ;
+	float soa3_a2(time, lev, lat, lon) ;
+		soa3_a2:mdims = 1 ;
+		soa3_a2:units = "kg/kg" ;
+		soa3_a2:mixing_ratio = "dry" ;
+		soa3_a2:long_name = "soa3_a2 concentration" ;
+	float soa4_a1(time, lev, lat, lon) ;
+		soa4_a1:mdims = 1 ;
+		soa4_a1:units = "kg/kg" ;
+		soa4_a1:mixing_ratio = "dry" ;
+		soa4_a1:long_name = "soa4_a1 concentration" ;
+	float soa4_a2(time, lev, lat, lon) ;
+		soa4_a2:mdims = 1 ;
+		soa4_a2:units = "kg/kg" ;
+		soa4_a2:mixing_ratio = "dry" ;
+		soa4_a2:long_name = "soa4_a2 concentration" ;
+	float soa5_a1(time, lev, lat, lon) ;
+		soa5_a1:mdims = 1 ;
+		soa5_a1:units = "kg/kg" ;
+		soa5_a1:mixing_ratio = "dry" ;
+		soa5_a1:long_name = "soa5_a1 concentration" ;
+	float soa5_a2(time, lev, lat, lon) ;
+		soa5_a2:mdims = 1 ;
+		soa5_a2:units = "kg/kg" ;
+		soa5_a2:mixing_ratio = "dry" ;
+		soa5_a2:long_name = "soa5_a2 concentration" ;
+	float soa_a1(time, lev, lat, lon) ;
+		soa_a1:mdims = 1 ;
+		soa_a1:units = "kg/kg" ;
+		soa_a1:long_name = "summation of species mass mixing ratios" ;
+	float soa_a2(time, lev, lat, lon) ;
+		soa_a2:mdims = 1 ;
+		soa_a2:units = "kg/kg" ;
+		soa_a2:long_name = "summation of species mass mixing ratios" ;
+	double sol_tsi(time) ;
+		sol_tsi:long_name = "total solar irradiance" ;
+		sol_tsi:units = "W/m2" ;
+	double time(time) ;
+		time:long_name = "time" ;
+		time:units = "days since 2021-06-01 00:00:00" ;
+		time:calendar = "gregorian" ;
+		time:bounds = "time_bnds" ;
+	double time_bnds(time, nbnd) ;
+		time_bnds:long_name = "time interval endpoints" ;
+	char time_written(time, chars) ;
+
+// global attributes:
+		:Conventions = "CF-1.0" ;
+		:source = "CAM" ;
+		:case = "f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001" ;
+		:logname = "shawnh" ;
+		:host = "r6i6n31" ;
+		:initial_file = "f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.i.2021-06-01-00000.nc" ;
+		:topography_file = "/glade/p/cesmdata/cseg/inputdata/atm/cam/met/MERRA2/0.9x1.25/fv_0.9x1.25_nc3000_Nsw042_Nrs008_Co060_Fi001_ZR_sgh30_24km_GRNL_MERRA2_c171218.nc" ;
+		:model_doi_url = "https://doi.org/10.5065/D67H1H0V" ;
+		:time_period_freq = "hour_6" ;
+		:history = "Wed Apr 27 07:20:49 2022: /usr/bin/ncrcat --ovr stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-01-00000.nc stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-02-00000.nc stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-03-00000.nc stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-04-00000.nc stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-05-00000.nc stage/561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-06-00000.nc stage/waccm-20220427071503788242.nc\n",
+			"Wed Apr 27 07:16:16 2022: ncks -d lat,-60.0,20.0 -d lon,90.0,190.0 /glade/collections/rda/data/ds313.6/6hourly/2021/f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-01-00000.nc 561505.subset.f.e22.beta02.FWSD.f09_f09_mg17.cesm2_2_beta02.forecast.001.cam.h3.2021-06-01-00000.nc" ;
+		:NCO = "netCDF Operators version 4.7.5 (Homepage = http://nco.sf.net, Code = http://github.com/nco/nco)" ;
+		:nco_openmp_thread_number = 1 ;
+data:
+
+ ilev = 4.50049997269275e-06, 7.42010008991656e-06, 1.22337002750328e-05, 
+    2.01700007806949e-05, 3.32545013748131e-05, 5.48274989853326e-05, 
+    9.03979966437873e-05, 0.000149040005226198, 0.000245720002567396, 
+    0.000405125007318929, 0.000667940014409396, 0.00110126495656004, 
+    0.00181564996637462, 0.00299349994747899, 0.00496299981023185, 
+    0.00815065141068771, 0.00999999974737875, 0.0199999994947575, 
+    0.0327000016113743, 0.0475850101793185, 0.0660000077914447, 
+    0.0893450196599588, 0.119702999654692, 0.15949500084389, 
+    0.211349004530348, 0.2785261021927, 0.365041109034792, 0.475806096801534, 
+    0.616779085248709, 0.795134110376239, 1.01944000925869, 1.30051001906395, 
+    1.65078998543322, 2.08497000858188, 2.62021110393107, 3.27643100172281, 
+    4.07657120376825, 5.04680117592216, 6.21680077165365, 7.61984195560217, 
+    9.29294154047966, 11.2768998369575, 13.6433998122811, 16.4570994675159, 
+    19.7915993630886, 23.7304102629423, 28.3678099513054, 33.8100083172321, 
+    40.175411850214, 47.6439110934734, 56.3879087567329, 66.6034072637558, 
+    78.5123109817505, 92.3657193779945, 108.663000166416, 127.837002277374, 
+    150.39299428463, 176.930003593008, 208.15203152597, 244.8750436306, 
+    288.08306157589, 337.500095367432, 375.000104308128, 412.500098347664, 
+    450.000107288361, 487.500101327896, 525.000110268593, 562.500104308128, 
+    600.000187754631, 637.500196695328, 675.000131130219, 700.000114738941, 
+    725.000083446503, 750.000096857548, 774.999834597111, 800.000235438347, 
+    820.000186562538, 835.000149905682, 850.000098347664, 864.999998360872, 
+    879.999898374081, 895.000018179417, 909.999817609787, 925.000028684735, 
+    940.000139176846, 954.999826848507, 969.999778550118, 985.000021220912, 
+    1000 ;
+
+ lat = -59.8429319371728, -58.9005235602094, -57.9581151832461, 
+    -57.0157068062827, -56.0732984293194, -55.130890052356, 
+    -54.1884816753927, -53.2460732984293, -52.303664921466, 
+    -51.3612565445026, -50.4188481675393, -49.4764397905759, 
+    -48.5340314136126, -47.5916230366492, -46.6492146596859, 
+    -45.7068062827225, -44.7643979057592, -43.8219895287958, 
+    -42.8795811518325, -41.9371727748691, -40.9947643979058, 
+    -40.0523560209424, -39.1099476439791, -38.1675392670157, 
+    -37.2251308900524, -36.282722513089, -35.3403141361257, 
+    -34.3979057591623, -33.455497382199, -32.5130890052356, 
+    -31.5706806282722, -30.6282722513089, -29.6858638743456, 
+    -28.7434554973822, -27.8010471204189, -26.8586387434555, 
+    -25.9162303664921, -24.9738219895288, -24.0314136125654, 
+    -23.0890052356021, -22.1465968586387, -21.2041884816754, 
+    -20.261780104712, -19.3193717277487, -18.3769633507853, -17.434554973822, 
+    -16.4921465968586, -15.5497382198953, -14.6073298429319, 
+    -13.6649214659686, -12.7225130890052, -11.7801047120419, 
+    -10.8376963350785, -9.89528795811519, -8.95287958115183, 
+    -8.01047120418848, -7.06806282722513, -6.12565445026178, 
+    -5.18324607329843, -4.24083769633508, -3.29842931937173, 
+    -2.35602094240838, -1.41361256544502, -0.471204188481678, 
+    0.471204188481678, 1.41361256544502, 2.35602094240838, 3.29842931937172, 
+    4.24083769633508, 5.18324607329843, 6.12565445026178, 7.06806282722513, 
+    8.01047120418848, 8.95287958115183, 9.89528795811518, 10.8376963350785, 
+    11.7801047120419, 12.7225130890052, 13.6649214659686, 14.6073298429319, 
+    15.5497382198953, 16.4921465968586, 17.434554973822, 18.3769633507853, 
+    19.3193717277487 ;
+
+ lev = 5.96030003130466e-06, 9.82690018247467e-06, 1.62018505278638e-05, 
+    2.6712251077754e-05, 4.40410001800728e-05, 7.261274781456e-05, 
+    0.000119719000934992, 0.000197380003896797, 0.000325422504943162, 
+    0.000536532510864163, 0.00088460248548472, 0.00145845746146733, 
+    0.00240457495692681, 0.00397824987885542, 0.00655682561045978, 
+    0.00907532557903323, 0.0149999996210681, 0.0263500005530659, 
+    0.0401425058953464, 0.0567925089853816, 0.0776725137257017, 
+    0.104524009657325, 0.139599000249291, 0.185422002687119, 
+    0.244937553361524, 0.321783605613746, 0.420423602918163, 
+    0.546292591025122, 0.705956597812474, 0.907287059817463, 
+    1.15997501416132, 1.47565000224859, 1.86787999700755, 2.35259055625647, 
+    2.94832105282694, 3.67650110274553, 4.5616861898452, 5.6318009737879, 
+    6.91832136362791, 8.45639174804091, 10.2849206887186, 12.4601498246193, 
+    15.0502496398985, 18.1243494153023, 21.7610048130155, 26.0491101071239, 
+    31.0889091342688, 36.9927100837231, 43.9096614718437, 52.0159099251032, 
+    61.4956580102444, 72.5578591227531, 85.4390151798725, 100.514359772205, 
+    118.250001221895, 139.114998281002, 163.661498938819, 192.541017559489, 
+    226.513537578285, 266.479052603245, 312.791578471661, 356.25009983778, 
+    393.750101327896, 431.250102818012, 468.750104308128, 506.250105798244, 
+    543.750107288361, 581.25014603138, 618.750192224979, 656.250163912773, 
+    687.50012293458, 712.500099092722, 737.500090152025, 762.499965727329, 
+    787.500035017729, 810.000211000443, 827.50016823411, 842.500124126673, 
+    857.500048354268, 872.499948367476, 887.499958276749, 902.499917894602, 
+    917.499923147261, 932.50008393079, 947.499983012676, 962.499802699313, 
+    977.499899885515, 992.500010610456 ;
+
+ lon = 90, 91.25, 92.5, 93.75, 95, 96.25, 97.5, 98.75, 100, 101.25, 102.5, 
+    103.75, 105, 106.25, 107.5, 108.75, 110, 111.25, 112.5, 113.75, 115, 
+    116.25, 117.5, 118.75, 120, 121.25, 122.5, 123.75, 125, 126.25, 127.5, 
+    128.75, 130, 131.25, 132.5, 133.75, 135, 136.25, 137.5, 138.75, 140, 
+    141.25, 142.5, 143.75, 145, 146.25, 147.5, 148.75, 150, 151.25, 152.5, 
+    153.75, 155, 156.25, 157.5, 158.75, 160, 161.25, 162.5, 163.75, 165, 
+    166.25, 167.5, 168.75, 170, 171.25, 172.5, 173.75, 175, 176.25, 177.5, 
+    178.75, 180, 181.25, 182.5, 183.75, 185, 186.25, 187.5, 188.75, 190 ;
+
+ time = 0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5, 2.75, 3, 3.25, 
+    3.5, 3.75, 4, 4.25, 4.5, 4.75, 5 ;
+}

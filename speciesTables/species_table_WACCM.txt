@@ -1,0 +1,3 @@
+WACCM variable  ; Description ; CMAQ variable; coef
+CH4; Methane; CH4; 1.0
+

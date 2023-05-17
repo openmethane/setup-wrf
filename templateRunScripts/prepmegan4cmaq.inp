@@ -1,0 +1,16 @@
+&control
+domains = TEMPLATE,
+start_lai_mnth = 1,
+end_lai_mnth = 12,
+wrf_dir = TEMPLATE,
+megan_dir = TEMPLATE,
+out_dir = TEMPLATE,
+runname = TEMPLATE,
+/
+
+&windowdefs
+x0 = TEMPLATE,
+y0 = TEMPLATE,
+ncolsin = TEMPLATE,
+nrowsin = TEMPLATE,
+/
