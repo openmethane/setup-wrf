@@ -250,9 +250,9 @@ def main():
     ndomains = len(domains)
 
     ## create output destinations, if need be:
-    print "Check that input meteorology files are provided and create output destinations (if need be)"
+    print("Check that input meteorology files are provided and create output destinations (if need be)")
     mcipOuputFound = checkWrfMcipDomainSizes.checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains)
-    print "\t... done"
+    print("\t... done")
 
     if (not mcipOuputFound) or forceUpdateMcip:
         runMCIP.runMCIP(dates = dates, domains = domains, metDir = metDir, wrfDir = wrfDir, ## wrfDate = wrfDate, 
@@ -293,12 +293,12 @@ def main():
                                                        link = linkInsteadOfCopy)    
 
     ## check the latitudes and longitudes of the WRF and MCIP grids against one another
-    print "Check the latitudes and longitudes of the WRF and MCIP grids against one another"
+    print("Check the latitudes and longitudes of the WRF and MCIP grids against one another")
     nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, x0, y0, ncolsin, nrowsin = checkWrfMcipDomainSizes.checkWrfMcipDomainSizes(metDir = metDir, date = dates[0], domains = domains, wrfDir = wrfDir)
-    print "\t... done"
+    print("\t... done")
 
     if prepareEmis:
-        print "Prepare emissions"
+        print("Prepare emissions")
         ## prepare the jproc files
         prepareJprocFiles.prepareJprocFiles(dates = dates,scripts = scripts,ctmDir = ctmDir,CMAQdir = CMAQdir, photDir = photDir, mechCMAQ = mechCMAQ, forceUpdate = forceUpdateJproc)
         ## prepare surf zone files
@@ -367,7 +367,7 @@ def main():
 
     if prepareRunScripts:
         #print("gfcbcjucrhcnrcbrbcnrchnrchnrhcrhcnricrhncruicjnrdfic")
-        print "Prepare ICON, BCON and CCTM run scripts"
+        print("Prepare ICON, BCON and CCTM run scripts")
         ## prepare the scripts for CCTM
         configureRunScripts.prepareCctmRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, SZpath = ctmDir, nhours = nhoursPerRun, printFreqHours = printFreqHours, forceUpdate = forceUpdateRunScripts)      ## prepare the scripts for BCON
         configureRunScripts.prepareBconRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, forceUpdate = forceUpdateRunScripts)

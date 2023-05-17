@@ -30,13 +30,13 @@ def checkSurfZoneFilesExist(ctmDir, doms):
         the files expected were found.
     """
     
-    print "Check whether surf zone files exist..."
+    print("Check whether surf zone files exist...")
     filesExist = True
     for idom,dom in enumerate(doms):
         outfile = '{}/surfzone_{}.nc'.format(ctmDir,dom)
         if not os.path.exists(outfile):
             filesExist = False
-    print "\t... the result is {}".format(filesExist)
+    print("\t... the result is {}".format(filesExist))
     return filesExist
     
 def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
@@ -89,10 +89,10 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
                  'SDATE', 'STIME', 'TSTEP', 'NTHIK', 'NCOLS', 'NROWS', 'NLAYS', 'NVARS',
                  'GDTYP', 'P_ALP', 'P_BET', 'P_GAM', 'XCENT', 'YCENT', 'XORIG', 'YORIG',
                  'XCELL', 'YCELL', 'VGTYP', 'VGTOP', 'VGLVLS', 'GDNAM', 'UPNAM', 'VAR-LIST', 'FILEDESC']
-    unicodeType = type(u'foo')
+    unicodeType = type('foo')
     ##
     for idom,dom in enumerate(doms):
-        print dom
+        print(dom)
         croFile = '{}/{}/{}/GRIDCRO2D_{}'.format(metDir,yyyymmdd_dashed,dom,mcipsuffix[idom])
         dotFile = '{}/{}/{}/GRIDDOT2D_{}'.format(metDir,yyyymmdd_dashed,dom,mcipsuffix[idom])
         outfile = '{}/surfzone_{}.nc'.format(ctmDir,dom)
@@ -106,7 +106,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
         LOND = LOND.astype(float)
 
         
-        print "create domain boundary and expanded version"
+        print("create domain boundary and expanded version")
         # Define the domain boundary
         ring = ogr.Geometry(ogr.wkbLinearRing)
         ring.AddPoint(LOND[ 0, 0], LATD[ 0, 0])
@@ -130,7 +130,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
         ocean.AddGeometry(ring)
 
         ## create a connection to the shapefile
-        print "Read shapefile"
+        print("Read shapefile")
         driver = ogr.GetDriverByName("ESRI Shapefile")
         dataSource = driver.Open(shapefiles[idom], 0)
         layer = dataSource.GetLayer()
@@ -163,7 +163,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
                 if bufferZone.Intersect(domainBoundary):
                     intersectingGeoms.append(bufferZone)
 
-        print "Calculate OPEN and SURF"
+        print("Calculate OPEN and SURF")
         OPEN = numpy.zeros(LAT.shape,dtype = numpy.float32)
         SURF = numpy.zeros(LAT.shape,dtype = numpy.float32)
         ## loop over the grid cells in the domain
@@ -206,9 +206,9 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
                 SURF[i,j] = propsurf
                 OPEN[i,j] = propsea
 
-        print "Write to file"
+        print("Write to file")
         lens = {}
-        for k in nccro.dimensions.keys():
+        for k in list(nccro.dimensions.keys()):
             lens[k] = len(nccro.dimensions[k])
 
         nlay = 1
@@ -219,7 +219,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
         ncout = netCDF4.Dataset(outfile, 'w', format='NETCDF4')
         outdims = dict()
 
-        for k in ncdot.dimensions.keys():
+        for k in list(ncdot.dimensions.keys()):
             outdims[k] = ncout.createDimension(k, lens[k])
 
         simpleFields = dict(OPEN = 1.0e-30,
@@ -228,7 +228,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
         ## all IOAPI files require a TFLAG variable, even if they are static in time
         outvars = dict()
         outvars['TFLAG'] = ncout.createVariable('TFLAG', 'i4', ('TSTEP','VAR','DATE-TIME',))
-        for k in simpleFields.keys():
+        for k in list(simpleFields.keys()):
             outvars[k] = ncout.createVariable(k, 'f4', ('TSTEP', 'LAY', 'ROW', 'COL'), zlib = True, shuffle = False)
             outvars[k].setncattr('long_name',"{:<16}".format(k))
             outvars[k].setncattr('units',"{:<16}".format("UNKNOWN"))
@@ -249,7 +249,7 @@ def setupSurfZoneFiles(metDir, ctmDir, doms, date, mcipsuffix, shapefiles):
         outvars['TFLAG'].setncattr('units',"<YYYYDDD,HHMMSS>")
         outvars['TFLAG'].setncattr('var_desc',"Timestep-valid flags:  (1) YYYYDDD or (2) HHMMSS                                ")
         ## set variables required for IOAPI
-        VarString = "".join([ "{:<16}".format(k) for k in simpleFields.keys() ])
+        VarString = "".join([ "{:<16}".format(k) for k in list(simpleFields.keys()) ])
         ncout.setncattr('VAR-LIST',VarString)
         ncout.setncattr('NVARS',numpy.int32(len(simpleFields)))
         ncout.setncattr('HISTORY',"")

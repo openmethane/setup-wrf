@@ -62,9 +62,9 @@ def compressNCfile(filename,ppc = None):
     '''
     
     if os.path.exists(filename):
-        print "Compress file {} with ncks".format(filename)
+        print("Compress file {} with ncks".format(filename))
         command = 'ncks -4 -L4 -O {} {}'.format(filename, filename)
-        print '\t'+command
+        print('\t'+command)
         commandList = command.split(' ')
         if ppc is None:
             ppcText = ''
@@ -81,11 +81,11 @@ def compressNCfile(filename,ppc = None):
         p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if len(stderr) > 0 or len(stdout) > 0:
-            print "stdout = " + stdout
-            print "stderr = " + stderr
+            print("stdout = " + stdout)
+            print("stderr = " + stderr)
             raise RuntimeError("Error from ncks...")
     else:
-        print "File {} not found...".format(filename)
+        print("File {} not found...".format(filename))
 
 def loadScripts(Scripts):
     '''Read the contents (i.e. the lines of text) of a set of scripts into a dictionary
@@ -98,7 +98,7 @@ def loadScripts(Scripts):
     '''
     scripts = copy.copy(Scripts)
     ## for each of the scripts, read in the contents
-    for k in scripts.keys():
+    for k in list(scripts.keys()):
         ## check that the script is found
         if not os.path.exists(scripts[k]['path']):
             raise RuntimeError("Template run script {} not found at {} ... ".format(k,scripts[k]['path']))

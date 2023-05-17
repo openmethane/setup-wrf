@@ -42,7 +42,7 @@ def prepareJprocFiles(dates,scripts,ctmDir,CMAQdir,photDir,mechCMAQ,forceUpdate)
         Nothing
 
     '''
-    print "\tPrepare jproc files"
+    print("\tPrepare jproc files")
     for idate, date in enumerate(dates):
         yyyyjjj = date.strftime('%Y%j')
         yyyymmdd = date.strftime('%Y%m%d')
@@ -51,10 +51,10 @@ def prepareJprocFiles(dates,scripts,ctmDir,CMAQdir,photDir,mechCMAQ,forceUpdate)
         ## check if the required JPROC file is present:
         outdir = '{}/{}'.format(ctmDir,yyyymmdd_dashed)
         JPROCoutput = '{}/JTABLE_{}'.format(outdir,yyyyjjj)
-        print "\t\tCheck that JPROC output is available for date = {}".format(yyyymmdd_dashed)
+        print("\t\tCheck that JPROC output is available for date = {}".format(yyyymmdd_dashed))
         if not os.path.exists(JPROCoutput) or forceUpdate:
             ## prepare the run script
-            print "\t\tPrepare JPROC run script for date = {}".format(yyyymmdd_dashed)
+            print("\t\tPrepare JPROC run script for date = {}".format(yyyymmdd_dashed))
             subsJproc = [['source TEMPLATE','source {}/scripts/config.cmaq'.format(CMAQdir)],
                          ['set BASE = TEMPLATE',    'set BASE = {}'.format(CMAQdir)],
                          ['set PHOTDIR = TEMPLATE', 'set PHOTDIR = {}'.format(photDir)],
@@ -66,14 +66,14 @@ def prepareJprocFiles(dates,scripts,ctmDir,CMAQdir,photDir,mechCMAQ,forceUpdate)
             outJprocFile = '{}/run.jproc'.format(outdir)
             helper_funcs.replace_and_write(scripts['jprocRun']['lines'], outJprocFile, subsJproc)
             ## run jproc
-            print "\t\tRun JPROC for date {}".format(yyyymmdd)
+            print("\t\tRun JPROC for date {}".format(yyyymmdd))
             os.chmod(outJprocFile,0o0744)
             process = subprocess.Popen(outJprocFile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (output, err) = process.communicate()
             exit_code = process.wait()
-            print outJprocFile
-            print err
-            print output
+            print(outJprocFile)
+            print(err)
+            print(output)
             #if exit_code != 0 or len(err) > 0:
              #   print err
               #  raise RuntimeError('Failure in JPROC')

@@ -32,7 +32,7 @@ def check_megan_input_files_exist(ctmDir, run, domains):
             megan_files_exist = False
             for ifile, exist in enumerate(exists):
                 if not exist:
-                    print "\t\tFile {} not found - will rerun MEGAN preparation scripts...".format(files[ifile])
+                    print("\t\tFile {} not found - will rerun MEGAN preparation scripts...".format(files[ifile]))
             ##
             break
     ##
@@ -63,7 +63,7 @@ def check_megan_daily_files_exist(ctmDir, domains, dates, run, GridNames, mechME
             exists = os.path.exists(outfile)
             if not exists:
                 megan_files_exist = False
-                print "File {} not found - will rerun MEGAN daily scripts...".format(outfile)
+                print("File {} not found - will rerun MEGAN daily scripts...".format(outfile))
                 ##
                 break
         ##
@@ -116,7 +116,7 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
     helper_funcs.replace_and_write(scripts['prepMegan4Cmaq']['lines'], outPrepFile, subsPrep)
 
     ## run the MEGAN preprocessing scripts
-    print "run prepmegan4cmaq_lai"
+    print("run prepmegan4cmaq_lai")
     
 
     foundAllOutputs = True
@@ -131,10 +131,10 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or len(err) > 0:
-            print " ".join(commandList)
-            print 'exit_code =',exit_code
-            print 'err',err
-            print 'output',output
+            print(" ".join(commandList))
+            print('exit_code =',exit_code)
+            print('err',err)
+            print('output',output)
             raise RuntimeError('failure in prepmegan4cmaq_lai.x')
 
     foundAllOutputs = True
@@ -144,16 +144,16 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
            foundAllOutputs = False
     ##
     if not foundAllOutputs:
-        print "run prepmegan4cmaq_pft"
+        print("run prepmegan4cmaq_pft")
         commandList = [prepdir + "/prepmegan4cmaq_pft.x", outPrepFile]
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or len(err) > 0:
-            print " ".join(commandList)
-            print 'exit_code =',exit_code
-            print 'err',err
-            print 'output',output
+            print(" ".join(commandList))
+            print('exit_code =',exit_code)
+            print('err',err)
+            print('output',output)
             raise RuntimeError('failure in prepmegan4cmaq_pft.x')
 
     foundAllOutputs = True
@@ -163,16 +163,16 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
            foundAllOutputs = False
     ##
     if not foundAllOutputs:
-        print "run prepmegan4cmaq_ef"
+        print("run prepmegan4cmaq_ef")
         commandList = [prepdir + "/prepmegan4cmaq_ef.x", outPrepFile]
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or len(err) > 0:
-            print " ".join(commandList)
-            print 'exit_code =',exit_code
-            print 'err',err
-            print 'output',output
+            print(" ".join(commandList))
+            print('exit_code =',exit_code)
+            print('err',err)
+            print('output',output)
             raise RuntimeError('failure in prepmegan4cmaq_ef.x')
 
     yyyymmdd = date.strftime('%Y%m%d')
@@ -200,19 +200,19 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
         helper_funcs.replace_and_write(scripts['megansetcase']['lines'], outSetcaseFile, subsMgn, strict = False, makeExecutable = True)
         helper_funcs.replace_and_write(scripts['txt2ioapi']['lines'], outTxt2ioapiFile, subsMgn, strict = False, makeExecutable = True)
         ## run the MEGAN preprocessing scripts
-        print "run txt2ioapi for domain",domain
+        print("run txt2ioapi for domain",domain)
         process = subprocess.Popen(outTxt2ioapiFile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or output.find('Normal Completion of program TXT2IOAPI') < 0 or len(err) > 0:
-            print outTxt2ioapiFile
-            print 'exit_code = ',exit_code
-            print 'err =',err
-            print 'output =', output
+            print(outTxt2ioapiFile)
+            print('exit_code = ',exit_code)
+            print('err =',err)
+            print('output =', output)
             raise RuntimeError('failure in txt2ioapi')
     ##
     ## compress inputs
-    print "compress the input files"
+    print("compress the input files")
     tar = tarfile.open("{}/csv_inputs.tar.gz".format(ctmDir), "w:gz")
     files = []
     for domain in domains:
@@ -228,7 +228,7 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
     for f in files:
         os.remove(f)
     ## compress outputs
-    print "compress the output files "
+    print("compress the output files ")
     process = subprocess.Popen(["/home/563/ns0890/runCMAQ/compress_netcdf.sh", ctmDir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (output, err) = process.communicate()
     exit_code = process.wait()
@@ -236,7 +236,7 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
         raise RuntimeError('failure in nc_compress')
     ## clean up the run scripts
     if removeScripts:
-        print "Clean up run scripts"
+        print("Clean up run scripts")
         outSetcaseFile = '{}/setcase.csh'.format(ctmDir)
         os.remove(outSetcaseFile)
         outPrepFile = '{}/prepmegan4cmaq_{}.inp'.format(ctmDir,run)
@@ -246,7 +246,7 @@ def make_megan_input_files(meganfolder, run, domains, x0, y0, ncolsin, nrowsin, 
             os.remove(outTxt2ioapiFile)
     ## clean up the log files (these can be relatively large)
     if removeTxt2ioapiLogs:
-        print "Clean up log files"
+        print("Clean up log files")
         logDir = '{}/txt2ioapi'.format(ctmDir)
         shutil.rmtree(logDir)
 
@@ -276,8 +276,8 @@ def make_megan_daily_outputs(meganfolder,metDir, run, domains, scripts, date, ct
     ##
     mechs = ['RADM2', 'RACM','CBMZ', 'CB05', 'CB6', 'SOAX', 'SAPRC99', 'SAPRC99Q', 'SAPRC99X']
     if not (mech in mechs):
-        print "mechanism chosen was {}".format(mech)
-        print "options for mechanisms are: {}".format(', '.join(mechs))
+        print("mechanism chosen was {}".format(mech))
+        print("options for mechanisms are: {}".format(', '.join(mechs)))
         raise RuntimeError('mechanism not in the list of mechanisms')
     ##
     yyyymmdd = date.strftime('%Y%m%d')
@@ -301,7 +301,7 @@ def make_megan_daily_outputs(meganfolder,metDir, run, domains, scripts, date, ct
             raise RuntimeError("{} file not found in folder {} ... ".format(filetype,mcipdir))
         ##
         mcipSuffix = matches[0].split('/')[-1].replace('{}_'.format(filetype),'')
-        print 'mcipSuffix = {}'.format(mcipSuffix)
+        print('mcipSuffix = {}'.format(mcipSuffix))
         ##
         subsMgn = [
             ## lines for setcase
@@ -330,7 +330,7 @@ def make_megan_daily_outputs(meganfolder,metDir, run, domains, scripts, date, ct
             ## for mgn2mech
             ['setenv MECHANISM TEMPLATE','setenv MECHANISM {}'.format(mech)]]
         ## prepare the MEGAN processing scripts
-        print "prepare the MEGAN processing scripts for date {} and domain {}".format(yyyymmdd, domain)
+        print("prepare the MEGAN processing scripts for date {} and domain {}".format(yyyymmdd, domain))
         helper_funcs.replace_and_write(scripts['megansetcase']['lines'], outSetcaseFile, subsMgn, strict = False, makeExecutable = True)
         helper_funcs.replace_and_write(scripts['met2mgn']['lines'], outMet2mgnFile, subsMgn, strict = False, makeExecutable = True)
         helper_funcs.replace_and_write(scripts['emproc']['lines'], outEmprocFile, subsMgn, strict = False, makeExecutable = True)
@@ -338,34 +338,34 @@ def make_megan_daily_outputs(meganfolder,metDir, run, domains, scripts, date, ct
 
         ## run the MEGAN preprocessing scripts
         ## the following need to be done for each day, and each domain
-        print "Run met2mgn for date {} and domain {}".format(yyyymmdd, domain)
+        print("Run met2mgn for date {} and domain {}".format(yyyymmdd, domain))
         process = subprocess.Popen(outMet2mgnFile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or output.find('Normal completion by met2mgn') < 0 or len(err) > 0:
-            print 'exit_code = ',exit_code
-            print 'err =',err
-            print 'output =', output
+            print('exit_code = ',exit_code)
+            print('err =',err)
+            print('output =', output)
             raise RuntimeError('failure in met2mgn')
 
-        print "Run emproc for date {} and domain {}".format(yyyymmdd, domain)
+        print("Run emproc for date {} and domain {}".format(yyyymmdd, domain))
         process = subprocess.Popen(outEmprocFile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or output.find('Normal Completion of program EMPROC') < 0:
-            print 'exit_code = ',exit_code
-            print 'err =',err
-            print 'output =', output
+            print('exit_code = ',exit_code)
+            print('err =',err)
+            print('output =', output)
             raise RuntimeError('failure in emproc')
 
-        print "Run mgn2mech for date {} and domain {}".format(yyyymmdd, domain)
+        print("Run mgn2mech for date {} and domain {}".format(yyyymmdd, domain))
         process = subprocess.Popen(outMgn2mechFile, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if exit_code != 0 or output.find('Normal Completion of program MGN2MECH') < 0 or len(err) > 0:
-            print 'exit_code = ',exit_code
-            print 'err =',err
-            print 'output =', output
+            print('exit_code = ',exit_code)
+            print('err =',err)
+            print('output =', output)
             raise RuntimeError('failure in mgn2mech')
         ##
     
@@ -406,7 +406,7 @@ def compressMeganOutputs(domains, GridNames, date, ctmDir, mechMEGAN):
     ## compress outputs
     yyyyjjj = date.strftime('%Y%j')
     yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-    print "Compress the output files "
+    print("Compress the output files ")
     prefixes = ['ER', 'MET.MEGAN']
     for domain, grid in zip(domains, GridNames):
         outdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domain)

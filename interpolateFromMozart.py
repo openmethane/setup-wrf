@@ -53,7 +53,7 @@ def extract_and_interpolate_interior(mzspec, ncin, lens, LON, Iz, iMZtime, isAer
     #
     out_interior = numpy.zeros((lens['LAY'], LON.shape[0], LON.shape[1]),dtype = numpy.float32)
     #
-    if mzspec in ncin.variables.keys():
+    if mzspec in list(ncin.variables.keys()):
         varin = ncin.variables[mzspec][iMZtime,:,:,:]
         #
         if isAerosol:
@@ -100,7 +100,7 @@ def extract_and_interpolate_boundary(mzspec, ncin, lens, LONP, Iz, iMZtime_for_e
     ntime = 1
     out_boundary = numpy.zeros((ntime,lens['LAY'],LONP.shape[0]),dtype = numpy.float32)
     #
-    if mzspec in ncin.variables.keys():
+    if mzspec in list(ncin.variables.keys()):
         varin = ncin.variables[mzspec][iMZtime,:,:,:]
         #
         if isAerosol:
@@ -161,7 +161,7 @@ def print_interior_variable(cmspec, out_interior, factor):
         Nothing
 
     '''
-    print "{:20} {:.3e}".format(cmspec, out_interior[0,:,:].mean()*factor)
+    print("{:20} {:.3e}".format(cmspec, out_interior[0,:,:].mean()*factor))
 
 def print_boundary_variable(cmspec, out_boundary, factor):
     '''Print the mean value of a boundary variable
@@ -175,7 +175,7 @@ def print_boundary_variable(cmspec, out_boundary, factor):
         Nothing
 
     '''
-    print "{:20} {:.3e}".format(cmspec, out_boundary[:,0,:].mean()*factor)
+    print("{:20} {:.3e}".format(cmspec, out_boundary[:,0,:].mean()*factor))
 
 
 def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, defaultSpec = 'O3'):
@@ -264,13 +264,13 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
     ncPR = netCDF4.Dataset(templateIconFiles[0], 'r', format='NETCDF4')
     PR_MZ = {}
     PR_AE = {}
-    for v in ncPR.variables.keys():
-        if ncPR.variables[v].units.strip() == u"ppmV":
+    for v in list(ncPR.variables.keys()):
+        if ncPR.variables[v].units.strip() == "ppmV":
             PR_MZ[v] = ncPR.variables[v][0,:,0,0]
-        elif ncPR.variables[v].units.strip() == u"micrograms/m**3":
+        elif ncPR.variables[v].units.strip() == "micrograms/m**3":
             PR_AE[v] = ncPR.variables[v][0,:,0,0]
 
-    PR_vars = PR_MZ.keys() + PR_AE.keys()
+    PR_vars = list(PR_MZ.keys()) + list(PR_AE.keys())
     ncPR.close()
 
     ALLSPEC = PR_vars + ALL_CM_SPEC
@@ -331,15 +331,15 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
                 if os.path.exists(outBCON):
                     os.remove(outBCON)
                 shutil.copyfile(templateBconFile,outBCON)
-                print "copy {} to {}".format(templateBconFile,outBCON)
+                print("copy {} to {}".format(templateBconFile,outBCON))
 
             if do_ICs:
                 if os.path.exists(outICON):
                     os.remove(outICON)
                 shutil.copyfile(templateIconFile,outICON)
-                print "copy {} to {}".format(templateIconFile,outICON)
+                print("copy {} to {}".format(templateIconFile,outICON))
 
-            print dotFile
+            print(dotFile)
             ncdot= netCDF4.Dataset(dotFile, 'r', format='NETCDF4')
             nccro= netCDF4.Dataset(croFile, 'r', format='NETCDF4')
             ncbdy= netCDF4.Dataset(bdyFile, 'r', format='NETCDF4')
@@ -348,19 +348,19 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
             ncin = netCDF4.Dataset(inputMozartFile, 'r', format='NETCDF4')
 
             if do_BCs:
-                print "write BCs to file: ",outBCON
+                print("write BCs to file: ",outBCON)
                 ncoutb=netCDF4.Dataset(outBCON, 'r+', format='NETCDF4')
-                all_vars = ncoutb.variables.keys()[1:]
+                all_vars = list(ncoutb.variables.keys())[1:]
                 nvars = len(all_vars)
 
             if do_ICs:
-                print "write ICs to file: ",outICON
+                print("write ICs to file: ",outICON)
                 ncouti=netCDF4.Dataset(outICON, 'r+', format='NETCDF4')
-                all_vars = ncoutb.variables.keys()[1:]
+                all_vars = list(ncoutb.variables.keys())[1:]
                 nvars = len(all_vars)
 
             lens = dict()
-            for k in nccro.dimensions.keys():
+            for k in list(nccro.dimensions.keys()):
                 lens[k] = len(nccro.dimensions[k])
 
             lens['PERIM'] = len(ncbdy.dimensions['PERIM'])
@@ -480,7 +480,7 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
             ## set the values to zero for species that we *WILL* interpolate to
             for spec in ALL_CM_SPEC:
                 if do_ICs:
-                    if not spec in ncouti.variables.keys():
+                    if not spec in list(ncouti.variables.keys()):
                         warnings.warn("Species {} was not found in template CMAQ IC file -- creating blank variable...".format(spec))
                         isnetcdf4 = (ncouti.data_model == 'NETCDF4')
                         ncouti.createVariable(varname = spec, datatype = 'f4', dimensions = ncouti.variables[defaultSpec].dimensions, zlib = isnetcdf4)
@@ -489,7 +489,7 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
                         ncouti.var_desc  = '{:80}'.format('Variable ' + spec)
                     ncouti.variables[spec][:] = 0.0
                 if do_BCs:
-                    if not spec in ncoutb.variables.keys():
+                    if not spec in list(ncoutb.variables.keys()):
                         warnings.warn("Species {} was not found in template CMAQ BC file -- creating blank variable...".format(spec))
                         isnetcdf4 = (ncoutb.data_model == 'NETCDF4')
                         ncoutb.createVariable(varname = spec, datatype = 'f4', dimensions = ncoutb.variables[defaultSpec].dimensions, zlib = isnetcdf4)

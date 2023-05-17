@@ -111,11 +111,11 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 os.mkdir(mcipDir)
 
     for idate, date in enumerate(dates):
-        print "date =",date
+        print("date =",date)
         yyyymmddhh = date.strftime('%Y%m%d%H')
         yyyymmdd_dashed = date.strftime('%Y-%m-%d')
         for idom, dom in enumerate(domains):
-            print '\tdom =',dom
+            print('\tdom =',dom)
             ##
             mcipDir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
             nextDate = date + datetime.timedelta(days = 1)
@@ -138,23 +138,23 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             
             if fix_simulation_start_date:
-                print "\t\tFix up SIMULATION_START_DATE attribute with ncatted"
+                print("\t\tFix up SIMULATION_START_DATE attribute with ncatted")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
                 for WRFfile in WRFfiles:
                     outPath = '{}/{}'.format(mcipDir,WRFfile)
                     command = 'ncatted -O -a SIMULATION_START_DATE,global,m,c,{} {} {}'.format(wrfstrttime,outPath,outPath)
-                    print '\t\t\t'+command
+                    print('\t\t\t'+command)
                     commandList = command.split(' ')        
                     ##
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print "stdout = " + stdout
-                        print "stderr = " + stderr
+                        print("stdout = " + stdout)
+                        print("stderr = " + stderr)
                         raise RuntimeError("Error from atted...")
 
             if add_qsnow:
-                print "\t\tAdd an artificial variable ('QSNOW') to the WRFOUT files"
+                print("\t\tAdd an artificial variable ('QSNOW') to the WRFOUT files")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
                 for WRFfile in WRFfiles:
                     outPath = '{}/{}'.format(mcipDir,WRFfile)
@@ -167,23 +167,23 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     
             ## print '2. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             if fix_truelat2 and (truelat2 != None):
-                print "\t\tFix up TRUELAT2 attribute with ncatted"
+                print("\t\tFix up TRUELAT2 attribute with ncatted")
                 for WRFfile in WRFfiles:
                     outPath = '{}/{}'.format(mcipDir,WRFfile)
                     command = 'ncatted -O -a TRUELAT2,global,m,f,{} {} {}'.format(truelat2,outPath,outPath)
-                    print '\t\t\t'+command
+                    print('\t\t\t'+command)
                     commandList = command.split(' ')        
                     ##
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print "stdout = " + stdout
-                        print "stderr = " + stderr
+                        print("stdout = " + stdout)
+                        print("stderr = " + stderr)
                         raise RuntimeError("Error from atted...")
             ## print '3. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
                     
             ##
-            print "\t\tCreate temporary run.mcip script"
+            print("\t\tCreate temporary run.mcip script")
             ## pdb.set_trace()
             #{}/{}'.format(wrfDir,date.strftime('%Y%m%d%H'))---by Sougol
             WRFfiles2 = ['{}/{}'.format(mcipDir,ff) for ff in WRFfiles ]
@@ -206,19 +206,19 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             ## print '4. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             command = tmpRunMcipPath
             commandList = command.split(' ')
-            print '\t\t\t'+command
+            print('\t\t\t'+command)
             ## delete any existing files
             for metfile in glob.glob("{}/MET*".format(mcipDir)):
-                print "rm",metfile
+                print("rm",metfile)
                 #os.remove(metfile)
 
             for gridfile in glob.glob("{}/GRID*".format(mcipDir)):
-                print "rm",gridfile
+                print("rm",gridfile)
                 #os.remove(gridfile)
 
             ## print '5. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             ##
-            print "\t\tRun temporary run.mcip script"
+            print("\t\tRun temporary run.mcip script")
             p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
 #            if stdout.split('\n') != 'NORMAL TERMINATION':
@@ -235,33 +235,33 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
 
             if compressWithNco:
                 for metfile in glob.glob("{}/MET*_*".format(mcipDir)):
-                    print "\t\tCompress {} with ncks".format(metfile)
+                    print("\t\tCompress {} with ncks".format(metfile))
                     command = 'ncks -4 -L4 -O {} {}'.format(metfile,metfile)
-                    print '\t\t\t'+command
+                    print('\t\t\t'+command)
                     commandList = command.split(' ')        
                     ##
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print "stdout = " + stdout
-                        print "stderr = " + stderr
+                        print("stdout = " + stdout)
+                        print("stderr = " + stderr)
                         raise RuntimeError("Error from ncks...")
 
                 for gridfile in glob.glob("{}/GRID*_*".format(mcipDir)):
-                    print "\t\tCompress {} with ncks".format(gridfile)
+                    print("\t\tCompress {} with ncks".format(gridfile))
                     command = 'ncks -4 -L4 -O {} {}'.format(gridfile,gridfile)
-                    print '\t\t\t'+command
+                    print('\t\t\t'+command)
                     commandList = command.split(' ')        
                     ##
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print "stdout = " + stdout
-                        print "stderr = " + stderr
+                        print("stdout = " + stdout)
+                        print("stderr = " + stderr)
                         raise RuntimeError("Error from ncks...")
 
             if doArchiveWrf and (wrfRunName is not None) and False:
-                print '\t\tChecking MCIP output in folder {}'.format(mcipDir)
+                print('\t\tChecking MCIP output in folder {}'.format(mcipDir))
                 ## double check that all the files MCIP files are present before archiving the WRF files
                 filetypes = ['GRIDBDY2D', 'GRIDCRO2D', 'GRIDDOT2D', 'METBDY3D', 'METCRO2D', 'METCRO3D', 'METDOT3D']
                 for filetype in filetypes:
@@ -275,53 +275,53 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 wrfouts = glob.glob("wrfout_{}_*".format(dom))
                 ##
                 command = 'tar -cvf {} {}'.format(tmpfl," ".join(wrfouts))
-                print '\t\t\t'+command
+                print('\t\t\t'+command)
                 commandList = command.split(' ')        
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if len(stderr) > 0:
-                    print "stdout = " + stdout
-                    print "stderr = " + stderr
+                    print("stdout = " + stdout)
+                    print("stderr = " + stderr)
                     raise RuntimeError("Error from tar...")
                 ##
                 command = 'mdss mkdir ns0890/data/WRF/{}/'.format(wrfRunName)
-                print '\t\t\t'+command
+                print('\t\t\t'+command)
                 commandList = command.split(' ')
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if len(stderr) > 0:
-                    print "stdout = " + stdout
-                    print "stderr = " + stderr
+                    print("stdout = " + stdout)
+                    print("stderr = " + stderr)
                     raise RuntimeError("Error from mdss...")
                 ##
                 command = 'mdss put {} ns0890/data/WRF/{}/wrfout_{}_{}.tar'.format(tmpfl,wrfRunName,yyyymmddhh,dom)
-                print '\t\t\t'+command
+                print('\t\t\t'+command)
                 commandList = command.split(' ')
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if len(stderr) > 0:
-                    print "stdout = " + stdout
-                    print "stderr = " + stderr
+                    print("stdout = " + stdout)
+                    print("stderr = " + stderr)
                     raise RuntimeError("Error from mdss...")
                 ##
                 command = 'rm -f {}'.format(tmpfl)
-                print '\t\t\t'+command
+                print('\t\t\t'+command)
                 commandList = command.split(' ')
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if len(stderr) > 0:
-                    print "stdout = " + stdout
-                    print "stderr = " + stderr
+                    print("stdout = " + stdout)
+                    print("stderr = " + stderr)
                     raise RuntimeError("Error from rm...")
                 ##
                 command = 'rm {}'.format(" ".join(wrfouts))
-                print '\t\t\t'+command
+                print('\t\t\t'+command)
                 commandList = command.split(' ')        
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if len(stderr) > 0:
-                    print "stdout = " + stdout
-                    print "stderr = " + stderr
+                    print("stdout = " + stdout)
+                    print("stderr = " + stderr)
                     raise RuntimeError("Error from rm...")
                 ##
                 os.chdir(cwd)

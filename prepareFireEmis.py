@@ -159,7 +159,7 @@ def checkFireEmisFilesExist(dates,doms,ctmDir):
             exists = os.path.exists(outputFireEmisFile)
             if not exists:
                 fire_emis_files_exist = False
-                print "File {} not found - will rerun fire emission scripts...".format(outputFireEmisFile)
+                print("File {} not found - will rerun fire emission scripts...".format(outputFireEmisFile))
             ##
             break
         ##
@@ -190,7 +190,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
     '''
 
 
-    print "Read the species table file"
+    print("Read the species table file")
     f = open(specTableFile, "r")
     line = f.readline() ## skip the first line
     species_map = {}
@@ -204,7 +204,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
         species_map[GFASspec] = {'spec':CMspec, 'coef':coef}
     f.close()
 
-    print "Read molecular weights and calculate the conversion factors from GFAS to CMAQ"
+    print("Read molecular weights and calculate the conversion factors from GFAS to CMAQ")
     nmlfiles = glob.glob('/home/563/ns0890/runCMAQ/Melb_Sch01/speciesTables/GC_CH4only.nml'.format(CMAQdir,mechCMAQ,mechCMAQ))
     molWts = {}
     for nmlfile in nmlfiles:
@@ -214,18 +214,18 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
         lines = [l.strip() for l in lines]
         ihead = [i for i,s in enumerate(lines) if s.find("'SPC:MOLWT:") >= 0]
         if not len(ihead) == 1:
-            print nmlfile
+            print(nmlfile)
             raise RuntimeError("Could not read the header of the namelist file...")
         ##
         ihead = ihead[0] + 2
         itail = [i for i,s in enumerate(lines) if s == "/"]
         if not len(itail) == 1:
-            print nmlfile
+            print(nmlfile)
             raise RuntimeError("Could not read the tail of the namelist file...")
         ##
         itail = itail[0]
         if ihead > itail:
-            print nmlfile
+            print(nmlfile)
             raise RuntimeError("Head should come before the tail in the namelist file...")
         ##
         for l in lines[ihead:itail]:
@@ -237,7 +237,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
 
     ## unique set of species
     ## flatten list-of-lists following: http://stackoverflow.com/a/952946/356426
-    cmaqSpecList = list(set(sum([species_map[gfasspec]['spec'] for gfasspec in species_map.keys()],[])))
+    cmaqSpecList = list(set(sum([species_map[gfasspec]['spec'] for gfasspec in list(species_map.keys())],[])))
     cmaqSpecList.sort()
 
     unit_factor = {}
@@ -262,9 +262,9 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
                  'SDATE', 'STIME', 'TSTEP', 'NTHIK', 'NCOLS', 'NROWS', 'NLAYS', 'NVARS',
                  'GDTYP', 'P_ALP', 'P_BET', 'P_GAM', 'XCENT', 'YCENT', 'XORIG', 'YORIG',
                  'XCELL', 'YCELL', 'VGTYP', 'VGTOP', 'VGLVLS', 'GDNAM', 'UPNAM', 'VAR-LIST', 'FILEDESC']
-    unicodeType = type(u'foo')
+    unicodeType = type('foo')
 
-    print "Read grid paramters from the GFAS file"
+    print("Read grid paramters from the GFAS file")
     GFASpath = '{}/{}'.format(GFASfolder, GFASfile)
     exists = os.path.exists(GFASpath)
     if not exists:
@@ -296,7 +296,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
 
     
     ## get the number of vertical levels in the MCIP (and hence CMAQ) files
-    print "Read grid paramters from the MCIP file"
+    print("Read grid paramters from the MCIP file")
     date = dates[0]
     idom = 0
     dom = doms[idom]
@@ -312,7 +312,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
     nz = len(ncmet.dimensions['LAY'])
     ncmet.close()
 
-    print "Calculate grid cell areas for the GFAS grid"
+    print("Calculate grid cell areas for the GFAS grid")
     areas = numpy.zeros((nlatGfas,nlonGfas))
     for ix in range(nlonGfas):
         for iy in range(nlatGfas):
@@ -326,7 +326,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
     ## loop through the domains, calculating the indices and coefficients
     domShape = []
     for idom, dom in enumerate(doms):
-        print "Calculate the indices and coefficients for domain",dom
+        print("Calculate the indices and coefficients for domain",dom)
 
         ind_x.append([])
         ind_y.append([])
@@ -405,9 +405,9 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
         idate = bisect.bisect_right(gfasTimes,Date)
 
         if idate == len(gfasTimes):
-            print ""
-            print "WARNING: at boundary of GFAS times: will use previous date..."
-            print ""
+            print("")
+            print("WARNING: at boundary of GFAS times: will use previous date...")
+            print("")
             idate = len(gfasTimes)-1
         elif idate > len(gfasTimes):
             raise RuntimeError("idate > len(gfasTimes)")
@@ -418,7 +418,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
                 cmaqData[spec][idom][:] = 0.0
 
         for idom, dom in enumerate(doms):
-            print "Calculate the emissions for domain",dom,"and date",yyyymmdd
+            print("Calculate the emissions for domain",dom,"and date",yyyymmdd)
             # t0 = time.time()
 
             mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
@@ -433,12 +433,12 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
             if os.path.exists(outputFireEmisFile):
                 os.remove(outputFireEmisFile)
 
-            print outputFireEmisFile
+            print(outputFireEmisFile)
             ncout = netCDF4.Dataset(outputFireEmisFile, 'w', format='NETCDF4')
             lens = dict()
             outdims = dict()
 
-            for k in nccro.dimensions.keys():
+            for k in list(nccro.dimensions.keys()):
                 lens[k] = len(nccro.dimensions[k])
 
             LAT  = nccro.variables['LAT'][:].squeeze()
@@ -449,7 +449,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
             area_factor = nccro.XCELL * nccro.YCELL ## m2 per grid-cell
             meanInjectionAltitudeNative = ncin.variables['MAMI_GDS0_SFC_ave24h'][idate,:,:] ## Mean altitude of maximum injection
 
-            for gfasspec in species_map.keys():
+            for gfasspec in list(species_map.keys()):
                 subset = ncin.variables[gfasspec][idate,:,:]
                 gridded = redistribute_spatially(LAT.shape, nz, ind_x, ind_y, coefs, idom, subset, meanInjectionAltitudeNative, ZH, HT, areas)
                 ##
@@ -471,7 +471,7 @@ def prepareFireEmis(run, dates, doms, GFASfolder, GFASfile, metDir, ctmDir, CMAQ
             lens['VAR'] = nvar
             lens['LAY'] = nz
 
-            for k in ncdot.dimensions.keys():
+            for k in list(ncdot.dimensions.keys()):
                 outdims[k] = ncout.createDimension(k, lens[k])
 
             outvars = dict()

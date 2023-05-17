@@ -193,8 +193,8 @@ def checkWrfMcipDomainSizes(metDir, date, domains, wrfDir = None):
                 warnings.warn("Distance between grid-points was {} km for domain {}".format(mindist,domain))
             icorn[i], jcorn[i] = numpy.unravel_index(minidx, wrfLat.shape)
         if icorn[0] != icorn[1] or icorn[2] != icorn[3] or jcorn[0] != jcorn[2] or jcorn[1] != jcorn[3]:
-            print "icorn =",icorn
-            print "jcorn =",jcorn
+            print("icorn =",icorn)
+            print("jcorn =",jcorn)
             raise RuntimeError("Indices of the corner points not completely consistent between the WRF and MCIP grids for domain {}".format(domain))
 
         nx_wrf[idomain] = wrfLat.shape[0] 

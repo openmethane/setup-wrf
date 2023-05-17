@@ -56,12 +56,12 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
 
     '''
 
-    print "\t\tInitialisation (deal with dates and paths)"
+    print("\t\tInitialisation (deal with dates and paths)")
     attrnames = ['IOAPI_VERSION', 'EXEC_ID', 'FTYPE', 'CDATE', 'CTIME', 'WDATE', 'WTIME',
                  'SDATE', 'STIME', 'TSTEP', 'NTHIK', 'NCOLS', 'NROWS', 'NLAYS', 'NVARS',
                  'GDTYP', 'P_ALP', 'P_BET', 'P_GAM', 'XCENT', 'YCENT', 'XORIG', 'YORIG',
                  'XCELL', 'YCELL', 'VGTYP', 'VGTOP', 'VGLVLS', 'GDNAM', 'UPNAM', 'VAR-LIST', 'FILEDESC']
-    unicodeType = type(u'foo')
+    unicodeType = type('foo')
 
     ##
     Date = datetime.datetime(date.year, date.month, date.day, 0, 0, 0) 
@@ -96,7 +96,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
       ##  raise RuntimeError('Could not establish frequency of emission inputs ...')
     ##
 
-    print "\t\tDeal with speciation"
+    print("\t\tDeal with speciation")
     ##
     conversionTable = {'WRFCHEMNAME' : [],
                        'CMAQNAME' : [],
@@ -147,7 +147,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
             raise RuntimeError('Cannot classify line "{}" in species conversion table file {}'.format(line, conversionTableFile))
 
 
-    print "\t\tConnect to input files"
+    print("\t\tConnect to input files")
     
     WRFCHEMSAMPLESPEC = conversionTable['WRFCHEMNAME'][0]
         
@@ -171,7 +171,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
         nc0 = netCDF4.Dataset(filenamein[0], 'r', format='NETCDF4')
         nLayWrf = len(nc0.dimensions['emissions_zdim'])
         Shape = list(nc0.variables[WRFCHEMSAMPLESPEC].shape)
-        WRFCHEM_vars = nc0.variables.keys()
+        WRFCHEM_vars = list(nc0.variables.keys())
         Shape[0] = 25
         nc0.close()
     elif freq == 'daily':
@@ -183,7 +183,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
             else:
                 isMod7 = numpy.where((tdiffDays % 7) == 0)[0]
                 iWrf[iD] = isMod7[numpy.argmin(numpy.abs(tdiffDays[isMod7]))]
-                print "Date {} not in list of wrfchemi files, using nearest mod-7 equivalent ({}), tdiff = {}".format(date.strftime('%Y-%m-%d'), wrfdates[iWrf[iD]].strftime('%Y-%m-%d'),tdiffDays[iWrf[iD]])
+                print("Date {} not in list of wrfchemi files, using nearest mod-7 equivalent ({}), tdiff = {}".format(date.strftime('%Y-%m-%d'), wrfdates[iWrf[iD]].strftime('%Y-%m-%d'),tdiffDays[iWrf[iD]]))
         ## 
         wrfDate = wrfdates[iWrf[0]].strftime('%Y-%m-%d_%H:%M:%S')
         nextWrfDate = wrfdates[iWrf[1]].strftime('%Y-%m-%d_%H:%M:%S')
@@ -192,7 +192,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
         nextInputEmis = '{}/wrfchemi_{}_{}'.format(inFolder,dom,nextWrfDate)
         ncin.append(netCDF4.Dataset(inputEmis, 'r', format='NETCDF4'))
         ncin.append(netCDF4.Dataset(nextInputEmis, 'r', format='NETCDF4'))
-        WRFCHEM_vars = ncin[0].variables.keys()
+        WRFCHEM_vars = list(ncin[0].variables.keys())
         nLayWrf = len(ncin[0].dimensions['emissions_zdim'])
     ##
 
@@ -205,7 +205,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
     ncout = netCDF4.Dataset(outputEmis, 'w', format='NETCDF4')
 
     lens = dict()
-    for k in nccro.dimensions.keys():
+    for k in list(nccro.dimensions.keys()):
         lens[k] = len(nccro.dimensions[k])
 
     lens['LAY'] = len(ncmet.dimensions['LAY'])
@@ -253,7 +253,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
     if addFires:
         inFire  = '{}/fire_emis_{}.nc'.format(chemdir,dom)
         ncfire = netCDF4.Dataset(inFire, 'r', format='NETCDF4')
-        fireSpec = ncfire.variables.keys()
+        fireSpec = list(ncfire.variables.keys())
         fireSpec = [s for s in fireSpec if s != 'TFLAG']
         unseenFireSpec = [s for s in fireSpec if not (s in specnames)]
     else:
@@ -285,7 +285,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
     # g/s/gridcell     = (ug/m2/s) * (g/ug)  * (m2/gridcell)
     #                  = (ug/m2/s) * (1.0e-6)  * (DX*DY)
 
-    print "\t\tDeal with direct conversion between species"
+    print("\t\tDeal with direct conversion between species")
 
     emisOut = {}
     templateValues = numpy.zeros((lens['TSTEP'],lens['LAY'],lens['ROW'],lens['COL']), dtype = numpy.float32)
@@ -310,7 +310,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
             emisOut[CMAQNAME]['values'][  24,0:nLayWrf,:,:] = ncin[1].variables[WRFCHEMNAME][0,:,ix0:ix1,iy0:iy1]*factor
         ##
 
-    print "\t\tAdd VOCs"
+    print("\t\tAdd VOCs")
     ##
     first = True
     if freq == 'hourly':
@@ -345,30 +345,30 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
             emisOut[CMAQNAME]['values'][  24,0:nLayWrf,:,:] = VOC_sum2[0,:,ix0:ix1,iy0:iy1]*factor*organicsTable['fraction'][ispec]
         ##
 
-    print "\t\tAdd 'other species'"        
+    print("\t\tAdd 'other species'")        
     for spec in otherSpecies:
-        if spec in emisOut.keys():
+        if spec in list(emisOut.keys()):
             warnings.warn("Species {} was listed in the species conversion table ({}) as one of the variables to initialise to zero, but it was already found in the emissions file - no new variable will be added... ".format(spec, conversionTableFile))
         else:
             isAerosol = (spec in otherAE)
             emisOut[spec] = {'isAerosol':isAerosol, 'values':copy.copy(templateValues)}
 
-    print "\t\tAdd MEGAN"
+    print("\t\tAdd MEGAN")
     if addMegan:
         excludeSpec = ['GDAY','NR','CH4','TFLAG']
-        for spec in ncmeg.variables.keys():
+        for spec in list(ncmeg.variables.keys()):
             if not (spec in excludeSpec ):
-                if not ( spec in emisOut.keys() ):
+                if not ( spec in list(emisOut.keys()) ):
                     isAerosol = (spec[0] == 'A') and (spec[-1] in ['I', 'J', 'K']) 
                     emisOut[spec] = {'isAerosol':isAerosol, 'values':copy.copy(templateValues)}
                 ##
                 emisOut[spec]['values'][0:24,0,:,:] = emisOut[spec]['values'][0:24,0,:,:] + ncmeg.variables[spec][0:24,0,:,:]
                 emisOut[spec]['values'][24,0,:,:]   = emisOut[spec]['values'][24,0,:,:]   + ncmeg.variables[spec][23,0,:,:]
 
-    print "\t\tAdd fires"
+    print("\t\tAdd fires")
     if addFires:
         for spec in fireSpec:
-            if not ( spec in emisOut.keys() ):
+            if not ( spec in list(emisOut.keys()) ):
                 isAerosol = (spec[0] == 'A') and (spec[-1] in ['I', 'J', 'K'])
                 emisOut[spec] = {'isAerosol':isAerosol, 'values':copy.copy(templateValues)}
                 ##
@@ -379,12 +379,12 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
         ##
         ncfire.close()
 
-    print "\t\tWrite output to file"
+    print("\t\tWrite output to file")
 
-    nvar = len(emisOut.keys())
+    nvar = len(list(emisOut.keys()))
     lens['VAR'] = nvar
     
-    for k in nccro.dimensions.keys():
+    for k in list(nccro.dimensions.keys()):
         res = ncout.createDimension(k, lens[k])
     
     ## define the time variable and set its values
@@ -402,7 +402,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
         ncout.variables['TFLAG'][:,ispec,1] = HHMMSS
 
     
-    for spec in emisOut.keys():
+    for spec in list(emisOut.keys()):
         res = ncout.createVariable(spec, 'f4', ('TSTEP', 'LAY', 'ROW', 'COL'), zlib = True)
         ncout.variables[spec].setncattr('long_name',"{:<16}".format(spec))
         ncout.variables[spec].setncattr('var_desc',"{:<80}".format("Emissions of %s" % spec))
@@ -419,7 +419,7 @@ def anthropEmis(dom, grid, run, date, nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0
         ##
         ncout.setncattr(a,val)
 
-    VarString = "".join([ "{:<16}".format(k) for k in emisOut.keys()])
+    VarString = "".join([ "{:<16}".format(k) for k in list(emisOut.keys())])
     ncout.setncattr('VAR-LIST',VarString)
     ncout.setncattr('NVARS',numpy.int32(nvar))
     ncout.setncattr('HISTORY',"")

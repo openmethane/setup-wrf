@@ -44,7 +44,7 @@ stdout, stderr = subprocess.Popen(cmds, stdout = subprocess.PIPE, stderr = subpr
 if os.path.exists(outfile_nc):
     os.remove(outfile_grib)
 else:
-    print "Error in convering grib to netcdf"
+    print("Error in convering grib to netcdf")
 ## convert from netCDF3 to compressed netCDF4
 cmds = ['ncks','-O','-4','-L4',outfile_nc,outfile_nc]
 stdout, stderr = subprocess.Popen(cmds, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()

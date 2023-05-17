@@ -106,7 +106,7 @@ def prepareCctmRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
                         ['set EMISfile = TEMPLATE',          'set EMISfile = {}'.format(EMISfile)]]
             ##
             ## adjust CCTM script
-            print "Prepare CMAQ script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain)
+            print("Prepare CMAQ script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain))
             helper_funcs.replace_and_write(scripts['cctmRun']['lines'], outCctmFile, subsCctm)
             print(outCctmFile)
             os.chmod(outCctmFile,0o0744)
@@ -174,7 +174,7 @@ def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
                             ['setenv MET_CRO_3D_CRS TEMPLATE',               'setenv MET_CRO_3D_CRS {}'.format(MetCro3dCrs)], 
                             ['setenv MET_CRO_3D_FIN TEMPLATE',               'setenv MET_CRO_3D_FIN {}'.format(MetCro3dFin)]]
                 ##
-                print "Prepare BCON script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain)
+                print("Prepare BCON script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain))
                 helper_funcs.replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
                 os.chmod(outBconFile,0o0744)
     return
@@ -236,11 +236,11 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
                     ['setenv OUTDIR TEMPLATE',                        'setenv OUTDIR {}'.format(ctmDir)],
                     ['setenv OUTFILE TEMPLATE',                       'setenv OUTFILE {}'.format(outfile)]]
         ##
-        print "Prepare BCON script for domain = {}".format(domain)
+        print("Prepare BCON script for domain = {}".format(domain))
         helper_funcs.replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
         os.chmod(outBconFile,0o0744)
         ##
-        print "Run BCON"
+        print("Run BCON")
         commandList = [outBconFile]
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
@@ -248,15 +248,15 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
         import pdb
         try:
           if output.find('Program  BCON completed successfully') < 0:
-              print outBconFile
-              print 'exit_code = ',exit_code
-              print 'err =',err
-              print 'output =', output
+              print(outBconFile)
+              print('exit_code = ',exit_code)
+              print('err =',err)
+              print('output =', output)
               raise RuntimeError('failure in bcon')
         except:
           pdb.set_trace()      
         ##
-        print "Compress the output file"
+        print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
         helper_funcs.compressNCfile(filename)
         outputFiles[idomain] = filename
@@ -297,7 +297,7 @@ def prepareMainRunScript(dates, domains, ctmDir, CMAQdir, scripts, doCompress, c
                 ['run=TEMPLATE',             'run={}'.format(run)],
                 ['compressScript=TEMPLATE',  'compressScript={}'.format(compressScript)]]
     ##
-    print "Prepare the global CMAQ run script"
+    print("Prepare the global CMAQ run script")
     helper_funcs.replace_and_write(scripts['cmaqRun']['lines'], outpath, subsCMAQ)
     os.chmod(outpath,0o0744)
     return
@@ -329,7 +329,7 @@ def preparePbsRunScript(ctmDir, scripts, run, cmaqEnvScript, forceUpdate):
                ['source TEMPLATE', 'source {}'.format(cmaqEnvScript)],
                ['TEMPLATE >& TEMPLATE', '{} >& {}'.format(CMAQscript, CMAQoutput)]]
     ##
-    print "Prepare the global PBS run script"
+    print("Prepare the global PBS run script")
     helper_funcs.replace_and_write(scripts['pbsRun']['lines'], outpath, subsPBS)
     os.chmod(outpath,0o0744)
     return
@@ -361,7 +361,7 @@ def prepareSlurmRunScript(ctmDir, scripts, run, cmaqEnvScript, forceUpdate):
                 ['source TEMPLATE', 'source {}'.format(cmaqEnvScript)],
                 ['TEMPLATE >& TEMPLATE', '{} >& {}'.format(CMAQscript, CMAQoutput)]]
     ##
-    print "Prepare the global SLURM run script"
+    print("Prepare the global SLURM run script")
     helper_funcs.replace_and_write(scripts['slurmRun']['lines'], outpath, subsSLURM)
     os.chmod(outpath,0o0744)
     return
@@ -424,23 +424,23 @@ def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
                     ['setenv OUTDIR TEMPLATE',                     'setenv OUTDIR {}'.format(ctmDir)],
                     ['setenv OUTFILE TEMPLATE',                    'setenv OUTFILE {}'.format(outfile)]]
         ##
-        print "Prepare ICON script for domain = {}".format(domain)
+        print("Prepare ICON script for domain = {}".format(domain))
         helper_funcs.replace_and_write(scripts['iconRun']['lines'], outIconFile, subsIcon)
         os.chmod(outIconFile,0o0744)
         ##
-        print "Run ICON"
+        print("Run ICON")
         commandList = [outIconFile]
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
         if output.find('Program  ICON completed successfully') < 0:
-            print outIconFile
-            print 'exit_code = ',exit_code
-            print 'err =',err
-            print 'output =', output
+            print(outIconFile)
+            print('exit_code = ',exit_code)
+            print('err =',err)
+            print('output =', output)
             raise RuntimeError('failure in icon')
         ##
-        print "Compress the output file"
+        print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
         helper_funcs.compressNCfile(filename)
     ##
