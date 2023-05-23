@@ -83,7 +83,7 @@ smooth_option                       = 1,
     sst_update = 1
     sst_skin = 1
     progn = 1,
-    num_land_cat = 21
+    num_land_cat = 24
 /
 
 &fdda                    
