@@ -254,7 +254,7 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
               print('output =', output)
               raise RuntimeError('failure in bcon')
         except:
-          pdb.set_trace()      
+            pass #pdb.set_trace()      
         ##
         print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
@@ -433,7 +433,7 @@ def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
-        if output.find('Program  ICON completed successfully') < 0:
+        if output.decode().find('Program  ICON completed successfully') < 0:
             print(outIconFile)
             print('exit_code = ',exit_code)
             print('err =',err)

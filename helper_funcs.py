@@ -5,7 +5,6 @@ import numpy
 import subprocess
 import os
 import re
-import exceptions
 import copy
 import pprint
 
@@ -171,7 +170,7 @@ def source2(script, shell = 'bash'):
 
     Env = os.environ.copy()
     for line in proc.stdout:
-        (key, _, value) = line.partition("=")
+        (key, _, value) = line.decode().partition("=")
         Env[key] = value
 
     proc.communicate()

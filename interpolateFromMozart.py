@@ -4,7 +4,6 @@ import numpy
 import datetime
 import netCDF4
 import os
-import exceptions
 import shutil
 import warnings
 import helper_funcs
@@ -402,7 +401,7 @@ def interpolateFromMozartToCmaqGrid(dates, doms, mech, inputMozartFile, template
             mm   = (TFLAG[:,1] - hh*10000) / 100
             ss   =  TFLAG[:,1] % 100
             ntimemod = len(yyyy)
-            timesmod = [datetime.datetime(yyyy[i],1,1,0,0,0) + datetime.timedelta(days = float(jjj[i] - 1) + float(hh[i])/24.0 + float(mm[i])/(24.0 * 60.0) + float(ss[i])/(24.0 * 60.0 * 60.0)) for i in range(ntimemod)]
+            timesmod = [datetime.datetime(int(yyyy[i]),1,1,0,0,0) + datetime.timedelta(days = float(jjj[i] - 1) + float(hh[i])/24.0 + float(mm[i])/(24.0 * 60.0) + float(ss[i])/(24.0 * 60.0 * 60.0)) for i in range(ntimemod)]
             itimes = numpy.where([t.date() == date.date() for t in timesmod])[0]
             itime0 = itimes[0]
             itime1 = itimes[-1]+2
