@@ -15,6 +15,10 @@ import datetime
 import pytz
 import pdb
 
+from urllib2 import build_opener
+
+opener = build_opener()
+
 def check_file_status(filepath, filesize):
     sys.stdout.write('\r')
     sys.stdout.flush()
@@ -37,13 +41,13 @@ def downloadFNL(email,pswd,targetDir,times):
         List of downloaded files
 
     """
-    print('in downloadFNL')
+    print 'in downloadFNL'
     oldDir = os.getcwd()
     ## check that the target directory is indeed a directory
     assert os.path.exists(targetDir) and os.path.isdir(targetDir), "Target directory {} not found...".format(targetDir)
     os.chdir(targetDir)
 
-    print('authenticate credentials')
+    print 'authenticate credentials'
     url = 'https://rda.ucar.edu/cgi-bin/login'
     values = {'email' : email, 'passwd' : pswd, 'action' : 'login'}
     # Authenticate
@@ -52,7 +56,7 @@ def downloadFNL(email,pswd,targetDir,times):
         print('Bad Authentication')
         print(ret.text)
         sys.exit()
-    dspath = 'http://data.rda.ucar.edu/ds083.3/'
+    dspath = 'https://data.rda.ucar.edu/ds083.3/'
     downloaded_files = []
 
     FNLstartDate = pytz.UTC.localize(datetime.datetime(2015,7,8,0,0,0))
@@ -62,20 +66,18 @@ def downloadFNL(email,pswd,targetDir,times):
         assert time > FNLstartDate, "Analysis times should not be before 2015-07-08"
         filepath = time.strftime('%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2')
         filename=dspath+filepath
-        file_base = os.path.basename(filepath)
-        print('Downloading',file_base)
-        req = requests.get(filename, cookies = ret.cookies, allow_redirects=True, stream=True)
-        filesize = int(req.headers['Content-length'])
-        with open(file_base, 'wb') as outfile:
-            chunk_size=1048576
-            for chunk in req.iter_content(chunk_size=chunk_size):
-                outfile.write(chunk)
-                if chunk_size < filesize:
-                    check_file_status(file_base, filesize)
-        check_file_status(file_base, filesize)
-        print()
-        downloaded_files.append(file_base)
+        filelist = [filename]
+        for file in filelist:
+           ofile = os.path.basename(file)
+           sys.stdout.write("downloading " + ofile + " ... ")
+           sys.stdout.flush()
+           infile = opener.open(file)
+           outfile = open(ofile, "wb")
+           outfile.write(infile.read())
+           #outfile.close()
+           sys.stdout.write("done\n")
 
+        downloaded_files.append(ofile)
     ##
     os.chdir(oldDir)
     ## send back a list of downloaded files
