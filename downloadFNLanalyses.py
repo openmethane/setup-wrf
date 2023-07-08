@@ -52,7 +52,7 @@ def downloadFNL(email,pswd,targetDir,times):
         print('Bad Authentication')
         print(ret.text)
         sys.exit()
-    dspath = 'http://rda.ucar.edu/data/ds083.3/'
+    dspath = 'http://data.rda.ucar.edu/ds083.3/'
     downloaded_files = []
 
     FNLstartDate = pytz.UTC.localize(datetime.datetime(2015,7,8,0,0,0))
