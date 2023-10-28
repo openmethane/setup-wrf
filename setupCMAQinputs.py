@@ -153,8 +153,8 @@ def main():
     domains = ['d01'] ## which domains should be run?
     run = 'openmethane' ## name of the simulation, appears in some filenames (keep this *short* - longer)
 
-    startDate = datetime.datetime(2022,7,1, 0, 0) ## this is the START of the first day
-    endDate = datetime.datetime(2022,7,1, 0, 0) ## this is the START of the last day
+    startDate = datetime.datetime(2022,7,3, 0, 0) ## this is the START of the first day
+    endDate = datetime.datetime(2022,8,1, 0, 0) ## this is the START of the last day
     nhoursPerRun = 24 ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1 ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
 
