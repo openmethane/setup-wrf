@@ -15,7 +15,7 @@ import datetime
 import pytz
 import pdb
 
-from urllib2 import build_opener
+from urllib.request import build_opener
 
 opener = build_opener()
 
@@ -41,20 +41,20 @@ def downloadFNL(email,pswd,targetDir,times):
         List of downloaded files
 
     """
-    print 'in downloadFNL'
+    print('in downloadFNL')
     oldDir = os.getcwd()
     ## check that the target directory is indeed a directory
     assert os.path.exists(targetDir) and os.path.isdir(targetDir), "Target directory {} not found...".format(targetDir)
     os.chdir(targetDir)
 
-    print 'authenticate credentials'
+    print('authenticate credentials')
     url = 'https://rda.ucar.edu/cgi-bin/login'
     values = {'email' : email, 'passwd' : pswd, 'action' : 'login'}
     # Authenticate
     ret = requests.post(url,data=values)
     if ret.status_code != 200:
         print('Bad Authentication')
-        print(ret.text)
+        print((ret.text))
         sys.exit()
     dspath = 'https://data.rda.ucar.edu/ds083.3/'
     downloaded_files = []
