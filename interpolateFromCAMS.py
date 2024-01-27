@@ -7,7 +7,7 @@ import os
 import shutil
 import warnings
 import helper_funcs
-
+moleMass = {'air':28.96, 'ch4_c':16}
 # def match_two_sorted_arrays(arr1,arr2):
 #     result = numpy.zeros(arr2.shape,dtype = numpy.int)
 #     for i, v in enumerate(arr2):
@@ -24,13 +24,13 @@ def match_two_sorted_arrays(arr1,arr2):
     Returns: 
         result: numpy integer array with the same dimensions as array arr2, with each element containing the index of arr1 that provides the *closest* match to the given entry in arr2
     '''
-    result = numpy.zeros(arr2.shape,dtype = numpy.int)
+    result = numpy.zeros(arr2.shape,dtype = int)
     for i, v in enumerate(arr2):
-        result[i] = len(arr1) - numpy.argmin(numpy.abs(arr1 - v)) - 1
+        result[i] =  numpy.argmin(numpy.abs(arr1 - v))
     return result
 
 
-def extract_and_interpolate_interior(mzspec, ncin, lens, LON, Iz, iMZtime, isAerosol, mz_mw_aerosol, T, P, near_interior):
+def extract_and_interpolate_interior(mzspec, ncin, lens, LON, Iz, iMZtime, P, near_interior):
     '''Interpolate from the CAMS grid to the CMAQ interior points (i.e. the full 3D array) 
     
     Args:
@@ -55,15 +55,8 @@ def extract_and_interpolate_interior(mzspec, ncin, lens, LON, Iz, iMZtime, isAer
     if mzspec in list(ncin.variables.keys()):
         varin = ncin.variables[mzspec][iMZtime,:,:,:]
         #
-        if isAerosol:
-            ##  VMR * P[Pa] / Rgas[J/K/kg] /T[K] * mw_aerosol[g/mole] /mw_air[g/mole] * 1E9[ug/kg]
-            Rgas = 286.9969 ## [J/K/kg] (constant)
-            mw_aerosol = mz_mw_aerosol[mzspec]
-            mw_air = 28.97 ## g/mol (constant)
-            varin = varin * P[iMZtime,:,:,:] / Rgas / T[iMZtime,:,:,:] * mw_aerosol / mw_air * 1.0e9
-        else:
-            convFac = moleMas['air']/moleMass['mzspec'] *1e6 # converting from kg/kg to VMR in ppmv 
-            varin = varin * convFac ## convert from VMR to PPMV
+        convFac = moleMass['air']/moleMass[mzspec] *1e6 # converting from kg/kg to VMR in ppmv 
+        varin = varin * convFac ## convert from VMR to PPMV
         #
         for irow in range(LON.shape[0]):
             for icol in range(LON.shape[1]):
@@ -74,7 +67,7 @@ def extract_and_interpolate_interior(mzspec, ncin, lens, LON, Iz, iMZtime, isAer
     #
     return out_interior
 
-def extract_and_interpolate_boundary(mzspec, ncin, lens, LONP, Iz, iMZtime_for_each_CMtime, isAerosol, mz_mw_aerosol, T, P, near_boundary):
+def extract_and_interpolate_boundary(mzspec, ncin, lens, LONP, Iz, iMZtime_for_each_CMtime, P, near_boundary):
     '''Interpolate from the CAMS grid to the CMAQ boundary points 
     
     Args:
@@ -84,9 +77,6 @@ def extract_and_interpolate_boundary(mzspec, ncin, lens, LONP, Iz, iMZtime_for_e
         LONP: array of longitudes of CMAQ boundary points with the same size as the output array
         Iz: array of indices of CAMS levels that correspond to the CMAQ levels
         iMZtime_for_each_CMtime: index of the CAMS time to use, one entry for each CMAQ time
-        isAerosol: Boolean (True/False) whether this is an aerosol species or not
-        mz_mw_aerosol: molecular weight of the CAMS species
-        T: array of temperatures (units = K) from the CAMS output
         P: array of pressures (units = Pa) from the CAMS output
         near_boundary: array of indices matching up the CAMS grid-points with CMAQ boundary grid-points
 
@@ -103,15 +93,8 @@ def extract_and_interpolate_boundary(mzspec, ncin, lens, LONP, Iz, iMZtime_for_e
     if mzspec in list(ncin.variables.keys()):
         varin = ncin.variables[mzspec][iMZtime,:,:,:]
         #
-        if isAerosol:
-            ##  VMR * P[Pa] / Rgas[J/K/kg] /T[K] * mw_aerosol[g/mole] /mw_air[g/mole] * 1E9[ug/kg]
-            Rgas = 286.9969 ## [J/K/kg] (constant)
-            mw_aerosol = mz_mw_aerosol[mzspec]
-            mw_air = 28.97 ## g/mol (constant)
-            varin = varin * P[iMZtime,:,:,:] / Rgas / T[iMZtime,:,:,:] * mw_aerosol / mw_air * 1.0e9
-        else:
-            convFac = moleMas['air']/moleMass['mzspec'] *1e6 # converting from kg/kg to VMR in ppmv 
-            varin = varin * convFac ## convert from VMR to PPMV
+        convFac = moleMass['air']/moleMass[mzspec] *1e6 # converting from kg/kg to VMR in ppmv 
+        varin = varin * convFac ## convert from VMR to PPMV
         #
         for iperim in range(LONP.shape[0]):
             ix, iy = near_boundary[iperim,:]
@@ -179,7 +162,7 @@ def print_boundary_variable(cmspec, out_boundary, factor):
     print("{:20} {:.3e}".format(cmspec, out_boundary[:,0,:].mean()*factor))
 
 
-def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, defaultSpec = 'O3'):
+def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, bias_correct =0.0 ):
     '''Function to interpolate the from the global CAMS CTM output to ICs and BCs for CMAQ
     
     Args:
@@ -202,80 +185,9 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
 
     '''
     ##
-    with  open(specTableFile, "r") as f:
-        line = f.readline()
-        species_map = []
-        MZspecies_dict = {}
-        ind = 0
-        for line in f:
-            if len(line) <= 1:
-                continue
-            words = line.split(";")
-            MZspec = words[0].strip()
-            CMspec = [s.strip() for s in words[2].split(",")]
-            coef = [float(s) for s in words[3].split(",")]
-            isAerosol = [((s[0] == 'A') and (s[-1] in ['I','J','K'])) or (s in ['ASEACAT', 'ASOIL']) for s in CMspec]
-            species_map.append({'MZspec':MZspec, 'CMspec':CMspec, 'coef':coef, 'isAerosol':isAerosol })
-            MZspecies_dict[MZspec] = ind
-            ind = ind + 1
+    ALLSPEC = ['CH4']
 
-    ALL_CM_SPEC = sum([s['CMspec'] for s in species_map],[])
-    ALL_CM_SPEC = list(set(ALL_CM_SPEC))
-    ALL_CM_SPEC.sort()
-
-    mz_mw_aerosol = {
-        'CB1_VMR_inst': 12.,
-        'CB2_VMR_inst': 12.,
-        'DUST1': 34.,
-        'DUST2': 34.,
-        'DUST3': 34.,
-        'DUST4': 34.,
-        'NH4NO3_VMR_inst': 80.0,
-        'NH4_VMR_inst': 18.0,
-        'OC1_VMR_inst': 12.0,
-        'OC2_VMR_inst': 12.0,
-        'SA1_VMR_inst': 58.,
-        'SA2_VMR_inst': 58.,
-        'SA3_VMR_inst': 58.,
-        'SA4_VMR_inst': 58.,
-        'SO4_VMR_inst': 96.0,
-        'SOA_VMR_inst': 144.0,
-        'so4_a1':96.0,
-        'so4_a2':96.0,
-        'so4_a3':96.0,     
-        'soa1_a1':144.,        
-        'soa1_a2':144.,         
-        'soa2_a1':144., 
-        'soa2_a2':144.,
-        'soa3_a1':144.,
-        'soa3_a2':144.,                
-        'soa4_a1':144.,  
-        'soa4_a2':144., 
-        'soa5_a1':144.,  
-        'soa5_a2':144.,                                
-        'bc_a1':12.,  
-        'bc_a4':12., 
-        'dst_a1':34.,                               
-        'dst_a2':34.,
-        'dst_a3':34.,
-        'NH4':18.}
-
-    with  netCDF4.Dataset(templateIconFiles[0], 'r', format='NETCDF4') as ncPR:
-        PR_MZ = {}
-        PR_AE = {}
-        for v in list(ncPR.variables.keys()):
-            if ncPR.variables[v].units.strip() == "ppmV":
-                PR_MZ[v] = ncPR.variables[v][0,:,0,0]
-            elif ncPR.variables[v].units.strip() == "micrograms/m**3":
-                PR_AE[v] = ncPR.variables[v][0,:,0,0]
-
-        PR_vars = list(PR_MZ.keys()) + list(PR_AE.keys())
-
-    ALLSPEC = PR_vars + ALL_CM_SPEC
-    ALLSPEC = list(set(ALLSPEC))
-    ALLSPEC.sort()
-
-    nvars = len(PR_vars)
+#    nvars = len(PR_vars)
 
     ## if we aren't forcing an update, check whether files exist and
     ## return early if possible
@@ -375,25 +287,17 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 sigma= ncmet.getncattr('VGLVLS')
                 sigmah = (sigma[1:] + sigma[:-1])/2.0 ## half levels
                 mtop = ncmet.getncattr('VGTOP')
-                hyam = ncin.variables['hyam'][:]
-                hybm = ncin.variables['hybm'][:]
-                hyai = ncin.variables['hyai'][:]
-                hybi = ncin.variables['hybi'][:]
-                P0 = ncin.variables['P0'][:]
-                PS = ncin.variables['PS'][:]
-                T = ncin.variables['T'][:]
                 #
-                base_MZ_time = datetime.datetime(2021,6,1,0,0,0)
-                daysSinceBase = ncin.variables['time'][:] - 366.0
-                MZdates = [base_MZ_time + datetime.timedelta(days=t) for t in list(daysSinceBase)]
+                base_MZ_time = datetime.datetime(1900,1,1,0,0,0) # epoch 
+                MZdates = [base_MZ_time + datetime.timedelta(hours=int(t)) for t in ncin['time'][:]]
                 #
-                latmz= ncin.variables['lat'][:].squeeze()
-                lonmz= ncin.variables['lon'][:].squeeze()
+                latmz= ncin.variables['latitude'][:].squeeze()
+                lonmz= ncin.variables['longitude'][:].squeeze()
                 PSURF= ncsrf.variables['PRSFC'][:].squeeze()
                 TFLAG= ncsrf.variables['TFLAG'][:,0,:].squeeze()
-                yyyy =  TFLAG[:,0] / 1000
+                yyyy =  TFLAG[:,0] // 1000
                 jjj  =  TFLAG[:,0] % 1000
-                hh   =  TFLAG[:,1] / 10000
+                hh   =  TFLAG[:,1] // 10000
                 mm   = (TFLAG[:,1] - hh*10000) / 100
                 ss   =  TFLAG[:,1] % 100
                 ntimemod = len(yyyy)
@@ -405,12 +309,8 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 TFLAG = TFLAG[itime0:itime1]
 
                 ## populate the pressure array
-                P = numpy.zeros(T.shape)
-                for itime in range(len(MZdates)):
-                    for irow  in range(len(latmz)):
-                        for icol in range(len(lonmz)):
-                            P[itime,:,irow,icol] = hyam * P0 + hybm * PS[itime,irow,icol]
-
+                P = numpy.zeros( ncin['ch4_c'].shape)
+                P += ncin['level'][...][:,numpy.newaxis,numpy.newaxis] # broadcasting but into axis 0 not axis -1
                 LATMZ = numpy.zeros((len(latmz), len(lonmz)))
                 LONMZ = numpy.zeros((len(latmz), len(lonmz)))
                 for irow in range(len(latmz)):
@@ -419,8 +319,8 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 for icol in range(len(lonmz)):
                     LATMZ[:,icol] = latmz
 
-                near_interior = numpy.zeros((LON.shape[0], LON.shape[1], 2),dtype = numpy.int)
-                near_boundary = numpy.zeros((LONP.shape[0], 2),dtype = numpy.int)
+                near_interior = numpy.zeros((LON.shape[0], LON.shape[1], 2),dtype = int)
+                near_boundary = numpy.zeros((LONP.shape[0], 2),dtype = int)
 
                 for irow in range(LON.shape[0]):
                     for icol in range(LON.shape[1]):
@@ -441,7 +341,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 if do_ICs:
                     itimestart = [it for it, t in enumerate(timesmod) if t == date][0]
 
-                iMZtime_for_each_CMtime = numpy.zeros((len(timesmod)),dtype = numpy.int)
+                iMZtime_for_each_CMtime = numpy.zeros((len(timesmod)),dtype = int)
                 for itime, time in enumerate(timesmod):
                     dtime = numpy.array([((time - t).total_seconds())/(24.0*60.0*60.0) for t in MZdates])
                     if all(dtime < 0.0):
@@ -454,12 +354,8 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 itimestart = [it for it, t in enumerate(timesmod) if t == date][0]
                 iMZtime = iMZtime_for_each_CMtime[0]
 
-                # To calculate pressure of each model grid box:
-                # pres_Pa[ilon, ilat, ilev, itim] = hyam[ilev] * P0 + hybm[ilev] * PS[ilon, ilat, itim]
-                # To calculate pressure at interfaces of each model grid box:
-                # pres_int_Pa[ilon, ilat, ilev, itim] = hyai[ilev] * P0 + hybi[ilev] * PS[ilon, ilat, itim]
 
-                ## interpolation from GEOS-CHEM to CMAQ levels
+                ## interpolation from CAMS to CMAQ levels
                 if not ('Iz' in vars() or 'Iz' in globals()):
                     irow = LON.shape[0]-1
                     icol = LON.shape[1]-1
@@ -468,11 +364,13 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     PRES_CM[0] = PSURF[itime,irow,icol]
                     PRES_CM = (PRES_CM[1:] + PRES_CM[:-1]) / 2.0
                     # PRES_MZ = Ap +  Bp * PSURF[itime,irow,icol]
-                    PRES_MZm = hyam * P0 + hybm * PSURF[itime,irow,icol]
-                    PRES_MZr = PRES_MZm[::-1]
-                    Iz = match_two_sorted_arrays(PRES_MZr,PRES_CM)
-
+                    PRES_MZm = ncin['level'][:].astype('float')
+                    mb2pa = 100. # converting from  millibar to pascal
+                    Iz = match_two_sorted_arrays(PRES_MZm*mb2pa, PRES_CM)
                 ## set the values to zero for species that we *WILL* interpolate to
+                ALL_CM_SPEC = ['CH4']
+                species_map = []
+                species_map.append({'MZspec':'ch4_c', 'CMspec':'CH4', 'coef':1.0, 'isAerosol':False })
                 for spec in ALL_CM_SPEC:
                     if do_ICs:
                         if not spec in list(ncouti.variables.keys()):
@@ -500,28 +398,24 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     CMspec = species_map[ispec]['CMspec']
                     coefs = species_map[ispec]['coef']
                     isAerosol = species_map[ispec]['isAerosol']
-                    if isAerosol[0]:
-                        Factor = 1.0 ## keep as ug/m3
-                    else:
-                        Factor = 1.0e3 ## convert from ppm to ppb
+                    Factor = 1.0e3 ## convert from ppm to ppb
                     ##
                     nCMspec = len(CMspec)
                     if do_ICs:
-                        out_interior = extract_and_interpolate_interior(MZspec, ncin, lens, LON, Iz, iMZtime, isAerosol[0], mz_mw_aerosol, T, P, near_interior)
+                        out_interior = extract_and_interpolate_interior(MZspec, ncin, lens, LON, Iz, iMZtime,  P, near_interior)
+                        out_interior +=bias_correct
                         print_interior_variable(MZspec, out_interior, Factor)
                     ##
                     if do_BCs:
-                        out_boundary = extract_and_interpolate_boundary(MZspec, ncin, lens, LONP, Iz, iMZtime_for_each_CMtime, isAerosol[0], mz_mw_aerosol, T, P, near_boundary)
+                        out_boundary = extract_and_interpolate_boundary(MZspec, ncin, lens, LONP, Iz, iMZtime_for_each_CMtime, P, near_boundary)
+                        out_boundary += bias_correct
                         print_boundary_variable(MZspec, out_boundary, Factor)
                     ##
-                    for jspec in range(nCMspec):
-                        cmspec = CMspec[jspec]
-                        coef = coefs[jspec]
-                        if do_ICs:
-                            populate_interior_variable(ncouti, cmspec, out_interior, coef)
-                        ##
-                        if do_BCs:
-                            populate_boundary_variable(ncoutb, cmspec, out_boundary, coef)
+                    if do_ICs:
+                        populate_interior_variable(ncouti, CMspec, out_interior, coefs)
+                    ##
+                    if do_BCs:
+                        populate_boundary_variable(ncoutb, CMspec, out_boundary, coefs)
 
                 if do_ICs:
                     ncouti.close()
@@ -529,4 +423,20 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     ncoutb.close()
 
 
+def main():
+    dates=[datetime.datetime(2022, 7, 1, 0, 0)]
+    doms=['d01']
+    mech='CH4only'
+    inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
+    templateIconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/icon.nc']
+    templateBconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/bcon.nc']
+    specTableFile='/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_WACCM.txt'
+    metDir='/scratch/q90/pjr563/openmethane-beta/mcip/'
+    ctmDir='/scratch/q90/pjr563/openmethane-beta/cmaq/'
+    GridNames = ['o']
+    mcipSuffix = ['1']
+    forceUpdate=True
+    interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipSuffix, forceUpdate, bias_correct=(1.838-1.771))                        
+if __name__ == "__main__":
+    main()
 

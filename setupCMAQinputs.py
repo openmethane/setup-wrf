@@ -26,7 +26,7 @@ import prepareMEGAN
 import prepareJprocFiles
 import prepareFireEmis
 import checkWrfMcipDomainSizes
-import interpolateFromMozart
+import interpolateFromCAMS
 import configureRunScripts
 import surfzonegeo
 import runMCIP
@@ -138,7 +138,7 @@ def main():
     gfasSpecIndexFile = '/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_GFAS_CBM05.txt' ## speciation file, mapping GFAS to CMAQ (CBM05) species
     #wrfchemSpecIndexFile = '/home/563/ns0890/runCMAQ/Melb_Sch01/speciesTables/species_table_WRFCHEM_CBM05.txt' ## speciation file, mapping WRFCHEMI to CMAQ (CBM05) species
     tempDir = '/scratch/q90/pjr563/openmethane-beta/tmp' ## directory for temporary files
-    inputMozartFile = "/scratch/q90/sa6589/test_Sougol/shared_Sougol/WACCM_Australia.nc" ## Output from CAMCHEM to use for boundary and initial conditions
+    inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
     cmaqVersionCode = 'CH4only' ##'D502a' ## abbreviated CMAQ number
     coastlineShapefiles = ["/scratch/lp86/ns0890/data/landuse/gshhg/GSHHS_shp/c/GSHHS_c_L1.shp",
                            "/scratch/lp86/ns0890/data/landuse/gshhg/GSHHS_shp/l/GSHHS_l_L1.shp",
@@ -146,14 +146,14 @@ def main():
                            "/scratch/lp86/ns0890/data/landuse/gshhg/GSHHS_shp/i/GSHHS_i_L1.shp"] ## a list of shapefiles describing coastlines for use in the surf-zone calculates. One per entry per domain
     cmaqEnvScript = '/home/563/pjr563/openmethane-beta/setup_wrf/load_cmaq_env.sh' ## path to the (bash) shell script that sets all of the run-time variables for CMAQ (e.g. LD_LIBRARY_PATH, module load <name>, etc.)
 
-    wrfDate = datetime.datetime(2019,5,1,0,0,0) ## this is the date in the WRF filenames but appears unused
+    wrfDate = datetime.datetime(2022,7,1,0,0,0) ## this is the date in the WRF filenames but appears unused
     sufadj="output_newMet"  #this is added by sougol to match the name of the folder created by running adj executable.
     GFASfile = "GFAS_Australia.nc" ## the file (within directory GFASdir) containing GFAS fire emission data
 
     domains = ['d01'] ## which domains should be run?
     run = 'openmethane' ## name of the simulation, appears in some filenames (keep this *short* - longer)
 
-    startDate = datetime.datetime(2022,7,3, 0, 0) ## this is the START of the first day
+    startDate = datetime.datetime(2022,7,1, 0, 0, 0) ## this is the START of the first day
     endDate = datetime.datetime(2022,8,1, 0, 0) ## this is the START of the last day
     nhoursPerRun = 24 ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1 ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
@@ -166,15 +166,15 @@ def main():
     mechCMAQ   = 'CH4only' ## name of chemical mechanism given to CMAQ (should be one of: cb05e51_ae6_aq, cb05mp51_ae6_aq, cb05tucl_ae6_aq, cb05tump_ae6_aq, racm2_ae6_aq, saprc07tb_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae6i_aq, saprc07tic_ae6i_aqkmti)
 
     addMegan   = False # combined emissions include MEGAN biogenic 
-    addFires   = True # combined emissions include GFAS fires
+    addFires   = False # combined emissions include GFAS fires
     prepareEmis = False # prepare the emission files
-    prepareICandBC = True # prepare the initial and boundary conditions from global MOZART output
+    prepareICandBC = True # prepare the initial and boundary conditions from global CAMS output
     prepareRunScripts = True # prepare the run scripts
 
     ## MCIP options
     add_qsnow = False ## add the 'QSNOW' variable to the WRFOUT files before running MCIP
 
-    forceUpdateMcip = True # force the update of the MCIP files
+    forceUpdateMcip = False # force the update of the MCIP files
     forceUpdateJproc = False  # force the update of the JPROC (photolysis rate constant) files
     forceUpdateSZ = False # force the update of the surfzone files
     forceUpdateMegan = False # force the update of MEGAN emission files
@@ -183,7 +183,7 @@ def main():
     forceUpdateICandBC = True # force an update of the initial and boundary conditions from global MOZART output
     forceUpdateRunScripts = True # force an update to the run scripts
 
-    scenarioTag = '160801_3km'         # scenario tag (for MCIP). 16-character maximum
+    scenarioTag = '220701_25km'         # scenario tag (for MCIP). 16-character maximum
     mapProjName = 'LamCon_34S_150E'    # Map projection name (for MCIP). 16-character maximum
     gridName    = 'openmethane'        # Grid name (for MCIP). 16-character maximum
     
@@ -363,7 +363,7 @@ def main():
         templateIconFiles = configureRunScripts.prepareTemplateIconFiles(date = dates[0], domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech  = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, forceUpdate = forceUpdateICandBC)
         ## use the template initial and boundary condition concentration
         ## files and populate them with values from MOZART output
-        interpolateFromMozart.interpolateFromMozartToCmaqGrid(dates = dates, doms = domains, mech = mech, inputMozartFile = inputMozartFile, templateIconFiles = templateIconFiles, templateBconFiles = templateBconFiles, specTableFile = mozartSpecIndex, metDir = metDir, ctmDir = ctmDir, GridNames = GridNames, mcipsuffix = APPL, forceUpdate = forceUpdateICandBC)
+        interpolateFromCAMS.interpolateFromCAMS(dates = dates, doms = domains, mech = mech, inputMozartFile = inputMozartFile, templateIconFiles = templateIconFiles, templateBconFiles = templateBconFiles, specTableFile = mozartSpecIndex, metDir = metDir, ctmDir = ctmDir, GridNames = GridNames, mcipsuffix = APPL, forceUpdate = forceUpdateICandBC)
 
     if prepareRunScripts:
         #print("gfcbcjucrhcnrcbrbcnrchnrchnrhcrhcnricrhncruicjnrdfic")
