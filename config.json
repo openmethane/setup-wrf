@@ -85,8 +85,8 @@
     "analysis_source" : "FNL",
 
     # if analysis_source is "FNL", you will need a login for CISL/rda.ucar.edu
-    "rda_ucar_edu_email" : "***REMOVED***",
-    "rda_ucar_edu_pword" : "***REMOVED***",
+    "orcid" : "***REMOVED***",
+    "rda_ucar_edu_api_token" : "***REMOVED***",
     # if analysis_source is "FNL", it's a good idea to take a subset of the grib2 files
     "regional_subset_of_grib_data" : "true",
 

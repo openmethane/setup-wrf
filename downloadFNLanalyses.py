@@ -27,13 +27,13 @@ def check_file_status(filepath, filesize):
     sys.stdout.write('%.3f %s' % (percent_complete, '% Completed'))
     sys.stdout.flush()
 
-def downloadFNL(email,pswd,targetDir,times):
+def downloadFNL(orcid, api_token, targetDir,times):
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3 | DOI: 10.5065/D65Q4T4Z
 
     Args:
-        email = [string] email address for which you have an account on rda.ucar.edu / CISL
-        pswd = [string] password for your account on rda.ucar.edu / CISL
+        orcid = [string] orcid for which you have an account on rda.ucar.edu / CISL
+        api_token = [string] api_token for  rda.ucar.edu / CISL
         targetDir = [string] Directory where the data should be downloaded
         times = [list of datetime.datetime objects] times to get analyses. Shoule be strictly at 00Z, 06Z, 12Z, 18Z and not before 2015-07-08
 
@@ -49,7 +49,7 @@ def downloadFNL(email,pswd,targetDir,times):
 
     print('authenticate credentials')
     url = 'https://rda.ucar.edu/cgi-bin/login'
-    values = {'email' : email, 'passwd' : pswd, 'action' : 'login'}
+    values = {'orcid_id' : orcid, 'api_token' : api_token, 'action' : 'tokenlogin'}
     # Authenticate
     ret = requests.post(url,data=values)
     if ret.status_code != 200:
