@@ -621,8 +621,8 @@ for ind_job in range(number_of_jobs):
                         print("\t\tAll FNL files were found - do not repeat the download")
                     else:
                         ## otherwise get it all
-                        FNLfiles = downloadFNL(email = config['rda_ucar_edu_email'],
-                                               pswd = config['rda_ucar_edu_pword'],
+                        FNLfiles = downloadFNL(orcid = config['orcid'],
+                                               api_token = config['rda_ucar_edu_api_token'],
                                                targetDir = run_dir_with_date,
                                                times = FNLtimes)
                     linkGribCmds = ['./link_grib.csh' ] + FNLfiles
