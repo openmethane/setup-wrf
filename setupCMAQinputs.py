@@ -130,11 +130,11 @@ def main():
     ##Melb_Sch01ctmDir = '/short/lp86/ns0890/data/CTM/Melb_Sch01/'
     
     ## same convention for the CMAQ output as for the MCIP output, except with ctmDir
-    wrfDir = "/scratch/q90/pjr563/openmethane-beta/wrf/aust25km" ## directory containing wrfout_* files
+    wrfDir = "/scratch/q90/pjr563/openmethane-beta/wrf/aust10km" ## directory containing wrfout_* files
     ## convention for WRF output, is wrfDir/2016112900/wrfout_d03_*
-    geoDir = "/home/563/pjr563/openmethane-beta/setup_wrf/templates/aust25km/" ## directory containing geo_em.* files
+    geoDir = "/home/563/pjr563/openmethane-beta/setup_wrf/templates/aust10km/" ## directory containing geo_em.* files
     #mozartSpecIndex = '/home/563/ns0890/runCMAQ/Melb_Sch01/speciesTables/species_table_CAMCHEM_CBM05.txt' ## speciation file, mapping MOZART to CMAQ (CBM05) species
-    mozartSpecIndex = '/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_WACCM.txt' ## speciation file, mapping WACCM to CMAQ (CH4only) species
+    specTableFile='/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_WACCM.txt'
     gfasSpecIndexFile = '/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_GFAS_CBM05.txt' ## speciation file, mapping GFAS to CMAQ (CBM05) species
     #wrfchemSpecIndexFile = '/home/563/ns0890/runCMAQ/Melb_Sch01/speciesTables/species_table_WRFCHEM_CBM05.txt' ## speciation file, mapping WRFCHEMI to CMAQ (CBM05) species
     tempDir = '/scratch/q90/pjr563/openmethane-beta/tmp' ## directory for temporary files
@@ -152,9 +152,9 @@ def main():
 
     domains = ['d01'] ## which domains should be run?
     run = 'openmethane' ## name of the simulation, appears in some filenames (keep this *short* - longer)
-
+    mcipSuffix = ['2']
     startDate = datetime.datetime(2022,7,1, 0, 0, 0) ## this is the START of the first day
-    endDate = datetime.datetime(2022,8,1, 0, 0) ## this is the START of the last day
+    endDate = datetime.datetime(2022,7,2, 0, 0) ## this is the START of the last day
     nhoursPerRun = 24 ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1 ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
 
@@ -183,7 +183,7 @@ def main():
     forceUpdateICandBC = True # force an update of the initial and boundary conditions from global MOZART output
     forceUpdateRunScripts = True # force an update to the run scripts
 
-    scenarioTag = '220701_25km'         # scenario tag (for MCIP). 16-character maximum
+    scenarioTag = '220701_10km'         # scenario tag (for MCIP). 16-character maximum
     mapProjName = 'LamCon_34S_150E'    # Map projection name (for MCIP). 16-character maximum
     gridName    = 'openmethane'        # Grid name (for MCIP). 16-character maximum
     
@@ -363,7 +363,12 @@ def main():
         templateIconFiles = configureRunScripts.prepareTemplateIconFiles(date = dates[0], domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech  = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, forceUpdate = forceUpdateICandBC)
         ## use the template initial and boundary condition concentration
         ## files and populate them with values from MOZART output
-        interpolateFromCAMS.interpolateFromCAMS(dates = dates, doms = domains, mech = mech, inputMozartFile = inputMozartFile, templateIconFiles = templateIconFiles, templateBconFiles = templateBconFiles, specTableFile = mozartSpecIndex, metDir = metDir, ctmDir = ctmDir, GridNames = GridNames, mcipsuffix = APPL, forceUpdate = forceUpdateICandBC)
+        interpolateFromCAMS.interpolateFromCAMSToCmaqGrid(dates, domains, mech,\
+                                                          inputCAMSFile, templateIconFiles,\
+                                                          templateBconFiles, specTableFile,\
+                                                          metDir, ctmDir,\
+                                                          GridNames, mcipSuffix,\
+                                                          forceUpdateICandBC, bias_correct=(1.838-1.771))
 
     if prepareRunScripts:
         #print("gfcbcjucrhcnrcbrbcnrchnrchnrhcrhcnricrhncruicjnrdfic")

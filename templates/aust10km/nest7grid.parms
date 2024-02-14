@@ -7,8 +7,8 @@
  standard_longitude=133.302,
  grid_cen_lat=-27.644,
  grid_cen_lon=133.302,
- grid_spacing_m=25000,
- NX_L=187,
- NY_L=177,
+ grid_spacing_m=10000,
+ NX_L=467,
+ NY_L=443,
 
  /
