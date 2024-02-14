@@ -4,7 +4,7 @@
 #PBS -q copyq
 #PBS -N setup_for_wrf
 #PBS -l walltime=10:00:00,mem=96GB
-#PBS -l storage=scratch/lp86+gdata/hh5+gdata/lp86
+#PBS -l storage=scratch/lp86+gdata/hh5+gdata/lp86+gdata/sx70
 #PBS -l ncpus=1
 #PBS -l wd
 ###PBS -j oe
