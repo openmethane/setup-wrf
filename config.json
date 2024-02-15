@@ -8,7 +8,7 @@
     "run_name" : "aust10km",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
-    "start_date" : "2022-06-30 00:00:00 UTC",
+    "start_date" : "2022-07-01 00:00:00 UTC",
     # The end time of the last simulation (same format as above)
     "end_date" : "2022-07-02 00:00:00 UTC",
     # Is this a restart run? (bool -> true/false, yes/no)
@@ -39,6 +39,8 @@
     "cleanup_script_template" : "cleanup_script_template.sh",
     # filename of the template script to coordinate the process
     "main_script_template" : "main_script_template.sh",
+    "average_field_script" : "${setup_root}/averageFields.py",
+    "check_wrfout_in_background_script" : "${setup_root}/checkWrfoutInBackground.py",
     
     # should the only task performed by the python script be to edit the WRF namelists and the shell scripts (the daily run-script, the daily clean-up script and the main coordination script)
     "only_edit_namelists" : "false",
