@@ -32,11 +32,11 @@ while True:
                 p = subprocess.Popen(cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 stdout, stderr = p.communicate()
                 if p.returncode != 0 or len(stderr) > 0:
-                    print 'Error processing',inFile
-                    print 'stderr:',stderr
-                    print 'returncode:',p.returncode
+                    print('Error processing',inFile)
+                    print('stderr:',stderr)
+                    print('returncode:',p.returncode)
                 elif not os.path.exists(outFile):
-                    print "output file not created:",outFile
+                    print("output file not created:",outFile)
                 else:
                     ## if the process completed successfully and the output file is found, then delete the input file
                     os.remove(inFile)
