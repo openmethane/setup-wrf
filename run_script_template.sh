@@ -8,7 +8,7 @@
 #PBS -q normal
 #PBS -l wd
 #PBS -P q90
-#PBS -l storage=scratch/w22+gdata/hh5+gdata/ua8+gdata/ub4
+#PBS -l storage=gdata/sx70+gdata/hh5+gdata/ua8+gdata/ub4
 
 module purge
 module load dot
@@ -19,12 +19,12 @@ module load hdf5/1.10.5
 module load netcdf/4.7.1
 module load nco
 module use /g/data3/hh5/public/modules
-module load conda/analysis27
+module load conda/analysis3
 
 ulimit -s unlimited
 cd ${RUN_DIR}
 
-python checkWrfoutInBackground.py &
+python3 checkWrfoutInBackground.py &
 backgroundPID=$!
 
 echo running with $PBS_NCPUS mpi ranks

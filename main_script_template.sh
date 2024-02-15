@@ -4,6 +4,7 @@
 #PBS -l mem=128GB
 #PBS -l ncpus=96
 #PBS -j oe
+#PBS -l storage=gdata/sx70+gdata/hh5+gdata/ua8+gdata/ub4
 #PBS -q normal
 #PBS -l wd
 
