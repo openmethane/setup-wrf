@@ -74,7 +74,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 yyyymmddhh = date.strftime('%Y%m%d%H')
                 times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24+1)]
                 for itime, time in enumerate(times):
-                    WRFfile = '{}/{}/wrfout_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
+                    WRFfile = '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
                     if not os.path.exists(WRFfile):
                         raise RuntimeError("File {} not found...")
                     ##
@@ -122,11 +122,11 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             ##
             times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24+1)]
             for itime, time in enumerate(times):
-                WRFfile = '{}/{}/wrfout_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
+                WRFfile = '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
                 if not os.path.exists(WRFfile):
                     raise RuntimeError("File {} not found...".format(WRFfile))
 
-            WRFfiles = [ 'wrfout_{}_{}'.format(dom, time.strftime('%Y-%m-%d_%H:%M:%S')) for time in times ]
+            WRFfiles = [ 'WRFOUT_{}_{}'.format(dom, time.strftime('%Y-%m-%d_%H:%M:%S')) for time in times ]
             ##
             for WRFfile in WRFfiles:
                 src = '{}/{}/{}'.format(wrfDir, yyyymmddhh, WRFfile)
@@ -272,7 +272,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 thisWRFdir = '{}/{}'.format(wrfDir,yyyymmddhh)
                 os.chdir(thisWRFdir)
                 ##
-                wrfouts = glob.glob("wrfout_{}_*".format(dom))
+                wrfouts = glob.glob("WRFOUT_{}_*".format(dom))
                 ##
                 command = 'tar -cvf {} {}'.format(tmpfl," ".join(wrfouts))
                 print('\t\t\t'+command)
@@ -294,7 +294,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     print("stderr = " + stderr)
                     raise RuntimeError("Error from mdss...")
                 ##
-                command = 'mdss put {} ns0890/data/WRF/{}/wrfout_{}_{}.tar'.format(tmpfl,wrfRunName,yyyymmddhh,dom)
+                command = 'mdss put {} ns0890/data/WRF/{}/WRFOUT_{}_{}.tar'.format(tmpfl,wrfRunName,yyyymmddhh,dom)
                 print('\t\t\t'+command)
                 commandList = command.split(' ')
                 p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

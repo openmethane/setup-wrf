@@ -160,18 +160,18 @@ def checkWrfMcipDomainSizes(metDir, date, domains, wrfDir = None):
         mcipLon = nc.variables['LON'][0,0,:,:]
         nc.close()
         ## find a WRF file
-        matches = glob.glob("{}/wrfout_{}_*".format(mcipdir,domain))
+        matches = glob.glob("{}/WRFOUT_{}_*".format(mcipdir,domain))
         if len(matches) == 0:
             if type(wrfDir) == type(None):
-                raise RuntimeError("No files matched the pattern wrfout_{}_* in folder {}, and no alternative WRF directory was provided...".format(domain,mcipdir))
+                raise RuntimeError("No files matched the pattern WRFOUT_{}_* in folder {}, and no alternative WRF directory was provided...".format(domain,mcipdir))
             elif len(matches) > 1:
-                warnings.warn("Multiple files match the pattern wrfout_{}_* in folder {}, using file {}".format(domain,mcipdir,matches[0]))
+                warnings.warn("Multiple files match the pattern WRFOUT_{}_* in folder {}, using file {}".format(domain,mcipdir,matches[0]))
             else:
-                matches = glob.glob("{}/wrfout_{}_*".format(wrfDir,domain))
+                matches = glob.glob("{}/WRFOUT_{}_*".format(wrfDir,domain))
                 if len(matches) == 0:
-                    raise RuntimeError("No files matched the pattern wrfout_{}_* the folders {} and {} ...".format(domain,mcipdir, wrfDir))
+                    raise RuntimeError("No files matched the pattern WRFOUT_{}_* the folders {} and {} ...".format(domain,mcipdir, wrfDir))
                 elif len(matches) > 1:
-                    warnings.warn("Multiple files match the pattern wrfout_{}_* in folder {}, using file {}".format(domain,wrfDir,matches[0]))
+                    warnings.warn("Multiple files match the pattern WRFOUT_{}_* in folder {}, using file {}".format(domain,wrfDir,matches[0]))
         ##
         wrfFile = matches[0]
         nc = netCDF4.Dataset(wrfFile)
