@@ -154,7 +154,7 @@ def main():
     run = 'openmethane' ## name of the simulation, appears in some filenames (keep this *short* - longer)
     mcipSuffix = ['2']
     startDate = datetime.datetime(2022,7,1, 0, 0, 0) ## this is the START of the first day
-    endDate = datetime.datetime(2022,7,2, 0, 0) ## this is the START of the last day
+    endDate = datetime.datetime(2022,7,31, 0, 0) ## this is the START of the last day
     nhoursPerRun = 24 ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1 ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
 
