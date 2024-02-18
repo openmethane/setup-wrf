@@ -176,3 +176,14 @@ def source2(script, shell = 'bash'):
     proc.communicate()
 
     return Env
+
+## make directories recursively, and safely
+## this function is a copy of: https://stackoverflow.com/a/600612/356426
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise

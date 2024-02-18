@@ -222,6 +222,10 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
             grid = GridNames[idom]
             mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
             chemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,dom)
+## check that the output directory exists - if not, create it
+            if not os.path.exists( chemdir):
+                helper_funcs.mkdir_p( chemdir)
+
             do_BCs = (dom == doms[0])
 
             if not (do_ICs or do_BCs):
