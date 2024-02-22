@@ -120,18 +120,16 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             mcipDir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
             nextDate = date + datetime.timedelta(days = 1)
             ##
-            times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24+1)]
-            for itime, time in enumerate(times):
-                WRFfile = '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
-                if not os.path.exists(WRFfile):
-                    raise RuntimeError("File {} not found...".format(WRFfile))
-
-            WRFfiles = [ 'WRFOUT_{}_{}'.format(dom, time.strftime('%Y-%m-%d_%H:%M:%S')) for time in times ]
+            times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24)]
+            WRFfiles = [ '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S')) for time in times ]
+            next_yyyymmddhh = nextDate.strftime('%Y%m%d%H')
+            nextDayFile ='{}/{}/WRFOUT_{}_{}'.format(wrfDir, next_yyyymmddhh, dom, nextDate.strftime('%Y-%m-%d_%H:%M:%S'))
+            WRFfiles.append( nextDayFile)
             ##
             for WRFfile in WRFfiles:
-                src = '{}/{}/{}'.format(wrfDir, yyyymmddhh, WRFfile)
+                src = WRFfile
                 assert os.path.exists(src), "file {} not found...".format(src)
-                dst = '{}/{}'.format(mcipDir, WRFfile)
+                dst = '{}/{}'.format(mcipDir, os.path.basename(WRFfile))
                 copyfile(src,dst)
                # print "copy {} to {}".format(src,dst)
             ##the above line is uncommented by Sougol
@@ -141,7 +139,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 print("\t\tFix up SIMULATION_START_DATE attribute with ncatted")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
                 for WRFfile in WRFfiles:
-                    outPath = '{}/{}'.format(mcipDir,WRFfile)
+                    outPath = '{}/{}'.format(mcipDir,os.path.basename( WRFfile))
                     command = 'ncatted -O -a SIMULATION_START_DATE,global,m,c,{} {} {}'.format(wrfstrttime,outPath,outPath)
                     print('\t\t\t'+command)
                     commandList = command.split(' ')        
@@ -149,8 +147,8 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print("stdout = " + stdout)
-                        print("stderr = " + stderr)
+                        print("stdout = " + str(stdout))
+                        print("stderr = " + str(stderr))
                         raise RuntimeError("Error from atted...")
 
             if add_qsnow:
