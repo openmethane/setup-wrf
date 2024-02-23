@@ -261,99 +261,6 @@ def main():
                         fix_simulation_start_date = True,
                         fix_truelat2 = False, truelat2 = None, wrfRunName = None, doArchiveWrf = False, add_qsnow = add_qsnow)
 
-    ## extract some parameters about the MCIP setup
-    CoordNames, GridNames, APPL = checkWrfMcipDomainSizes.getMcipGridNames(metDir,dates,domains)
-
-    ## get the environment from the CMAQ/scripts/config.cmaq file
-    configFile = '{}/scripts/config.cmaq'.format(CMAQdir)
-    configEnv = helper_funcs.source2(configFile, shell = 'csh')
-    #print(configEnv)
-    ## figure out what the CCTM executable will be called
-    cctmExec = 'ADJOINT_FWD'
-
-    ## get the shell environment variables
-    envVars = helper_funcs.source2('/home/563/ns0890/.bashrc')
-
-    if copyInputsFromPreviousSimulation:
-        checkWrfMcipDomainSizes.copyFromPreviousCtmDir(oldCtmDir = oldCtmDir, newCtmDir = ctmDir, dates = dates, domains = domains,
-                                                       oldRun = oldRun, newRun = run,
-                                                       CMAQmech = mechCMAQ, mech = mech, GridNames = GridNames, 
-                                                       copyEFMAPS = copyEFMAPS,
-                                                       copyLAIS = copyLAIS,
-                                                       copyPFTS = copyPFTS,
-                                                       copySURFZONE = copySURFZONE,
-                                                       copyJTABLE = copyJTABLE,
-                                                       copyTemplateIC = copyTemplateIC,
-                                                       copyTemplateBC = copyTemplateBC,
-                                                       copyBCON = copyBCON,
-                                                       copyICON = copyICON,
-                                                       copyFIREEMIS = copyFIREEMIS,
-                                                       copyMEGANEMIS = copyMEGANEMIS,
-                                                       copyMERGEDEMIS = copyMERGEDEMIS,
-                                                       link = linkInsteadOfCopy)    
-
-    ## check the latitudes and longitudes of the WRF and MCIP grids against one another
-    print("Check the latitudes and longitudes of the WRF and MCIP grids against one another")
-    nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, x0, y0, ncolsin, nrowsin = checkWrfMcipDomainSizes.checkWrfMcipDomainSizes(metDir = metDir, date = dates[0], domains = domains, wrfDir = wrfDir)
-    print("\t... done")
-
-    if prepareEmis:
-        print("Prepare emissions")
-        ## prepare the jproc files
-        prepareJprocFiles.prepareJprocFiles(dates = dates,scripts = scripts,ctmDir = ctmDir,CMAQdir = CMAQdir, photDir = photDir, mechCMAQ = mechCMAQ, forceUpdate = forceUpdateJproc)
-        ## prepare surf zone files
-        #surfzoneFilesExist = surfzonegeo.checkSurfZoneFilesExist(ctmDir = ctmDir, doms = domains)
-       # if (not surfzoneFilesExist) or forceUpdateSZ:
-           # surfzoneFiles = surfzonegeo.setupSurfZoneFiles(metDir = metDir, ctmDir = ctmDir, doms = domains, date = dates[0], mcipsuffix = APPL, shapefiles = coastlineShapefiles)
-
-        #if addMegan:
-            ## check that all the MEGAN input files exist (assume true until proven otherwise)
-           # print "\tCheck whether MEGAN input files exist ..."
-            #megan_files_exist = prepareMEGAN.check_megan_input_files_exist(ctmDir = ctmDir, run = run, domains = domains)
-            #print "\t... result =", megan_files_exist
-            ##
-            ## the following files need only be generated once for a given domain structure
-            #if (not megan_files_exist) or forceUpdateMegan:
-               # print "Make MEGAN input files ..."
-               # prepareMEGAN.make_megan_input_files(meganfolder = MEGANdir, run = run, domains  = domains, x0 = x0, y0 = y0, ncolsin = ncolsin, nrowsin = nrowsin, prepdir = prepMEGANdir, scripts = scripts, date  = dates[0], wrfDir = wrfDirForMegan, tempDir = tempDir, ctmDir = ctmDir, inputsDir = LaiPftEmfacDir, metDir = metDir, GridNames = GridNames)
-            ##
-            ## check that all the daily output from MEGAN exists:
-            #print "Check whether MEGAN output files exist ..."
-            #megan_output_exists = prepareMEGAN.check_megan_daily_files_exist(ctmDir = ctmDir, domains = domains, dates = dates, run = run, GridNames = GridNames, mechMEGAN = mechMEGAN)
-            #print "\t... result =", megan_output_exists
-            ##
-            ## prepare the biogenic emissions
-            #if not megan_output_exists:
-               # for idate, date in enumerate(dates):
-                    ## prepare the biogenic emissions
-                   # print "Prepare MEGAN biogenic emissions for",date.strftime('%Y%m%d')
-                    #prepareMEGAN.make_megan_daily_outputs(meganfolder = MEGANdir, metDir = metDir, run = run, domains = domains, scripts = scripts, date = date, ctmDir = ctmDir, mech = mechMEGAN, tempDir = tempDir, GridNames = GridNames)
-                   # prepareMEGAN.compressMeganOutputs(domains = domains, GridNames = GridNames, date = date, ctmDir = ctmDir, mechMEGAN = mechMEGAN)
-
-        #
-        ##
-        #if addFires:
-           # print "Check whether fire emission files exist ..."
-           # fire_emis_files_exist = prepareFireEmis.checkFireEmisFilesExist(dates = dates, doms = domains, ctmDir = ctmDir)
-            #print "\t... result =", fire_emis_files_exist
-            #if (not fire_emis_files_exist) or forceUpdateFires:
-               # print "Prepare fire emissions"
-                #prepareFireEmis.prepareFireEmis(run = run, dates = dates, doms = domains,
-                                      #          GFASfolder = GFASdir, GFASfile = GFASfile,
-                                       #         metDir = metDir, ctmDir = ctmDir, CMAQdir = CMAQdir,
-                                        #        mechCMAQ = mechCMAQ, mcipsuffix = APPL,
-                                         #       specTableFile = gfasSpecIndexFile)
-        ##
-        ## prepare the anthropogenic emissions
-        #for idate, date in enumerate(dates):
-         #   for idomain, domain in enumerate(domains):
-          #      fileExists = anthropEmis.checkIfMergedEmisFileExists(date = date, dom = domain, ctmDir = ctmDir)
-           #     if (not fileExists) or forceUpdateMerger:
-            #        print "Prepare anthropogenic emissions for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain)
-                    
-             #       anthropEmis.anthropEmis(dom = domain, grid = GridNames[idomain], run = run, date = date, nx_wrf = nx_wrf[idomain], ny_wrf = ny_wrf[idomain], nx_cmaq = nx_cmaq[idomain], ny_cmaq = ny_cmaq[idomain], ix0 = x0[idomain], iy0 = y0[idomain], mech = mech, inFolder = ANTHROPdir, addMegan = addMegan, addFires = addFires, conversionTableFile = wrfchemSpecIndexFile, ctmDir = ctmDir, metDir = metDir, mcipsuffix = APPL[idomain], mechMEGAN = mechMEGAN)
-              #      print "\t...Completed merging emissions for this date/domain combo"
-
     if prepareICandBC:
         ## prepare the template boundary condition concentration files
         ## from profiles using BCON
@@ -378,8 +285,6 @@ def main():
         configureRunScripts.prepareBconRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, forceUpdate = forceUpdateRunScripts)
         ## prepare the main run script
         configureRunScripts.prepareMainRunScript(dates = dates, domains = domains, ctmDir = ctmDir, CMAQdir = CMAQdir, scripts = scripts, doCompress = doCompress, compressScript = compressScript, run = run, forceUpdate = forceUpdateRunScripts)
-        ## prepare the PBS submission script
-        configureRunScripts.preparePbsRunScript(ctmDir = ctmDir, scripts = scripts, run = run, cmaqEnvScript = cmaqEnvScript, forceUpdate = forceUpdateRunScripts)
     ##
     return
 
