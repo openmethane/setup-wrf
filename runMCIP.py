@@ -125,21 +125,18 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             next_yyyymmddhh = nextDate.strftime('%Y%m%d%H')
             nextDayFile ='{}/{}/WRFOUT_{}_{}'.format(wrfDir, next_yyyymmddhh, dom, nextDate.strftime('%Y-%m-%d_%H:%M:%S'))
             WRFfiles.append( nextDayFile)
-            ##
-            for WRFfile in WRFfiles:
-                src = WRFfile
+            outPaths = ['{}/{}'.format(mcipDir, os.path.basename(WRFfile)) for WRFfile in WRFfiles]
+            for src, dst in  zip(WRFfiles, outPaths):
                 assert os.path.exists(src), "file {} not found...".format(src)
-                dst = '{}/{}'.format(mcipDir, os.path.basename(WRFfile))
-                copyfile(src,dst)
-               # print "copy {} to {}".format(src,dst)
-            ##the above line is uncommented by Sougol
-            ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
+                copyfile( src,dst)
+                # print "copy {} to {}".format(src,dst)
+                ##the above line is uncommented by Sougol
+                ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             
             if fix_simulation_start_date:
                 print("\t\tFix up SIMULATION_START_DATE attribute with ncatted")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
-                for WRFfile in WRFfiles:
-                    outPath = '{}/{}'.format(mcipDir,os.path.basename( WRFfile))
+                for outPath in outPaths:
                     command = 'ncatted -O -a SIMULATION_START_DATE,global,m,c,{} {} {}'.format(wrfstrttime,outPath,outPath)
                     print('\t\t\t'+command)
                     commandList = command.split(' ')        
@@ -154,8 +151,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             if add_qsnow:
                 print("\t\tAdd an artificial variable ('QSNOW') to the WRFOUT files")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
-                for WRFfile in WRFfiles:
-                    outPath = '{}/{}'.format(mcipDir,WRFfile)
+                for outPath in outPaths:
                     nc = netCDF4.Dataset(outPath,'a')
                     res = nc.createVariable('QSNOW', 'f4',
                                             ('Time', 'bottom_top', 'south_north', 'west_east'),
@@ -163,11 +159,9 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     nc.variables['QSNOW'][:] = 0.0
                     nc.close()
                     
-            ## print '2. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             if fix_truelat2 and (truelat2 != None):
                 print("\t\tFix up TRUELAT2 attribute with ncatted")
-                for WRFfile in WRFfiles:
-                    outPath = '{}/{}'.format(mcipDir,WRFfile)
+                for outPath in outPaths:
                     command = 'ncatted -O -a TRUELAT2,global,m,f,{} {} {}'.format(truelat2,outPath,outPath)
                     print('\t\t\t'+command)
                     commandList = command.split(' ')        
@@ -178,17 +172,16 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                         print("stdout = " + stdout)
                         print("stderr = " + stderr)
                         raise RuntimeError("Error from atted...")
-            ## print '3. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
+                    ## print '3. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
                     
             ##
             print("\t\tCreate temporary run.mcip script")
             ## pdb.set_trace()
             #{}/{}'.format(wrfDir,date.strftime('%Y%m%d%H'))---by Sougol
-            WRFfiles2 = ['{}/{}'.format(mcipDir,ff) for ff in WRFfiles ]
             subs = [['set DataPath   = TEMPLATE', 'set DataPath   = {}'.format(mcipDir)],
                     ['set InMetDir   = TEMPLATE','set InMetDir   = {}'.format(mcipDir)],
                     ['set OutDir     = TEMPLATE', 'set OutDir     = {}'.format(mcipDir)],
-                    ['set InMetFiles = ( TEMPLATE )', 'set InMetFiles = ( {} )'.format(' '.join(WRFfiles))],
+                    ['set InMetFiles = ( TEMPLATE )', 'set InMetFiles = ( {} )'.format(' '.join(outPaths))],
                     ['set InTerFile  = TEMPLATE', 'set InTerFile  = {}/geo_em.{}.nc'.format(geoDir,dom)],
                     ['set MCIP_START = TEMPLATE', 'set MCIP_START = {}:00:00.0000'.format(date.strftime('%Y-%m-%d-%H'))],
                     ['set MCIP_END   = TEMPLATE', 'set MCIP_END   = {}:00:00.0000'.format(nextDate.strftime('%Y-%m-%d-%H'))],
@@ -208,29 +201,25 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             ## delete any existing files
             for metfile in glob.glob("{}/MET*".format(mcipDir)):
                 print("rm",metfile)
-                #os.remove(metfile)
+                os.remove(metfile)
 
             for gridfile in glob.glob("{}/GRID*".format(mcipDir)):
                 print("rm",gridfile)
-                #os.remove(gridfile)
+                os.remove(gridfile)
 
             ## print '5. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             ##
             print("\t\tRun temporary run.mcip script")
             p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
-#            if stdout.split('\n') != 'NORMAL TERMINATION':
-#                print "stdout = " + stdout
-#                print "stderr = " + stderr
-#                raise RuntimeError("Error from run.mcip ...")
+            if stdout.split(b'\n')[-2] != b'NORMAL TERMINATION':
+                print ("stdout = " + str(stdout))
+                print ("stderr = " + str(stderr))
+                raise RuntimeError("Error from run.mcip ...")
             ##
 
-            ## print '6. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
-            ## sys.exit()
-            #for WRFfile in WRFfiles2:
-               # os.unlink(WRFfile)
-                #the above one is commented by Sougol to avoid deletiobn of wrf files
-
+            for outPath in outPaths:
+                os.unlink(outPath)
             if compressWithNco:
                 for metfile in glob.glob("{}/MET*_*".format(mcipDir)):
                     print("\t\tCompress {} with ncks".format(metfile))
@@ -241,8 +230,8 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print("stdout = " + stdout)
-                        print("stderr = " + stderr)
+                        print("stdout = " + str(stdout))
+                        print("stderr = " + str(stderr))
                         raise RuntimeError("Error from ncks...")
 
                 for gridfile in glob.glob("{}/GRID*_*".format(mcipDir)):
@@ -254,8 +243,8 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stdout, stderr = p.communicate()
                     if len(stderr) > 0:
-                        print("stdout = " + stdout)
-                        print("stderr = " + stderr)
+                        print("stdout = " + str(stdout))
+                        print("stderr = " + str(stderr))
                         raise RuntimeError("Error from ncks...")
 
             if doArchiveWrf and (wrfRunName is not None) and False:
