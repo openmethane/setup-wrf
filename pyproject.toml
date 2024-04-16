@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "setup_for_wrf"
+version = "0.1.0"
+description = "Scripts for running WRF "
+authors = [
+    "Peter Rayner <peter.rayner@superpowerinstitute.com.au>",
+    "Jeremy Silver"
+]
+readme = "README.md"
+packages = []
+
+[tool.poetry.dependencies]
+python = "^3.10,<3.12"
+pytz = "*"
+f90nml = "*"
+netCDF4 = "*"
+requests = "*"
