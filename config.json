@@ -1,9 +1,9 @@
 # naming convention should be: CAPS = environment variable, lower-case = internal
 {
     # overall base directory for project
-    "project_root": "${HOME}/openmethane-beta",
+    "project_root": "/project",
     # base dir for set up scripts
-    "setup_root" : "${project_root}/setup_wrf",
+    "setup_root" : "/project",
     # Project name
     "run_name" : "aust10km",
     # Start date-time of the first simulation:
@@ -31,7 +31,7 @@
     "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
 
     # top-level directory for the WRF and WPS outputs
-    "run_dir" : "/scratch/q90/pjr563/openmethane-beta/wrf/${run_name}",
+    "run_dir" : "${project_root}/data/runs/${run_name}",
 
     # filename of the template run-script
     "run_script_template" : "run_script_template.sh",
@@ -49,9 +49,9 @@
     "use_high_res_sst_data" : "true",
     
     # the top-level WPS directory
-    "wps_dir" : "${project_root}/wrf/coecms/WPS",
+    "wps_dir" : "/opt/wrf/WPS",
     # the top-level directory containing the WRF executables and data-tables
-    "wrf_dir" : "${project_root}/wrf/coecms/WRF",
+    "wrf_dir" : "/opt/wrf/WRF",
     # this directory (the directory with template namelists)
     "nml_dir" : "${setup_root}/templates/${run_name}",
     # scripts to copy from directory ${nml_dir} to each day

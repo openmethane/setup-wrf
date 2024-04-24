@@ -15,7 +15,7 @@
  j_parent_start    = 1,
  e_we          = 187,
  e_sn          = 177,
- geog_data_res     = 'usgs_10m+default','usgs_30s+default','usgs_30s+default','usgs_30s+default',
+ geog_data_res     = 'default','default','default','default',
  dx = 25000,
  dy = 25000,
  map_proj =  'lambert',
@@ -24,7 +24,7 @@
  truelat1  = -15.,
  truelat2  = -40.,
  stand_lon = 133.302,
- geog_data_path = '/g/data/sx70/data/WPS_GEOG_20190418',
+ geog_data_path = '/opt/wrf/geog',
  ref_x = 93.5,
  ref_y = 88.5,
 /

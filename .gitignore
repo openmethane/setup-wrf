@@ -4,3 +4,6 @@
 
 # Virtual environment
 .venv
+
+# Ignore the generated outputs
+data/runs
