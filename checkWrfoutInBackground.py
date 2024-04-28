@@ -25,7 +25,7 @@ while True:
             ##
             if ntimes == 12:
                 outFile = inFile.upper()
-                outfile = outfile.replace('_D','_d') # previous upper method also capitalizes domain names which breaks consistency with MCIP
+                outFile = outFile.replace('_D','_d') # previous upper method also capitalizes domain names which breaks consistency with MCIP
                 timeBits = inFile.split('_')
                 timestr = '_'.join(timeBits[2:])
                 cmds = ['python','averageFields.py','-i',inFile,'-o',outFile,'-t',timestr]
