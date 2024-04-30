@@ -30,6 +30,7 @@ while [ $n -lt ${njobs} ]; do
   # Submit run
   ./run.sh
 
+  let n=n+1
 done
 
 cd ${RUN_DIR}
