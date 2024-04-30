@@ -3,20 +3,22 @@
 
 Files included:
 * `add_remove_var.txt`: List of variables to add/remove to the standard WRF output stream
-* `cleanup_script_template.sh`: Template of per-run clean-up script
 * `config.json`: JSON file with configuration variables
 * `load_conda_env.sh`: Environment variables required to run `setup_for_wrf.py`
 * `load_wrf_env.sh`: Environment variables required to run WRF executables (same as to compile WRF)
-* `main_script_template.sh`: Template of the main coordination script script
 * `namelist.wps`: Template namelist for WPS
 * `namelist.wrf`: Template namelist for WRF
 * `nccopy_compress_output.sh`: Script to compress any uncompressed netCDF3 files to deflated netCDF4
-* `run_script_template.sh`: Template of the per-run run script
 * `setup_for_wrf.py`: Main script to run to prepare the simulations
 * `submit_setup.sh`: Script to submit (to the `copyq`) that does the setup
+* `cleanup_script_template.sh`: Template of per-run clean-up script
+* `main_script_template.sh`: Template of the main coordination script
+* `run_script_template.sh`: Template of the per-run run script
 
 
 ## Getting started
+
+This repository supports two target environments to run.
 
 ### NCI 
 **Updated to run on Gadi: these scripts no longer work on Raijin**
@@ -45,7 +47,7 @@ The python script does the following:
 
 To run the WRF model, either submit the main coordination script or the daily run-scripts with `qsub`.
 
-### Non-NCI running [WIP]
+### docker
 
 When not running on NCI, a docker container is recommended to reduce the
 
