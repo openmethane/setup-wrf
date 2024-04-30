@@ -83,7 +83,7 @@ after the container is destroyed.
 Inside the container, the wrf setup process can be run using
 
 ```
-python setup_for_wrf.py
+python setup_for_wrf.py -c config.docker.json
 ```
 
 ## Notes on the input files and scripts
