@@ -38,9 +38,9 @@ ENV LD_LIBRARY_PATH="/opt/wrf/libs/lib:${LD_LIBRARY_PATH}"
 
 WORKDIR /project
 
-# Install libgfortran and nco dependencies
+# Install additional apt dependencies
 RUN apt-get update && \
-    apt-get install -y libgfortran5 nco && \
+    apt-get install -y libgfortran5 nco csh mpich && \
     rm -rf /var/lib/apt/lists/*
 
 # Setup poetry

@@ -1,5 +1,6 @@
+# Ignore any local virtual environments
 .venv
 venv
-data
 
+# Ignore the generated runs
 data/runs
