@@ -45,9 +45,12 @@ The python script does the following:
 
 To run the WRF model, either submit the main coordination script or the daily run-scripts with `qsub`.
 
-### Non-NCI running [WIP]
+### docker
 
-When not running on NCI, a docker container is recommended to reduce the
+When not running on NCI, a docker container is recommended 
+to reduce the complexity of setting up the required dependencies.
+The Docker target can be run on any platform that supports docker,
+including Windows, MacOS, and Linux.
 
 This container can be built via:
 
