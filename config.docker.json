@@ -17,9 +17,9 @@
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     "restart" : "false",
     # Number of hours of simulation of each run (excluding spin-up)
-    "num_hours_per_run": 1,
+    "num_hours_per_run": 24,
     # Number of hours of spin-up simulation of each run
-    "num_hours_spin_up": 0,
+    "num_hours_spin_up": 12,
     # submit run as one job (if false, each run needs to get through the queue separately)
     "run_as_one_job" : "true",
     # Submit the WRF runs at the end of the script? (bool -> true/false, yes/no)
@@ -36,11 +36,11 @@
     "run_dir" : "/project/data/runs/${run_name}",
 
     # filename of the template run-script
-    "run_script_template" : "${setup_root}/targets/${target}/run_script_template.sh",
+    "run_script_template" : "${target_dir}/run_script_template.sh",
     # filename of the template script for clean-up duties
-    "cleanup_script_template" : "${setup_root}/targets/${target}/cleanup_script_template.sh",
+    "cleanup_script_template" : "${target_dir}/cleanup_script_template.sh",
     # filename of the template script to coordinate the process
-    "main_script_template" : "${setup_root}/targets/${target}/main_script_template.sh",
+    "main_script_template" : "${target_dir}/main_script_template.sh",
     "average_field_script" : "${setup_root}/averageFields.py",
     "check_wrfout_in_background_script" : "${setup_root}/checkWrfoutInBackground.py",
     
@@ -56,8 +56,12 @@
     "wrf_dir" : "/opt/wrf/WRF",
     # this directory (the directory with template namelists)
     "nml_dir" : "${setup_root}/templates/${run_name}",
+    # the directory containing the target-specific configuration
+    "target_dir" : "${setup_root}/targets/${target}",
     # scripts to copy from directory ${nml_dir} to each day
-    "scripts_to_copy_from_nml_dir":"add_remove_var.txt,nccopy_compress_output.sh,load_wrf_env.sh",
+    "scripts_to_copy_from_nml_dir":"add_remove_var.txt",
+    # scripts to copy from directory ${target_dir} to each day
+    "scripts_to_copy_from_target_dir":"nccopy_compress_output.sh,load_wrf_env.sh",
     # output location for the met_em files
     "metem_dir" : "${run_dir}/metem",
 

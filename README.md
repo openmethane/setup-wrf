@@ -1,19 +1,34 @@
 # WRF coordination scripts
 
 
-Files included:
-* `add_remove_var.txt`: List of variables to add/remove to the standard WRF output stream
-* `config.json`: JSON file with configuration variables
-* `load_conda_env.sh`: Environment variables required to run `setup_for_wrf.py`
-* `load_wrf_env.sh`: Environment variables required to run WRF executables (same as to compile WRF)
-* `namelist.wps`: Template namelist for WPS
-* `namelist.wrf`: Template namelist for WRF
-* `nccopy_compress_output.sh`: Script to compress any uncompressed netCDF3 files to deflated netCDF4
-* `setup_for_wrf.py`: Main script to run to prepare the simulations
-* `submit_setup.sh`: Script to submit (to the `copyq`) that does the setup
-* `cleanup_script_template.sh`: Template of per-run clean-up script
-* `main_script_template.sh`: Template of the main coordination script
-* `run_script_template.sh`: Template of the per-run run script
+## WRF runs
+
+The `setup_for_wrf.py` script generates the required 
+configuration and data to run WRF for a given domain and time.
+
+`setup_for_wrf.py` uses a JSON configuration file to define
+where the various input files are located, where the 
+output files should be stored, and how the WRF model should be run.
+
+`config.json` will be used as the default configuration file,
+but this can be overriden using the `-c` command line argument.
+An example config file `config.docker.json`
+ that targets running WRF using docker.
+
+The `setup_for_wrf.py` script does the following:
+* Reads the configuration file
+* Performs substitutions of the config file. For example, if used, the shell environment variable `${HOME}` will be replaced by its value when interpreting the script. The variable `wps_dir` is defined within the config file, and if the token `${wps_dir}` appears within the configuration entries, such tokens will be replaced by the value of this variable.
+* Configure the main coordination script
+* Loop over the required WRF jobs, performing the following:
+  * Check if the WRF input files for this run are available (`wrfinput_d0?`). If not, perform the following:
+    * Check that the geogrid files are available (copies should be found in the directory given by the config variable `nml_dir`). If not available, configure the WPS namelist and run `geogrid.exe` to produce them.
+    * Check if the `met_em` files for this run are available. If not, perform the following:
+      * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the high-resolution SST files (RTG) - this is optional
+      * If using the NCEP FNL analysis (available from 2015-07-09), download and subset the grib files
+      * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the analysis files (ERA Interim or FNL)
+      * Run `metgrid.exe` to produce the `met_em` files, moves these to a directory (`METEM`)
+    * Link to the `met_em` files (in the `METEM` directory), configure the WRF namelist, run `real.exe`
+  * Configure the daily "run" and "cleanup" scripts
 
 
 ## Getting started
@@ -30,26 +45,14 @@ Procedure to run these scripts:
 ..a. Log into one of the `copyq` nodes in interactive mode (via `qsub -I -q copyq -l wd,walltime=2:00:00,ncpus=1,mem=6GB -l storage=scratch/${PROJECT}+gdata/sx70+gdata/hh5`, for example).
 ..b. Run `./submit_setup.sh` on the command line. Before doing this, replace `${PROJECT}` in the `submit_setup.sh` script, with your `${PROJECT}` shell environment variable - this can be found in your `${HOME}/.config/gadi-login.conf` file.
 
-The python script does the following:
-* Reads the `config.json` configuration file
-* Performs substitutions of the config file. For example, if used, the shell environment variable `${HOME}` will be replaced by its value when interpreting the script. The variable `wps_dir` is defined within the config file, and if the token `${wps_dir}` appears within the configuration entries, such tokens will be replaced by the value of this variable.
-* Configure the main coordination script
-* Loop over the WRF jobs, performing the following:
-  * Check if the WRF input files for this run are available (`wrfinput_d0?`). If not, perform the following:
-    * Check that the geogrid files are available (copies should be found in the directory given by the config variable `nml_dir`). If not available, configure the WPS namelist and run `geogrid.exe` to produce them.
-    * Check if the `met_em` files for this run are available. If not, perform the following:
-      * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the high-resolution SST files (RTG) - this is optional
-      * If using the NCEP FNL analysis (available from 2015-07-09), download and subset the grib files
-      * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the analysis files (ERA Interim or FNL)
-      * Run `metgrid.exe` to produce the `met_em` files, moves these to a directory (`METEM`)
-    * Link to the `met_em` files (in the `METEM` directory), configure the WRF namelist, run `real.exe`
-  * Configure the daily "run" and "cleanup" scripts
-
 To run the WRF model, either submit the main coordination script or the daily run-scripts with `qsub`.
 
 ### docker
 
-When not running on NCI, a docker container is recommended to reduce the
+When not running on NCI, a docker container is recommended 
+to reduce the complexity of setting up the required dependencies.
+The Docker target can be run on any platform that supports docker,
+including Windows, MacOS, and Linux.
 
 This container can be built via:
 
@@ -99,6 +102,24 @@ and data required to run WRF in the `data/runs/` directory.
 
 ## Notes on the input files and scripts
 
+There are a number of files that are copied from various locations into the run directories. These are:
+
+| File Name                    | Description                                                                    | Templated |
+|------------------------------|--------------------------------------------------------------------------------|-----------|
+| `cleanup_script_template.sh` | Template of per-run clean-up script                                            | Yes       |
+| `main_script_template.sh`    | Template of the main coordination script                                       | Yes       |
+| `run_script_template.sh`     | Template of the per-run run script                                             | Yes       |
+| `namelist.wps`               | Template namelist for WPS                                                      | Yes       |
+| `namelist.wrf`               | Template namelist for WRF                                                      | Yes       |
+| `load_wrf_env.sh`            | Environment variables required to run WRF executables (same as to compile WRF) | No        |
+| `nccopy_compress_output.sh`  | Script to compress any uncompressed netCDF3 files to deflated netCDF4          | No        |
+| `add_remove_var.txt`         | List of variables to add/remove to the standard WRF output stream              | No        |
+
+
+The non-templated files are copied from either the `nml_dir` or `target_dir` directories (as defined in `config.json`).
+The location of the non-templated files is define using the `scripts_to_copy_from_nml_dir` and 
+`scripts_to_copy_from_nml_dir` configuration values.
+
 The following files are configured based on the results of `config.json`: `namelist.wps`, `namelist.wrf`, `cleanup_script_template.sh`, `main_script_template.sh`, `run_script_template.sh`. The tokens to replace are identified with the following format: `${keyword}`. Generally speaking, the values for substitution are defined within the python script (`setup_for_wrf.py`). To change the substitutions, edit the python script in the sections between the lines bounded by `## EDIT:` and `## end edit section`.
 
 The `load_wrf_env.sh` script should contain the *same* environment modules that were used to compile WRF. It is assumed that you have compiled with MPI (i.e. 'distributed memory').
@@ -109,12 +130,12 @@ This has been tested on *Gadi* using the [CLEX CMS WRF setup](https://github.com
 
 ## Analysis inputs
 
-This script will either use the ERA Interim reanalyses available on NCI or download NCEP FNL 0.25 analyses. This is set in `config.json'. If using the FNL analyses, you need to create an account on the [UCAR CISL](https://rda.ucar.edu) portal, and enter the credentials in `config.json' - this is not terribly secure, so make up a **fresh password** for this site. If switching between the FNL and ERA Interim reanalyses, you will need to change the Vtable file used (set in `config.json'), and also the number of vertical levels (set in `namelist.wrf' file). Also the merger of the RTG SSTs is only done for the ERA Interim analysis, and this step is optional (set in `config.json').
+This script will either use the ERA Interim reanalyses available on NCI or download NCEP FNL 0.25 analyses. This is set in `config.json`. If using the FNL analyses, you need to create an account on the [UCAR CISL](https://rda.ucar.edu) portal, and enter the credentials in `config.json` - this is not terribly secure, so make up a **fresh password** for this site. If switching between the FNL and ERA Interim reanalyses, you will need to change the Vtable file used (set in `config.json`), and also the number of vertical levels (set in `namelist.wrf` file). Also the merger of the RTG SSTs is only done for the ERA Interim analysis, and this step is optional (set in `config.json`).
 
 ## Notes on the structure of the output
 
 All the main WRF output will be produced within subfolders of the directory given by variable `run_dir` in the config file. It will have the following substructure:
-* `${run_dir}/METEM`: contains any `met_em` files produced (once the `wrfinput_d0?` files have been created, these `met_em` files can be deleted).
+* `${run_dir}/metem`: contains any `met_em` files produced (once the `wrfinput_d0?` files have been created, these `met_em` files can be deleted).
 * `${run_dir}/${YYYYMMDDHH}`: One folder per WRF run, where `${YYYYMMDDHH}` is the (UTC) date-stamp of the starting time of the corresponding WRF run (n.b. this run may actually start earlier if spinup is requested.
 One exception to this is that the GEOGRID output files (`geo_em.d0?.nc`) are moved to the directory given by the variable `nml_dir` in the config file.
 
