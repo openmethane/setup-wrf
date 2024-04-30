@@ -7,7 +7,7 @@
     # Project name
     "run_name" : "aust10km",
     # Target environment for running tasks
-    "target": "nci"
+    "target": "nci",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
     "start_date" : "2022-07-31 00:00:00 UTC",
@@ -38,9 +38,9 @@
     # filename of the template run-script
     "run_script_template" : "${setup_root}/targets/${target}/run_script_template.sh",
     # filename of the template script for clean-up duties
-    "cleanup_script_template" : "{setup_root}/targets/${target}/cleanup_script_template.sh",
+    "cleanup_script_template" : "${setup_root}/targets/${target}/cleanup_script_template.sh",
     # filename of the template script to coordinate the process
-    "main_script_template" : "{setup_root}/targets/${target}/main_script_template.sh",
+    "main_script_template" : "${setup_root}/targets/${target}/main_script_template.sh",
     "average_field_script" : "${setup_root}/averageFields.py",
     "check_wrfout_in_background_script" : "${setup_root}/checkWrfoutInBackground.py",
     
