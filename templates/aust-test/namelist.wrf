@@ -43,9 +43,9 @@ time_step_fract_num      = 0,
 time_step_fract_den      = 1,
 max_dom                  = 1,
 s_we                     = 1,
-e_we                     = 467,
+e_we                     = 20,
 s_sn                     = 1,
-e_sn                     = 443,
+e_sn                     = 20,
 s_vert                   = 1,
 e_vert                   = 33,
 num_metgrid_levels       = 38,
@@ -53,8 +53,8 @@ dx                       = 10000,
 dy                       = 10000,
 grid_id                  = 1,
 parent_id                = 1,
-i_parent_start           = 1,
-j_parent_start           = 1,
+i_parent_start           = 200,
+j_parent_start           = 200,
 parent_grid_ratio        = 1,
 parent_time_step_ratio   = 1,
 !eta_levels = 1.000, 0.997, 0.994, 0.990, 0.985, 0.980, 0.970, 0.960, 0.950, 0.940, 0.922, 0.894, 0.860, 0.817, 0.766, 0.707, 0.644, 0.576,0.507, 0.444, 0.380, 0.324, 0.273, 0.228,0.188, 0.152, 0.121, 0.093, 0.069, 0.048,0.029, 0.014, 0.000,
@@ -83,7 +83,7 @@ smooth_option                       = 1,
     sst_update = 1
     sst_skin = 1
     progn = 1,
-    num_land_cat = 24
+    num_land_cat = 21
 /
 
 &fdda                    
