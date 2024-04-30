@@ -6,4 +6,4 @@
 .venv
 
 # Ignore the generated outputs
-data/runs
+data

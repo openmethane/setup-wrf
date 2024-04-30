@@ -5,8 +5,8 @@ WORKDIR /src
 ENV WGRIB2_VERSION="v2.0.8"
 
 # Update the repo
-RUN apt update && \
-    apt install -y build-essential libaec-dev zlib1g-dev libcurl4-openssl-dev libboost-dev curl wget zip unzip bzip2 gfortran gcc g++
+RUN apt-get update && \
+    apt-get install -y build-essential libaec-dev zlib1g-dev libcurl4-openssl-dev libboost-dev curl wget zip unzip bzip2 gfortran gcc g++
 
 
 # Download the latest wgrib2 source code

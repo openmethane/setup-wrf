@@ -49,10 +49,6 @@ To run the WRF model, either submit the main coordination script or the daily ru
 
 When not running on NCI, a docker container is recommended to reduce the
 
-Note: the `--platform=linux/amd64` part in the following commands is optional, 
-but required when running on Arm-based CPUs.
-
-
 This container can be built via:
 
 ```
@@ -61,30 +57,43 @@ docker build --platform=linux/amd64 . -t setup_wrf
 
 Before running [static geographical data](https://www2.mmm.ucar.edu/wrf/users/download/get_sources_wps_geog.html) 
 used by WPS must be downloaded and extracted locally.
+This only needs to be performed once.
+
 The highest resolution data are used in this case (~29 GB uncompressed).
 These data were not included in the docker container given their size
 and static nature. Instead, they are mounted as a local volume 
 when running the docker container.
 
-Once the static data has been extracted, 
+The required data can be downloaded and extracted to `data/geog` using the following command:
+
+```
+make data/geog
+```
+
+Once the static geography data has been extracted, 
 the docker container containing the project dependencies can be run:
 
 ```
-export GEOG_DATA=/absolute/path/to/extracted/geog/data/WPS_GEOG
-docker run --rm -it -v $(PWD):/project -v $GEOG_DATA:/opt/wrf/geog setup_wrf
+docker run --rm -it -v $(PWD):/project -v $(PWD)/data/geog:/opt/wrf/geog setup_wrf
 ```
 
-This mounts the static geographical data which is located in a directory specified using
-the `GEOG_DATA_DIR` environment variable. `GEOG_DATA_DIR` must be an absolute path.
-The root project directory is also mounted to `/opt/wrf/geog` in the docker container. 
+The static geographical data is mounted to `/opt/wrf/geog`.
+The root project directory is also mounted to `/project` in the docker container. 
 This allows for any changes made to this directory (or child directories) to be reflected
 after the container is destroyed.
 
-Inside the container, the wrf setup process can be run using
+Inside the container, the wrf setup process can be run using the following command
+(this might take some time):
 
 ```
 python setup_for_wrf.py -c config.docker.json
 ```
+
+This command will generate all the required configuration
+and data required to run WRF in the `data/runs/` directory.
+
+[TODO]: Add instructions for running WRF
+[TODO]: Add instructions for running CMAQ
 
 ## Notes on the input files and scripts
 
