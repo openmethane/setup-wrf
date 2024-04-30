@@ -9,7 +9,7 @@ python3 checkWrfoutInBackground.py &
 backgroundPID=$!
 
 echo running with $PBS_NCPUS mpi ranks
-time /apps/openmpi/4.0.2/bin/mpirun -np $PBS_NCPUS ./wrf.exe >& wrf.log
+time mpirun -np $PBS_NCPUS ./wrf.exe >& wrf.log
 
 ## give the python script a chance to finish
 sleep 20

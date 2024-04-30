@@ -79,7 +79,7 @@ Once the static geography data has been extracted,
 the docker container containing the project dependencies can be run:
 
 ```
-docker run --rm -it -v $(PWD):/project -v $(PWD)/data/geog:/opt/wrf/geog setup_wrf
+docker run --rm -it -v $(PWD):/project -v $(PWD)/data/geog/WPS_GEOG:/opt/wrf/geog setup_wrf
 ```
 
 The static geographical data is mounted to `/opt/wrf/geog`.
@@ -96,8 +96,20 @@ python setup_for_wrf.py -c config.docker.json
 
 This command will generate all the required configuration
 and data required to run WRF in the `data/runs/` directory.
+Depending on the time configuration,
+multiple WRF jobs may be generated under the `data/runs/<run_name>` directory.
 
-[TODO]: Add instructions for running WRF
+
+The `data/runs/<run_name>/main.sh` script generated in the previous step
+can be used to run all the WRF jobs sequentially.
+For each job, `main.sh` runs `data/runs/<run_name>/<YYYYMMDDHH>/run.sh`,
+which runs WRF for the given time and domain.
+Depending on the size of your domain and the number of processors available,
+this may take some time.
+
+`data/runs/<run_name>/<YYYYMMDDHH>/run.sh` can also be run directly 
+to run WRF for a specific time period.
+
 [TODO]: Add instructions for running CMAQ
 
 ## Notes on the input files and scripts
