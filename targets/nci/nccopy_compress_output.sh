@@ -40,4 +40,3 @@ find $1 -type f -exec file -m $tempfile {} \; | grep "NetCDF Data Format data" |
 rm -f $tempfilemgc $tempfile
 
 echo "## End of script ##"
-

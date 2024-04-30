@@ -36,11 +36,11 @@
     "run_dir" : "/scratch/q90/pjr563/openmethane-beta/wrf/${run_name}",
 
     # filename of the template run-script
-    "run_script_template" : "${setup_root}/targets/${target}/run_script_template.sh",
+    "run_script_template" : "${target_dir}/run_script_template.sh",
     # filename of the template script for clean-up duties
-    "cleanup_script_template" : "${setup_root}/targets/${target}/cleanup_script_template.sh",
+    "cleanup_script_template" : "${target_dir}/cleanup_script_template.sh",
     # filename of the template script to coordinate the process
-    "main_script_template" : "${setup_root}/targets/${target}/main_script_template.sh",
+    "main_script_template" : "${target_dir}/main_script_template.sh",
     "average_field_script" : "${setup_root}/averageFields.py",
     "check_wrfout_in_background_script" : "${setup_root}/checkWrfoutInBackground.py",
     
@@ -54,10 +54,14 @@
     "wps_dir" : "${project_root}/wrf/coecms/WPS",
     # the top-level directory containing the WRF executables and data-tables
     "wrf_dir" : "${project_root}/wrf/coecms/WRF",
-    # this directory (the directory with template namelists)
+    # the directory containining the run specific configuration (the directory with template namelists)
     "nml_dir" : "${setup_root}/templates/${run_name}",
+    # the directory containing the target-specific configuration
+    "target_dir" : "${setup_root}/targets/${target}",
     # scripts to copy from directory ${nml_dir} to each day
-    "scripts_to_copy_from_nml_dir":"add_remove_var.txt,nccopy_compress_output.sh,load_wrf_env.sh",
+    "scripts_to_copy_from_nml_dir":"add_remove_var.txt",
+    # scripts to copy from directory targets/${target} to each day
+    "scripts_to_copy_from_target_dir":"nccopy_compress_output.sh,load_wrf_env.sh",
     # output location for the met_em files
     "metem_dir" : "${run_dir}/metem",
 

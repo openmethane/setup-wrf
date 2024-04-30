@@ -194,6 +194,13 @@ def grep_lines(regex, lines):
     out = [ line for line in lines if line.find(regex) >= 0 ]
     return out
 
+def symlink_file(input_directory, output_directory, filename):
+    src = os.path.join(input_directory, filename)
+    assert os.path.exists(src), "Cannot find script {} ...".format(filename)
+    dst = os.path.join(output_directory, filename)
+    if not os.path.exists(dst):
+        os.symlink(src, dst)
+
 
 def compressNCfile(filename,ppc = None):
     '''Compress a netCDF3 file to netCDF4 using ncks
@@ -872,14 +879,21 @@ for ind_job in range(number_of_jobs):
                         pattern = config['wrf_run_tables_pattern'],
                         destDir = run_dir_with_date)
 
-    # link to scripts from the namelist directory
-    scriptsToGet = config['scripts_to_copy_from_nml_dir'].split(',')
-    for scriptToGet in scriptsToGet:
-        src = os.path.join(config["nml_dir"], scriptToGet)
-        assert os.path.exists(src), "Cannot find script {} ...".format(scriptToGet)
-        dst = os.path.join(run_dir_with_date, scriptToGet)
-        if not os.path.exists(dst):
-            os.symlink(src, dst)
+    # link to scripts from the namelist and target directories
+    for input_directory_key, scripts_to_copy_key in (
+        ("target_dir", "scripts_to_copy_from_target_dir"),
+        ("nml_dir", "scripts_to_copy_from_nml_dir"),
+    ):
+        input_directory = config[input_directory_key]
+        scripts_to_copy = config[scripts_to_copy_key].split(",")
+        
+        for script_to_copy in scripts_to_copy:
+            symlink_file(input_directory, run_dir_with_date, script_to_copy)
+            
+    
+        
+    for script_to_copy in config['scripts_to_copy_from_target_dir'].split(','):
+        symlink_file(config["target_dir"], run_dir_with_date, script_to_copy)
 
     if (not config['only_edit_namelists']) and (not wrfInitFilesExist):
         ##
