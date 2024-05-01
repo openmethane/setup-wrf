@@ -30,12 +30,12 @@ jobs:
           context: .
           tags: setup_wrf:latest
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=docker,dest=/tmp/setup_wrf.tar
+          outputs: type=docker,dest=/tmp/setup_wrf.tar.gz
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: setup_wrf
-          path: /tmp/setup_wrf.tar
+          path: /tmp/setup_wrf.tar.gz
 
   test:
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
           path: /tmp
       - name: Load image into docker context
         run: |
-          docker load --input /tmp/setup_wrf.tar
+            docker load --input /tmp/setup_wrf.tar.gz
       - name: Cache Geog data
         id: cache-geog
         uses: actions/cache@v4
@@ -87,7 +87,7 @@ jobs:
           path: /tmp
       - name: Load image into docker context
         run: |
-          docker load --input /tmp/setup_wrf.tar
+          docker load --input /tmp/setup_wrf.tar.gz
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Container registry
@@ -112,4 +112,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
           push: true
-          cache-from: type=local,src=/tmp/setup_wrf.tar
+          cache-from: type=local,src=/tmp/setup_wrf.tar.gz
