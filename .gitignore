@@ -1,3 +1,9 @@
 *~
 *.pyc
 *.nc
+
+# Virtual environment
+.venv
+
+# Ignore the generated outputs
+data

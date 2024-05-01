@@ -1,6 +1,5 @@
-# WRF coordination scripts for NCI (Gadi)
+# WRF coordination scripts
 
-**Updated to run on Gadi: these scripts no longer work on Raijin**
 
 Files included:
 * `add_remove_var.txt`: List of variables to add/remove to the standard WRF output stream
@@ -15,6 +14,12 @@ Files included:
 * `run_script_template.sh`: Template of the per-run run script
 * `setup_for_wrf.py`: Main script to run to prepare the simulations
 * `submit_setup.sh`: Script to submit (to the `copyq`) that does the setup
+
+
+## Getting started
+
+### NCI 
+**Updated to run on Gadi: these scripts no longer work on Raijin**
 
 Procedure to run these scripts:
 0. [Apply for membership](https://my.nci.org.au/) to the 'sx70' NCI group to use the `WPS_GEOG` dataset. If you also want to use the ERAI analyses, you will need to apply for access to the 'ua8' and 'ub4' NCI groups.
@@ -40,6 +45,58 @@ The python script does the following:
 
 To run the WRF model, either submit the main coordination script or the daily run-scripts with `qsub`.
 
+### docker
+
+When not running on NCI, a docker container is recommended 
+to reduce the complexity of setting up the required dependencies.
+The Docker target can be run on any platform that supports docker,
+including Windows, MacOS, and Linux.
+
+This container can be built via:
+
+```
+docker build --platform=linux/amd64 . -t setup_wrf
+```
+
+Before running [static geographical data](https://www2.mmm.ucar.edu/wrf/users/download/get_sources_wps_geog.html) 
+used by WPS must be downloaded and extracted locally.
+This only needs to be performed once.
+
+The highest resolution data are used in this case (~29 GB uncompressed).
+These data were not included in the docker container given their size
+and static nature. Instead, they are mounted as a local volume 
+when running the docker container.
+
+The required data can be downloaded and extracted to `data/geog` using the following command:
+
+```
+make data/geog
+```
+
+Once the static geography data has been extracted, 
+the docker container containing the project dependencies can be run:
+
+```
+docker run --rm -it -v $(PWD):/project -v $(PWD)/data/geog:/opt/wrf/geog setup_wrf
+```
+
+The static geographical data is mounted to `/opt/wrf/geog`.
+The root project directory is also mounted to `/project` in the docker container. 
+This allows for any changes made to this directory (or child directories) to be reflected
+after the container is destroyed.
+
+Inside the container, the wrf setup process can be run using the following command
+(this might take some time):
+
+```
+python setup_for_wrf.py -c config.docker.json
+```
+
+This command will generate all the required configuration
+and data required to run WRF in the `data/runs/` directory.
+
+[TODO]: Add instructions for running WRF
+[TODO]: Add instructions for running CMAQ
 
 ## Notes on the input files and scripts
 
