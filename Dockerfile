@@ -59,4 +59,4 @@ RUN poetry install  --no-interaction --no-ansi
 # For testing it might be easier to mount $(PWD):/project so that local changes are reflected in the container
 COPY . /project
 
-ENTRYPOINT ["/bin/bash"]
+CMD ["/bin/bash"]
