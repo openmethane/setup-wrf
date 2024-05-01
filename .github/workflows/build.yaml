@@ -61,6 +61,12 @@ jobs:
             -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
             setup_wrf \
             python setup_for_wrf.py -c config.docker.json
+          # Run WRF
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
+            setup_wrf \
+            data/runs/aust-test/main.sh
       - name: Upload WRF artifacts on failure
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -84,11 +90,12 @@ jobs:
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
-      - name: Build and push image
-        uses: docker/build-push-action@v5
-        id: build-final
-        with:
-          context: .
-          labels: ${{ steps.meta.outputs.labels }}
-          tags: ${{ steps.meta.outputs.tags }}
-          push: true
+# TODO: Investigate how to push to the container registry
+#      - name: Build and push image
+#        uses: docker/build-push-action@v5
+#        id: build-final
+#        with:
+#          context: .
+#          labels: ${{ steps.meta.outputs.labels }}
+#          tags: ${{ steps.meta.outputs.tags }}
+#          push: true
