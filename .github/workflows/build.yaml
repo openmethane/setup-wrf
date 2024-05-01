@@ -77,9 +77,9 @@ jobs:
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
-            mkdir -p data/geog
-	        curl "https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz" -o data/geog/geog_low_res_mandatory.tar.gz
-	        tar -xvzf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
+          mkdir -p data/geog
+          curl "https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz" -o data/geog/geog_low_res_mandatory.tar.gz
+          tar -xvzf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
       - name: Run test
         run: |
           docker run --rm -v $(PWD):/project -v $(PWD)/data/geog/WPS_GEOG:/opt/wrf/geog setup_wrf python setup_for_wrf.py -c config.docker.json
