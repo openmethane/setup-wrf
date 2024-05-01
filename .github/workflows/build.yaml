@@ -55,9 +55,10 @@ jobs:
         run: |
           # Update the namelist.wps file to use the low resolution data
           sed -i "s/geog_data_res.*/geog_data_res = 'lowres',/g" templates/aust-test/namelist.wps
+          # Run setup_for_wrf.py
           docker run --rm \
             -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/data/geog/WPS_GEOG:/opt/wrf/geog \
+            -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
             setup_wrf \
             python setup_for_wrf.py -c config.docker.json
       - name: Upload WRF artifacts on failure
