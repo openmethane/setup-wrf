@@ -53,6 +53,8 @@ jobs:
           tar -xvzf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
       - name: Run test
         run: |
+          # Update the namelist.wps file to use the 10m resolution data
+          sed -i "s/geog_data_res.*/geog_data_res = '10m',/g" templates/aust-test/namelist.wps
           docker run --rm \
             -v ${{ github.workspace }}:/project \
             -v ${{ github.workspace }}/data/geog/WPS_GEOG:/opt/wrf/geog \
