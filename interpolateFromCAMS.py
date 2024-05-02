@@ -162,7 +162,7 @@ def print_boundary_variable(cmspec, out_boundary, factor):
     print("{:20} {:.3e}".format(cmspec, out_boundary[:,0,:].mean()*factor))
 
 
-def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, bias_correct =0.0 ):
+def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, bias_correct =0.0 ):
     '''Function to interpolate the from the global CAMS CTM output to ICs and BCs for CMAQ
     
     Args:
@@ -172,7 +172,6 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
         inputCAMSFile: Output from CAMS to use for boundary and initial conditions
         templateIconFiles: list of filenames for template ICON files
         templateBconFiles: list of filenames for template BCON files
-        specTableFile: speciation file, mapping CAMS to CMAQ (CBM05) species
         metDir: base directory for the MCIP output
         ctmDir: base directory for the CCTM inputs and outputs
         GridNames: list of MCIP map projection names (one per domain)
@@ -185,10 +184,6 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
 
     '''
     ##
-    ALLSPEC = ['CH4']
-
-#    nvars = len(PR_vars)
-
     ## if we aren't forcing an update, check whether files exist and
     ## return early if possible
     if not forceUpdate:

@@ -1,11 +1,10 @@
 '''Autogenerate run scripts for the CCTM, BCON and ICON, as well as higher-level run scripts
 '''
 import os
-import datetime
 import helper_funcs
 import subprocess
 
-def prepareCctmRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, mechCMAQ, GridNames, mcipsuffix, scripts, EXEC, SZpath, forceUpdate,nhours = 24, printFreqHours = 1):
+def prepareCctmRunScripts(dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, mechCMAQ, GridNames, mcipsuffix, scripts, EXEC, SZpath, forceUpdate,nhours = 24, printFreqHours = 1):
     '''Prepare one run script for CCTM per domain per day
 
     Args: 
@@ -39,7 +38,6 @@ def prepareCctmRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
         mm = date.strftime('%m')
         dd = date.strftime('%d')
         yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        yyyymmddhh = date.strftime('%Y%m%d%H')
         hhmmss = date.strftime('%H%M%S')
         duration = '{:02d}0000'.format(nhours)
         if printFreqHours >= 1:
@@ -49,22 +47,18 @@ def prepareCctmRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
         ##
         if idate != 0:
             lastdate = dates[idate-1]
-            lastyyyyjjj = lastdate.strftime('%Y%j')
             lastyyyymmdd = lastdate.strftime('%Y%m%d')
             lastyyyymmdd_dashed = lastdate.strftime('%Y-%m-%d')
-            lastyyyymmddhh = lastdate.strftime('%Y%m%d%H')
         ##
         for idomain, domain in enumerate(domains):
             mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,domain)
             chemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domain)
             chemdatedir = '{}/{}'.format(ctmDir,yyyymmdd_dashed)
             outCctmFile = '{}/run.cctm_{}_{}'.format(chemdir,domain,yyyymmdd)
-        #    print("sougollllllllllll----------------%%%Jrijrjorjv")
             if os.path.exists(outCctmFile) and not forceUpdate:
                  continue
             ##
             grid = GridNames[idomain]
-            ## CTM_APPL = '{}_{}'.format(CFG, yyyymmdd)
             if idate == 0:
                 ICONdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domain)
                 ICfile = 'ICON.{}.{}.{}.nc'.format(domain,grid,mech)
@@ -112,7 +106,7 @@ def prepareCctmRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
             os.chmod(outCctmFile,0o0744)
     return
 
-def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, mechCMAQ, GridNames, mcipsuffix, scripts, EXEC, forceUpdate):
+def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, mechCMAQ, GridNames, mcipsuffix, scripts, forceUpdate):
     '''Prepare run scripts for BCON, one per domain per day
 
     Args:
@@ -127,7 +121,6 @@ def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
         GridNames: list of MCIP map projection names (one per domain)
         mcipsuffix: Suffix for the MCIP output files
         scripts: dictionary of scripts, including an entry with the key 'bconRun'
-        EXEC: The name of the CCTM executable
         forceUpdate: Boolean (True/False) for whether we should update the output if it already exists
 
     Returns:
@@ -139,9 +132,7 @@ def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
         yyyyjjj = date.strftime('%Y%j')
         yyyymmdd = date.strftime('%Y%m%d')
         yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        yyyymmddhh = date.strftime('%Y%m%d%H')
-        ##
-        outdir = '{}/{}'.format(ctmDir, yyyymmdd_dashed )
+
         for idomain, domain in enumerate(domains):
             mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,domain)
             chemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domain)
@@ -149,9 +140,8 @@ def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
             ##
             ## adjust BCON script
             if idomain != 0:
-                lastchemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domains[idomain-1])
                 lastmcipdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domains[idomain-1])
-                CTM_APPL = '{}_{}'.format(CFG, yyyymmdd)
+
                 outBconFile = '{}/run.bcon_{}_{}'.format(chemdir,domain,yyyymmdd)
                 if os.path.exists(outBconFile) and not forceUpdate:
                     continue
@@ -203,9 +193,7 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
     yyyyjjj = date.strftime('%Y%j')
     yyyymmdd = date.strftime('%Y%m%d')
     yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-    yyyymmddhh = date.strftime('%Y%m%d%H')
     ##
-    outdir = '{}/{}'.format(ctmDir, yyyymmdd_dashed )
     ndom = len(domains)
     outputFiles = [''] * ndom
     inputType = 'profile'
@@ -245,7 +233,6 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
         process = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, err) = process.communicate()
         exit_code = process.wait()
-        import pdb
         try:
           if output.find('Program  BCON completed successfully') < 0:
               print(outBconFile)
@@ -253,8 +240,8 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
               print('err =',err)
               print('output =', output)
               raise RuntimeError('failure in bcon')
-        except:
-            pass #pdb.set_trace()      
+        except Exception:
+            raise
         ##
         print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
@@ -390,22 +377,19 @@ def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
     yyyyjjj = date.strftime('%Y%j')
     yyyymmdd = date.strftime('%Y%m%d')
     yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-    yyyymmddhh = date.strftime('%Y%m%d%H')
-    ##
-    outdir = '{}/{}'.format(ctmDir, yyyymmdd_dashed )
+
     ndom = len(domains)
     outputFiles = [''] * ndom
     inputType = 'profile'
     for idomain, domain in enumerate(domains):
         mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,domain)
-        chemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,domain)
         grid = GridNames[idomain]
         outfile = 'template_icon_profile_{}_{}.nc'.format(mech,domain)
         outpath = '{}/{}'.format(ctmDir,outfile)
         outputFiles[idomain] = outpath
         if os.path.exists(outpath):
             if forceUpdate:
-                ## ICON does not like it if the destination file exits
+                ## ICON does not like it if the destination file exists
                 os.remove(outpath)
             else:
                 continue

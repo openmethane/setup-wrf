@@ -67,7 +67,6 @@ def main():
     wrfDir = "/scratch/q90/pjr563/openmethane-beta/wrf/aust10km" ## directory containing wrfout_* files
     ## convention for WRF output, is wrfDir/2016112900/wrfout_d03_*
     geoDir = "/home/563/pjr563/openmethane-beta/setup_wrf/templates/aust10km/" ## directory containing geo_em.* files
-    specTableFile='/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_WACCM.txt'
     inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
     sufadj="output_newMet"  #this is added by sougol to match the name of the folder created by running adj executable.
 
@@ -152,19 +151,19 @@ def main():
         templateIconFiles = configureRunScripts.prepareTemplateIconFiles(date = dates[0], domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech  = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, forceUpdate = forceUpdateICandBC)
         ## use the template initial and boundary condition concentration
         ## files and populate them with values from MOZART output
-        interpolateFromCAMS.interpolateFromCAMSToCmaqGrid(dates, domains, mech,\
-                                                          inputCAMSFile, templateIconFiles,\
-                                                          templateBconFiles, specTableFile,\
-                                                          metDir, ctmDir,\
-                                                          GridNames, mcipSuffix,\
+        interpolateFromCAMS.interpolateFromCAMSToCmaqGrid(dates, domains, mech,
+                                                          inputCAMSFile, templateIconFiles,
+                                                          templateBconFiles,
+                                                          metDir, ctmDir,
+                                                          GridNames, mcipSuffix,
                                                           forceUpdateICandBC, bias_correct=(1.838-1.771))
 
     if prepareRunScripts:
         #print("gfcbcjucrhcnrcbrbcnrchnrchnrhcrhcnricrhncruicjnrdfic")
         print("Prepare ICON, BCON and CCTM run scripts")
         ## prepare the scripts for CCTM
-        configureRunScripts.prepareCctmRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, SZpath = ctmDir, nhours = nhoursPerRun, printFreqHours = printFreqHours, forceUpdate = forceUpdateRunScripts)      ## prepare the scripts for BCON
-        configureRunScripts.prepareBconRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, forceUpdate = forceUpdateRunScripts)
+        configureRunScripts.prepareCctmRunScripts(dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, EXEC = cctmExec, SZpath = ctmDir, nhours = nhoursPerRun, printFreqHours = printFreqHours, forceUpdate = forceUpdateRunScripts)      ## prepare the scripts for BCON
+        configureRunScripts.prepareBconRunScripts(sufadjname=sufadj, dates = dates, domains = domains, ctmDir = ctmDir, metDir = metDir, CMAQdir = CMAQdir, CFG = run, mech = mech, mechCMAQ = mechCMAQ, GridNames = GridNames, mcipsuffix = APPL, scripts = scripts, forceUpdate = forceUpdateRunScripts)
         ## prepare the main run script
         configureRunScripts.prepareMainRunScript(dates = dates, domains = domains, ctmDir = ctmDir, CMAQdir = CMAQdir, scripts = scripts, doCompress = doCompress, compressScript = compressScript, run = run, forceUpdate = forceUpdateRunScripts)
     ##
