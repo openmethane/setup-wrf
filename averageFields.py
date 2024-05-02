@@ -1,10 +1,6 @@
 import netCDF4
-import datetime
 import numpy
-import glob
 import argparse
-import os
-import pdb
 
 parser = argparse.ArgumentParser(description='Average times over wrfout file.')
 parser.add_argument('-i','--input', help='Input filepath')
@@ -78,7 +74,7 @@ for name in variables.keys():
                              variables[name]['dimensions'],
                              zlib = (variables[name]['dtype'].str[1:] == 'f4'),
                              fill_value = variables[name]['fill_value'])
-    res = trg.variables[name].setncatts(attributes[name])
+    trg.variables[name].setncatts(attributes[name])
     ## write out the data
     if name == 'Times':
         trg.variables[name][:] = numpy.array([c for c in outputTime], dtype='|S1').reshape(variables[name]['dimlens'])

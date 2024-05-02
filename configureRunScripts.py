@@ -288,71 +288,7 @@ def prepareMainRunScript(dates, domains, ctmDir, CMAQdir, scripts, doCompress, c
     helper_funcs.replace_and_write(scripts['cmaqRun']['lines'], outpath, subsCMAQ)
     os.chmod(outpath,0o0744)
     return
-    
-    
-def preparePbsRunScript(ctmDir, scripts, run, cmaqEnvScript, forceUpdate):
-    '''Set up the PBS submission script
 
-    Args:
-        ctmDir: base directory for the CCTM inputs and outputs
-        scripts: dictionary of scripts, including an entry with the key 'pbsRun'
-        cmaqEnvScript: path to the (bash) shell script that sets all of the run-time variables for CMAQ (e.g. LD_LIBRARY_PATH, module load <name>, etc.)
-        run: name of the simulation, appears in some filenames
-        case: the name of case to run (used in some filenames)
-        forceUpdate: Boolean (True/False) for whether we should update the output if it already exists
-
-    Returns:
-        Nothing
-    '''
-    outfile = 'PBS_CMAQ_job_{}.sh'
-    outpath = '{}/{}'.format(ctmDir,outfile)
-    if os.path.exists(outpath) and (not forceUpdate):
-        return
-    ##
-    CMAQscript = '{}/runCMAQ.sh'.format(ctmDir)
-    CMAQoutput = '{}/runCMAQ-output.txt'.format(ctmDir)
-    ##
-    subsPBS = [['#PBS -N TEMPLATE', '#PBS -N {}'.format(run)],
-               ['source TEMPLATE', 'source {}'.format(cmaqEnvScript)],
-               ['TEMPLATE >& TEMPLATE', '{} >& {}'.format(CMAQscript, CMAQoutput)]]
-    ##
-    print("Prepare the global PBS run script")
-    helper_funcs.replace_and_write(scripts['pbsRun']['lines'], outpath, subsPBS)
-    os.chmod(outpath,0o0744)
-    return
-
-def prepareSlurmRunScript(ctmDir, scripts, run, cmaqEnvScript, forceUpdate):
-    '''Set up the SLURM submission script
-
-    Args:
-        ctmDir: base directory for the CCTM inputs and outputs
-        scripts: dictionary of scripts, including an entry with the key 'slurmRun'
-        cmaqEnvScript: path to the (bash) shell script that sets all of the run-time variables for CMAQ (e.g. LD_LIBRARY_PATH, module load <name>, etc.)
-        run: name of the simulation, appears in some filenames
-        forceUpdate: Boolean (True/False) for whether we should update the output if it already exists
-
-    Returns:
-        Nothing
-    '''
-    outfile = 'SLURM_CMAQ_job.sh'
-    outpath = '{}/{}'.format(ctmDir,outfile)
-    if os.path.exists(outpath) and (not forceUpdate):
-        return
-    ##
-    slurmOutputFile = '{}/slurm_output.txt'.format(ctmDir)
-    CMAQscript = '{}/runCMAQ.sh'.format(ctmDir)
-    CMAQoutput = '{}/runCMAQ-output.txt'.format(ctmDir)
-    ##
-    subsSLURM = [['#SBATCH -J TEMPLATE', '#SBATCH -J {}'.format(run)],
-                ['#SBATCH -o TEMPLATE', '#SBATCH -o {}'.format(slurmOutputFile)],
-                ['source TEMPLATE', 'source {}'.format(cmaqEnvScript)],
-                ['TEMPLATE >& TEMPLATE', '{} >& {}'.format(CMAQscript, CMAQoutput)]]
-    ##
-    print("Prepare the global SLURM run script")
-    helper_funcs.replace_and_write(scripts['slurmRun']['lines'], outpath, subsSLURM)
-    os.chmod(outpath,0o0744)
-    return
-    
 
 def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, GridNames, mcipsuffix, scripts, forceUpdate):
     '''Prepare template IC files using ICON

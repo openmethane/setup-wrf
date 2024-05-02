@@ -1,14 +1,9 @@
 import netCDF4
-import datetime
 import os
-import sys
 import time
 import resource
 import subprocess
 
-## execfile("/opt/Modules/default/init/python")
-
-## ulimit -s unlimited
 resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
 while True:

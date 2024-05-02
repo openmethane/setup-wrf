@@ -8,11 +8,6 @@ import shutil
 import warnings
 import helper_funcs
 moleMass = {'air':28.96, 'ch4_c':16}
-# def match_two_sorted_arrays(arr1,arr2):
-#     result = numpy.zeros(arr2.shape,dtype = numpy.int)
-#     for i, v in enumerate(arr2):
-#         result[i] = len(arr1) - numpy.searchsorted(arr1, v) - 1
-#     return result
 
 def match_two_sorted_arrays(arr1,arr2):
     '''Match up two sorted arrays
@@ -162,7 +157,7 @@ def print_boundary_variable(cmspec, out_boundary, factor):
     print("{:20} {:.3e}".format(cmspec, out_boundary[:,0,:].mean()*factor))
 
 
-def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, bias_correct =0.0 ):
+def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, metDir, ctmDir, GridNames, mcipsuffix, forceUpdate, bias_correct =0.0, defaultSpec = 'O3' ):
     '''Function to interpolate the from the global CAMS CTM output to ICs and BCs for CMAQ
     
     Args:
@@ -217,7 +212,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
             grid = GridNames[idom]
             mcipdir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
             chemdir = '{}/{}/{}'.format(ctmDir,yyyymmdd_dashed,dom)
-## check that the output directory exists - if not, create it
+            ## check that the output directory exists - if not, create it
             if not os.path.exists( chemdir):
                 helper_funcs.mkdir_p( chemdir)
 
@@ -249,8 +244,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 print("copy {} to {}".format(templateIconFile,outICON))
 
             print(dotFile)
-            with  netCDF4.Dataset(dotFile, 'r', format='NETCDF4') as ncdot,\
-                  netCDF4.Dataset(croFile, 'r', format='NETCDF4') as nccro,\
+            with  netCDF4.Dataset(croFile, 'r', format='NETCDF4') as nccro,\
                   netCDF4.Dataset(bdyFile, 'r', format='NETCDF4') as ncbdy,\
                   netCDF4.Dataset(metFile, 'r', format='NETCDF4') as ncmet,\
                   netCDF4.Dataset(srfFile, 'r', format='NETCDF4') as ncsrf,\
@@ -281,10 +275,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 LON  = nccro.variables['LON'][:].squeeze()
                 LATP = ncbdy.variables['LAT'][:].squeeze()
                 LONP = ncbdy.variables['LON'][:].squeeze()
-                LWMASK_BDY = ncbdy.variables['LWMASK'][:].squeeze()
-                LWMASK_CRO = nccro.variables['LWMASK'][:].squeeze()
                 sigma= ncmet.getncattr('VGLVLS')
-                sigmah = (sigma[1:] + sigma[:-1])/2.0 ## half levels
                 mtop = ncmet.getncattr('VGTOP')
                 #
                 base_MZ_time = datetime.datetime(1900,1,1,0,0,0) # epoch 
@@ -336,10 +327,6 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     near_boundary[iperim,0] = ix
                     near_boundary[iperim,1] = iy
 
-                ## prepare initial conditions
-                if do_ICs:
-                    itimestart = [it for it, t in enumerate(timesmod) if t == date][0]
-
                 iMZtime_for_each_CMtime = numpy.zeros((len(timesmod)),dtype = int)
                 for itime, time in enumerate(timesmod):
                     dtime = numpy.array([((time - t).total_seconds())/(24.0*60.0*60.0) for t in MZdates])
@@ -350,7 +337,6 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     else:
                         iMZtime_for_each_CMtime[itime] = numpy.where(dtime >= 0)[0][-1]
 
-                itimestart = [it for it, t in enumerate(timesmod) if t == date][0]
                 iMZtime = iMZtime_for_each_CMtime[0]
 
 
@@ -372,7 +358,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                 species_map.append({'MZspec':'ch4_c', 'CMspec':'CH4', 'coef':1.0, 'isAerosol':False })
                 for spec in ALL_CM_SPEC:
                     if do_ICs:
-                        if not spec in list(ncouti.variables.keys()):
+                        if spec not in list(ncouti.variables.keys()):
                             warnings.warn("Species {} was not found in template CMAQ IC file -- creating blank variable...".format(spec))
                             isnetcdf4 = (ncouti.data_model == 'NETCDF4')
                             ncouti.createVariable(varname = spec, datatype = 'f4', dimensions = ncouti.variables[defaultSpec].dimensions, zlib = isnetcdf4)
@@ -381,7 +367,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                             ncouti.var_desc  = '{:80}'.format('Variable ' + spec)
                         ncouti.variables[spec][:] = 0.0
                     if do_BCs:
-                        if not spec in list(ncoutb.variables.keys()):
+                        if spec not in list(ncoutb.variables.keys()):
                             warnings.warn("Species {} was not found in template CMAQ BC file -- creating blank variable...".format(spec))
                             isnetcdf4 = (ncoutb.data_model == 'NETCDF4')
                             ncoutb.createVariable(varname = spec, datatype = 'f4', dimensions = ncoutb.variables[defaultSpec].dimensions, zlib = isnetcdf4)
@@ -396,10 +382,8 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     MZspec = species_map[ispec]['MZspec']
                     CMspec = species_map[ispec]['CMspec']
                     coefs = species_map[ispec]['coef']
-                    isAerosol = species_map[ispec]['isAerosol']
                     Factor = 1.0e3 ## convert from ppm to ppb
                     ##
-                    nCMspec = len(CMspec)
                     if do_ICs:
                         out_interior = extract_and_interpolate_interior(MZspec, ncin, lens, LON, Iz, iMZtime,  P, near_interior)
                         out_interior +=bias_correct
@@ -429,13 +413,13 @@ def main():
     inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
     templateIconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/icon.nc']
     templateBconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/bcon.nc']
-    specTableFile='/scratch/q90/sa6589/test_Sougol/shared_Sougol/Melb_Sch01/speciesTables/species_table_WACCM.txt'
     metDir='/scratch/q90/pjr563/openmethane-beta/mcip/'
     ctmDir='/scratch/q90/pjr563/openmethane-beta/cmaq/'
     GridNames = ['o']
     mcipSuffix = ['2']
     forceUpdate=True
-    interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipSuffix, forceUpdate, bias_correct=(1.838-1.771))                        
+    interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, metDir, ctmDir, GridNames, mcipSuffix, forceUpdate, bias_correct=(1.838-1.771))
+
 if __name__ == "__main__":
     main()
 

@@ -1,5 +1,6 @@
 '''Run MCIP from python
 
+TODO: Update verify and update docstring
 The set-up provided assumes that the WRF model output will be in one
 file per simulation (rather than one file per hour, or per six hours),
 which reflects the sample WRF model output provided in preparation for
@@ -20,8 +21,8 @@ for date in dates:
           Abort       
       endif           
       Compress to netCDF4 using ncks                    
-  endfor              
-endfor                
+  endfor
+endfor
 '''
 
 import netCDF4
@@ -30,9 +31,7 @@ import subprocess
 import helper_funcs
 import os
 import glob
-import pdb
 import tempfile
-import sys
 from shutil import copyfile
 
 def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, GridName, scripts,
@@ -64,41 +63,14 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
     cwd = os.getcwd()
 
     ndoms = len(domains)
-    datesWRF = [[]] * ndoms 
     nMinsPerInterval = [60] * ndoms
 
-    if False:
-        for idom,dom in enumerate(domains):
-            timesChar = []
-            for idate, date in enumerate(dates):
-                yyyymmddhh = date.strftime('%Y%m%d%H')
-                times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24+1)]
-                for itime, time in enumerate(times):
-                    WRFfile = '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S'))
-                    if not os.path.exists(WRFfile):
-                        raise RuntimeError("File {} not found...")
-                    ##
-                    nc  = netCDF4.Dataset(WRFfile)
-                    timeschar = nc.variables['Times'][:]
-                    nc.close()
-                    timesChar.append([''.join(row) for row in timeschar])
-            ##
-            flatten = lambda l: [item for sublist in l for item in sublist]
-            timesChar = flatten(timesChar)
-            try:
-                datesWRF[idom] = [datetime.datetime.strptime(d, '%Y-%m-%d_%H:%M:%S') for d in timesChar]
-            except:
-                pdb.set_trace()
-            nMinsPerInterval[idom] = (datesWRF[idom][1] - datesWRF[idom][0]).total_seconds()/60.0
 
     if not os.path.exists(metDir):
         os.mkdir(metDir)
     ##
     for idate, date in enumerate(dates):
-        yyyyjjj = date.strftime('%Y%j')
-        yyyymmdd = date.strftime('%Y%m%d')
         yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        yyyymmddhh = date.strftime('%Y%m%d%H')
         ##
         parent_mcipdir = '{}/{}'.format(metDir,yyyymmdd_dashed)
         ## create output destination
@@ -129,10 +101,8 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             for src, dst in  zip(WRFfiles, outPaths):
                 assert os.path.exists(src), "file {} not found...".format(src)
                 copyfile( src,dst)
-                # print "copy {} to {}".format(src,dst)
-                ##the above line is uncommented by Sougol
                 ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
-            
+
             if fix_simulation_start_date:
                 print("\t\tFix up SIMULATION_START_DATE attribute with ncatted")
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
@@ -153,13 +123,13 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                 wrfstrttime = date.strftime('%Y-%m-%d_%H:%M:%S')
                 for outPath in outPaths:
                     nc = netCDF4.Dataset(outPath,'a')
-                    res = nc.createVariable('QSNOW', 'f4',
+                    nc.createVariable('QSNOW', 'f4',
                                             ('Time', 'bottom_top', 'south_north', 'west_east'),
                                             zlib = True)
                     nc.variables['QSNOW'][:] = 0.0
                     nc.close()
                     
-            if fix_truelat2 and (truelat2 != None):
+            if fix_truelat2 and (truelat2 is not None):
                 print("\t\tFix up TRUELAT2 attribute with ncatted")
                 for outPath in outPaths:
                     command = 'ncatted -O -a TRUELAT2,global,m,f,{} {} {}'.format(truelat2,outPath,outPath)

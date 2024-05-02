@@ -9,11 +9,11 @@
 # rpconroy@ucar.edu (Riley Conroy) for further assistance.
 #################################################################
 
-import sys, os
+import sys
+import os
 import requests
 import datetime
 import pytz
-import pdb
 
 from urllib.request import build_opener
 
@@ -66,19 +66,17 @@ def downloadFNL(orcid, api_token, targetDir,times):
         assert time > FNLstartDate, "Analysis times should not be before 2015-07-08"
         filepath = time.strftime('%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2')
         filename=dspath+filepath
-        filelist = [filename]
-        for file in filelist:
-           ofile = os.path.basename(file)
-           sys.stdout.write("downloading " + ofile + " ... ")
-           sys.stdout.flush()
-           infile = opener.open(file)
-           outfile = open(ofile, "wb")
-           outfile.write(infile.read())
-           #outfile.close()
-           sys.stdout.write("done\n")
+
+        ofile = os.path.basename(filename)
+        sys.stdout.write("downloading " + ofile + " ... ")
+        sys.stdout.flush()
+        infile = opener.open(filename)
+        outfile = open(ofile, "wb")
+        outfile.write(infile.read())
+        #outfile.close()
+        sys.stdout.write("done\n")
 
         downloaded_files.append(ofile)
     ##
     os.chdir(oldDir)
-    ## send back a list of downloaded files
     return downloaded_files

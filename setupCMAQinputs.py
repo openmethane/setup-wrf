@@ -50,7 +50,7 @@ import runMCIP
 #- gridName: Grid name (for MCIP). 16-character maximum
 #- doCompress: compress the output from netCDF3 to netCDF4 during the CMAQ run
 #- compressScript: script to find and compress netCDF3 to netCDF4
-#- scripts: This is a dictionary with paths to each of the run-scripts. Elements of the dictionary should themselves be dictionaries, with the key 'path' and the value being the path to that file. The keys of the 'scripts' dictionary should be as follow: mcipRun: MCIP run script; bconRun: BCON run script; iconRun: ICON run script; cctmRun: CCTM run script; cmaqRun: main CMAQ run script; pbsRun: PBS submission script.
+#- scripts: This is a dictionary with paths to each of the run-scripts. Elements of the dictionary should themselves be dictionaries, with the key 'path' and the value being the path to that file. The keys of the 'scripts' dictionary should be as follow: mcipRun: MCIP run script; bconRun: BCON run script; iconRun: ICON run script; cctmRun: CCTM run script; cmaqRun: main CMAQ run script.
 def main():
     ################ MOST USER INPUT SHOULD BE BELOW HERE ###################
 
@@ -108,13 +108,12 @@ def main():
     # iconRun - ICON run script
     # cctmRun - CCTM run script
     # cmaqRun - main CMAQ run script
-    # pbsRun - PBS submission script
     scripts = {'mcipRun':{'path': '{}/run.mcip'.format(templateDir)},
                'bconRun': {'path': '{}/run.bcon'.format(templateDir)},
                'iconRun': {'path': '{}/run.icon'.format(templateDir)},
                'cctmRun': {'path': '{}/run.cctm'.format(templateDir)},
                'cmaqRun': {'path': '{}/runCMAQ.sh'.format(templateDir)},
-               'pbsRun': {'path': '{}/PBS_CMAQ_job.sh'.format(templateDir)}}
+    }
 
 
     ################ MOST USER INPUT SHOULD BE ABOVE HERE ###################

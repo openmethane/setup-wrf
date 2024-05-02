@@ -6,7 +6,6 @@ import netCDF4
 import glob
 import warnings
 import helper_funcs
-import shutil
 
 def checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains):
     '''
@@ -26,10 +25,7 @@ def checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains):
         os.mkdir(ctmDir)
     ##
     for idate, date in enumerate(dates):
-        yyyyjjj = date.strftime('%Y%j')
-        yyyymmdd = date.strftime('%Y%m%d')
         yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        yyyymmddhh = date.strftime('%Y%m%d%H')
         ##
         parent_chemdir = '{}/{}'.format(ctmDir,yyyymmdd_dashed)
         ## create output destination
@@ -53,7 +49,6 @@ def checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains):
                 return allMcipFilesFound
             ## check that the other MCIP output files are present
             filetypes = ['GRIDBDY2D', 'GRIDCRO2D', 'GRIDDOT2D', 'METBDY3D', 'METCRO2D', 'METCRO3D', 'METDOT3D']
-            APPL = []
             for filetype in filetypes:
                 matches = glob.glob("{}/{}_*".format(mcipdir,filetype))
                 if len(matches) == 0:
@@ -62,11 +57,6 @@ def checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains):
                     return allMcipFilesFound
                 elif len(matches) > 1:
                     print("warn-inside checkwrfmcip")
-                    #warnings.warn("Multiple files match the {} pattern in {}, using file {}".format(filetype,folder,matches[0]))
-               # APPL.append(matches[0].split('/')[-1].replace('{}_'.format(filetype),''))
-               # if not all([appl == APPL[0] for appl in APPL]):
-                #    raise RuntimeError("MCIP suffices in folder {} are not consistent ... ".format(filetype,mcipdir))
-    ##
     return allMcipFilesFound
 
 def getMcipGridNames(metDir, dates, domains):
@@ -207,149 +197,3 @@ def checkWrfMcipDomainSizes(metDir, date, domains, wrfDir = None):
         nrowsin[idomain] = mcipLat.shape[0]
 
     return nx_wrf, ny_wrf, nx_cmaq, ny_cmaq, ix0, iy0, ncolsin, nrowsin
-
-def copyFromPreviousCtmDir(oldCtmDir, newCtmDir, dates, domains,
-                           oldRun, newRun,
-                           CMAQmech, mech, mechMEGAN, GridNames, 
-                           copyEFMAPS = False,
-                           copyLAIS = False,
-                           copyPFTS = False,
-                           copySURFZONE = False,
-                           copyJTABLE = False,
-                           copyTemplateIC = False,
-                           copyTemplateBC = False,
-                           copyBCON = False,
-                           copyICON = False,
-                           copyFIREEMIS = False,
-                           copyMEGANEMIS = False,
-                           copyMERGEDEMIS = False,
-                           link = False):
-    '''Copy CMAQ inputs from a previous run
-
-    Args:
-        oldCtmDir: base directory for the existing CCTM inputs and outputs
-        newCtmDir: base directory for the new CCTM inputs and outputs
-        dates: list of datetime objects, one per date MCIP and CCTM output should be defined
-        domains: list of which domains should be run?
-        oldRun: name of the old simulation, appears in some filenames
-        newRun: name of the new simulation, appears in some filenames
-        CMAQmech: name of chemical mechanism given to CMAQ
-        mech: name of chemical mechanism to appear in filenames
-        GridNames: list of MCIP map projection names (one per domain)
-        copyEFMAPS = copy the EFMAPS files?
-        copyLAIS = copy the LAIS files?
-        copyPFTS = copy the PFTS files
-        copySURFZONE = copy the surfzone files?
-        copyJTABLE = copy the JTABLE files?
-        copyTemplateIC = copy the template IC files
-        copyTemplateBC = copy the template BC files
-        copyBCON = copy the daily BC files
-        copyICON = copy the daily IC files
-        copyFIREEMIS = copy the fire emissions
-        copyMEGANEMIS = copy the megan emissions
-        copyMERGEDEMIS = copy the merged emissions
-        link = if 'True', symbolic links are made rather than copies
-
-    Returns:
-        Nothing
-    '''
-
-    def copyFunc(source, dest, link, strict = True):
-        if strict and (not os.path.exists(source)):
-            raise RuntimeError("File {} expected but not found ... ".format(source))
-        if link:
-            os.link(source, dest)
-        else:
-            shutil.copy(source, dest)
-        return
-    
-    if not os.path.exists(newCtmDir):
-        os.mkdir(newCtmDir)
-    ##
-    if not os.path.exists(oldCtmDir):
-        raise RuntimeError("CTM folder {} expected but not found ... ".format(oldCtmDir))
-    ##
-    for idate, date in enumerate(dates):
-        yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        ##
-        parent_chemdir = '{}/{}'.format(newCtmDir,yyyymmdd_dashed)
-        ## create output destination
-        if not os.path.exists(parent_chemdir):
-            os.mkdir(parent_chemdir)
-        for idomain, domain in enumerate(domains):
-            chemdir = '{}/{}/{}'.format(newCtmDir,yyyymmdd_dashed,domain)
-            ## create output destination
-            if not os.path.exists(chemdir):
-                os.mkdir(chemdir)
-    ##
-    for idomain, domain in enumerate(domains):
-        grid = GridNames[idomain]
-        if copyEFMAPS:
-            source = '{}/EFMAPS.{}_{}.ncf'.format(oldCtmDir,oldRun,domain)
-            dest   = '{}/EFMAPS.{}_{}.ncf'.format(newCtmDir,newRun,domain)
-            copyFunc(source, dest, link)
-        if copyLAIS:
-            source = '{}/LAIS46.{}_{}.ncf'.format(oldCtmDir,oldRun,domain)
-            dest   = '{}/LAIS46.{}_{}.ncf'.format(newCtmDir,newRun,domain)
-            copyFunc(source, dest, link)
-        if copyPFTS:
-            source = '{}/PFTS16.{}_{}.ncf'.format(oldCtmDir,oldRun,domain)
-            dest   = '{}/PFTS16.{}_{}.ncf'.format(newCtmDir,newRun,domain)
-            copyFunc(source, dest, link)
-        if copySURFZONE:
-            source = '{}/surfzone_{}.nc'.format(oldCtmDir,domain)
-            dest   = '{}/surfzone_{}.nc'.format(newCtmDir,domain)
-            copyFunc(source, dest, link)
-
-        if copyTemplateBC:
-            source = '{}/template_bcon_profile_{}_{}.nc'.format(oldCtmDir,CMAQmech,domain)
-            dest   = '{}/template_bcon_profile_{}_{}.nc'.format(newCtmDir,CMAQmech,domain)
-            copyFunc(source, dest, link)
-            
-        if copyTemplateIC:
-            source = '{}/template_icon_profile_{}_{}.nc'.format(oldCtmDir,CMAQmech,domain)
-            dest   = '{}/template_icon_profile_{}_{}.nc'.format(newCtmDir,CMAQmech,domain)
-            copyFunc(source, dest, link)
-            
-    for idate, date in enumerate(dates):
-        yyyymmdd_dashed = date.strftime('%Y-%m-%d')
-        yyyyjjj = date.strftime('%Y%j')
-        ##
-        if copyJTABLE:
-            oldDateDir = '{}/{}'.format(oldCtmDir,yyyymmdd_dashed)
-            newDateDir = '{}/{}'.format(newCtmDir,yyyymmdd_dashed)
-            source = '{}/JTABLE_{}'.format(oldDateDir,yyyyjjj)
-            dest   = '{}/JTABLE_{}'.format(newDateDir,yyyyjjj)
-            copyFunc(source, dest, link)
-        ##
-        for idomain, domain in enumerate(domains):
-            newchemdir = '{}/{}/{}'.format(newCtmDir,yyyymmdd_dashed,domain)
-            oldchemdir = '{}/{}/{}'.format(oldCtmDir,yyyymmdd_dashed,domain)
-            ##
-            if copyBCON:
-                source = '{}/BCON.{}.{}.{}.nc'.format(oldchemdir,dom,grid,mech)
-                dest   = '{}/BCON.{}.{}.{}.nc'.format(newchemdir,dom,grid,mech)
-                copyFunc(source, dest, link, strict = False)
-            
-            if copyICON:
-                source = '{}/ICON.{}.{}.{}.nc'.format(oldchemdir,dom,grid,mech)
-                dest   = '{}/ICON.{}.{}.{}.nc'.format(newchemdir,dom,grid,mech)
-                copyFunc(source, dest, link, strict = False)
-
-            if copyFIREEMIS:
-                source = '{}/fire_emis_{}.nc'.format(oldchemdir,dom)
-                dest   = '{}/fire_emis_{}.nc'.format(newchemdir,dom)
-                copyFunc(source, dest, link)
-
-            if copyMEGANEMIS:
-                source = '{}/MEGANv2.10.{}.{}.{}.ncf'.format(oldchemdir,grid,mechMEGAN,yyyyjjj)
-                dest   = '{}/MEGANv2.10.{}.{}.{}.ncf'.format(newchemdir,grid,mechMEGAN,yyyyjjj)
-                copyFunc(source, dest, link)
-
-            if copyMERGEDEMIS:
-                source = '{}/mergedEmis_{}_{}_{}.nc'.format(oldchemdir,yyyymmdd_dashed,dom,mech)
-                dest   = '{}/mergedEmis_{}_{}_{}.nc'.format(newchemdir,yyyymmdd_dashed,dom,mech)
-                copyFunc(source, dest, link)
-            
-    
-    
