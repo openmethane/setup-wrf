@@ -886,19 +886,14 @@ for ind_job in range(number_of_jobs):
     ):
         input_directory = config[input_directory_key]
         scripts_to_copy = config[scripts_to_copy_key].split(",")
-        
+
         for script_to_copy in scripts_to_copy:
             symlink_file(input_directory, run_dir_with_date, script_to_copy)
-            
-    
-        
-    for script_to_copy in config['scripts_to_copy_from_target_dir'].split(','):
-        symlink_file(config["target_dir"], run_dir_with_date, script_to_copy)
 
     if (not config['only_edit_namelists']) and (not wrfInitFilesExist):
         ##
         logfile = 'real_stderr_stdout.log'
-        
+
         print("\t\tRun real.exe at {}".format(datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
         p = subprocess.Popen(['mpirun','-np','1','./real.exe'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
