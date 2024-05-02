@@ -131,16 +131,6 @@ for scriptName in scriptNames:
         print("Problem reading in template {} script".format(scriptName))
         print(str(e))
 
-## make directories recursively, and safely
-## this function is a copy of: https://stackoverflow.com/a/600612/356426
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
 
 ## function to parse times
 def process_date_string(datestring):
@@ -158,7 +148,7 @@ def process_date_string(datestring):
     return date
 
 def decode_bytes(x):
-    if type(x) == bytes:
+    if isinstance(x, bytes):
         x = x.decode('utf-8')
     return x
 
@@ -189,7 +179,7 @@ def grep_file(regex, inFile):
     return out
 
 def grep_lines(regex, lines):
-    if type(lines) == type(''):
+    if isinstance(lines, str):
         lines = lines.split('\n')
     out = [ line for line in lines if line.find(regex) >= 0 ]
     return out
@@ -247,12 +237,12 @@ def compressNCfile(filename,ppc = None):
 try:
     start_date = process_date_string(config['start_date'])
     end_date   = process_date_string(config['end_date'])
+
+    ## check that the dates are in the right order
+    assert end_date > start_date, "End date should be after start date"
 except Exception as e:
     print("Problem parsing start/end times")
-    print(str(e))
-
-## check that the dates are in the right order
-assert end_date > start_date, "End date should be after start date"
+    raise e
 
 ## calculate the number of jobs
 run_length_hours = (end_date - start_date).total_seconds()/3600.
@@ -276,7 +266,7 @@ for paramDict in namelistParamsThatShouldAgree:
     ## the dx,dy variables need special treatment - they are handled differently in the two namelists
     if paramDict['wrf_var'] in ['dx','dy']:
         if WPSnml['share']['max_dom'] == 1:
-            if type(WRFval) == type([]):
+            if isinstance(WRFval, list):
                 assert WRFval[0] == WPSval, "Mismatched values for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
             else:
                 assert WRFval == WPSval, "Mismatched values for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
@@ -292,7 +282,7 @@ for paramDict in namelistParamsThatShouldAgree:
             assert all([a == b for a,b in zip(WRFval,expectedVal)]), "Mismatched values for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
     else:
         assert type(WRFval) == type(WPSval), "Mismatched type for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
-        if type(WRFval) == type([]):
+        if isinstance(WRFval, list):
             assert len(WRFval) == len(WPSval), "Mismatched length for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
             assert all([a == b for a,b in zip(WRFval,WPSval)]), "Mismatched values for variable {} between the WRF and WPS namelists".format(paramDict['wrf_var'])
         else:
@@ -305,8 +295,7 @@ nDom = WPSnml['share']['max_dom']
 run_length_total_hours = config["num_hours_per_run"] + config["num_hours_spin_up"]
 
 ## check that the output directory exists - if not, create it
-if not os.path.exists(config["run_dir"]):
-    mkdir_p(config["run_dir"])
+os.makedirs(config["run_dir"], exist_ok=True)
 
 print('\t\tGenerate the main coordination script')
 
@@ -346,11 +335,11 @@ for ind_job in range(number_of_jobs):
     print("Start preparation for the run beginning {}".format(job_start_usable.date()))
     ##
     yyyymmddhh_start = job_start_usable.strftime('%Y%m%d%H')
-    run_dir_with_date = os.path.join(config["run_dir"],yyyymmddhh_start)
-    if not os.path.exists(run_dir_with_date):
-        mkdir_p(run_dir_with_date)
-    ##
+    run_dir_with_date: str = os.path.join(config["run_dir"], yyyymmddhh_start)
+
+    os.makedirs(run_dir_with_date, exist_ok=True)
     os.chdir(run_dir_with_date)
+
     ## check that the WRF initialisation files exist
     print("\tCheck that the WRF initialisation files exist")
     wrfbdyPath = os.path.join(run_dir_with_date,'wrfbdy_d01') ## check for the BCs
@@ -386,12 +375,14 @@ for ind_job in range(number_of_jobs):
                 ## copy the geogrid table
                 src = config['geogrid_tbl']
                 assert os.path.exists(src), "Cannot find GEOGRID.TBL at {} ...".format(src)
+
                 geogridFolder = os.path.join(run_dir_with_date,'geogrid')
-                if not os.path.exists(geogridFolder):
-                    mkdir_p(geogridFolder)
+                os.makedirs(geogridFolder, exist_ok=True)
+
                 ##
                 dst = os.path.join(run_dir_with_date,'geogrid','GEOGRID.TBL')
-                if os.path.exists(dst): os.remove(dst)
+                if os.path.exists(dst):
+                    os.remove(dst)
                 os.symlink(src, dst)
                 ## link to the geogrid.exe program
                 src = config['geogrid_exe']
@@ -445,7 +436,7 @@ for ind_job in range(number_of_jobs):
             ##
             print("\tCheck that the met_em files exist")
             if not os.path.exists(config["metem_dir"]):
-                mkdir_p(config["metem_dir"])
+                os.makedirs(config["metem_dir"], exist_ok=True)
                 metemFilesExist = False
             else:
                 metemFilesExist = True
@@ -499,7 +490,7 @@ for ind_job in range(number_of_jobs):
 
                         sstDir = 'sst_tmp'
                         if not os.path.exists(sstDir):
-                            mkdir_p(sstDir)
+                            os.makedirs(sstDir, exist_ok=True)
                         ##
                         for iDayWps in range(nDaysWps):
                             wpsDate = wpsStrDate + datetime.timedelta(days = iDayWps)
@@ -575,7 +566,7 @@ for ind_job in range(number_of_jobs):
 
                     analysisDir = 'analysis_tmp'
                     if not os.path.exists(analysisDir):
-                        mkdir_p(analysisDir)
+                        os.makedirs(analysisDir, exist_ok=True)
 
                     ## find the files matching the analysis pattern
                     patternTypes = ["analysis_pattern_surface", "analysis_pattern_upper"]
@@ -657,19 +648,16 @@ for ind_job in range(number_of_jobs):
                             os.remove(FNLfile)
                             shutil.copyfile(tmpfile,FNLfile)
                     
-                ## write out the namelist
-                if os.path.exists('namelist.wps'):
-                    os.remove('namelist.wps')
-                ##
                 ## EDIT: the following are the substitutions used for the WPS namelist
                 WPSnml['share']['start_date'] = [job_start.strftime('%Y-%m-%d_%H:%M:%S')] * nDom
                 WPSnml['share']['end_date']   = [job_end.strftime(  '%Y-%m-%d_%H:%M:%S')] * nDom
                 WPSnml['ungrib']['prefix'] = 'ERA'
                 WPSnml['share']['interval_seconds'] = 6*60*60
                 ## end edit section #####################################################
+
                 ## write out the namelist
-                if os.path.exists('namelist.wps'): os.remove('namelist.wps')
-                ##
+                if os.path.exists('namelist.wps'):
+                    os.remove('namelist.wps')
                 WPSnml.write('namelist.wps')
                 ##
                 purge(run_dir_with_date, 'GRIBFILE*')
@@ -735,8 +723,8 @@ for ind_job in range(number_of_jobs):
                 #############
                 print("\t\tRun metgrid at {}".format(datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')))
                 metgriddir = os.path.join(run_dir_with_date,'metgrid')
-                if not os.path.exists(metgriddir):
-                    mkdir_p(metgriddir)
+                os.makedirs(metgriddir, exist_ok=True)
+
                 WPSnml['metgrid']['fg_name']    = ['ERA']
                 if config['use_high_res_sst_data']:
                     WPSnml['metgrid']['fg_name'].append('SST')
