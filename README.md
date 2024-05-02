@@ -3,17 +3,16 @@
 
 ## WRF runs
 
-The `setup_for_wrf.py` script generates the required 
-configuration and data to run WRF for a given domain and time.
+The `setup_for_wrf.py` script generates the required configuration and data to run WRF for a given domain and time.
 
 `setup_for_wrf.py` uses a JSON configuration file to define
 where the various input files are located, where the 
-output files should be stored, and how the WRF model should be run.
+output files should be stored, and how the WRF model should be run. 
+See [Input files](#input-files) for more information about how the configuration file is used.
 
 `config.json` will be used as the default configuration file,
 but this can be overriden using the `-c` command line argument.
-An example config file `config.docker.json`
- that targets running WRF using docker.
+An example config file `config.docker.json`that targets running WRF using docker.
 
 The `setup_for_wrf.py` script does the following:
 * Reads the configuration file
@@ -46,6 +45,11 @@ Procedure to run these scripts:
 ..b. Run `./submit_setup.sh` on the command line. Before doing this, replace `${PROJECT}` in the `submit_setup.sh` script, with your `${PROJECT}` shell environment variable - this can be found in your `${HOME}/.config/gadi-login.conf` file.
 
 To run the WRF model, either submit the main coordination script or the daily run-scripts with `qsub`.
+
+#### A few caveats
+
+This has been tested on *Gadi* using the [CLEX CMS WRF setup](https://github.com/coecms/WRF). Users of NCI wanting to run WRF are strongly encouraged to use this version, and to consult [the CMS page on WRF](http://climate-cms.wikis.unsw.edu.au/WRF). These scripts assume that WRF was compiled for MPI multiprocessing (i.e. 'distributed memory' parallelism). 
+
 
 ### docker
 
@@ -112,7 +116,7 @@ to run WRF for a specific time period.
 
 [TODO]: Add instructions for running CMAQ
 
-## Notes on the input files and scripts
+## Input files
 
 There are a number of files that are copied from various locations into the run directories. These are:
 
@@ -132,13 +136,14 @@ The non-templated files are copied from either the `nml_dir` or `target_dir` dir
 The location of the non-templated files is define using the `scripts_to_copy_from_nml_dir` and 
 `scripts_to_copy_from_nml_dir` configuration values.
 
-The following files are configured based on the results of `config.json`: `namelist.wps`, `namelist.wrf`, `cleanup_script_template.sh`, `main_script_template.sh`, `run_script_template.sh`. The tokens to replace are identified with the following format: `${keyword}`. Generally speaking, the values for substitution are defined within the python script (`setup_for_wrf.py`). To change the substitutions, edit the python script in the sections between the lines bounded by `## EDIT:` and `## end edit section`.
+The templated files are configured based on the results of `config.json`
+The tokens to replace are identified with the following format: `${keyword}`. 
+Generally speaking, the values for substitution are defined within the python script (`setup_for_wrf.py`). 
+To change the substitutions, edit the python script in the sections between the lines bounded by `## EDIT:` and `## end edit section`.
 
-The `load_wrf_env.sh` script should contain the *same* environment modules that were used to compile WRF. It is assumed that you have compiled with MPI (i.e. 'distributed memory').
+The `load_wrf_env.sh` script should contain the *same* environment modules that were used to compile WRF. 
+It is assumed that you have compiled with MPI (i.e. 'distributed memory').
 
-## A few caveats
-
-This has been tested on *Gadi* using the [CLEX CMS WRF setup](https://github.com/coecms/WRF). Users of NCI wanting to run WRF are strongly encouraged to use this version, and to consult [the CMS page on WRF](http://climate-cms.wikis.unsw.edu.au/WRF). These scripts assume that WRF was compiled for MPI multiprocessing (i.e. 'distributed memory' parallelism). 
 
 ## Analysis inputs
 

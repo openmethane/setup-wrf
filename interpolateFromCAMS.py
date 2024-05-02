@@ -438,7 +438,7 @@ def main():
     metDir='/scratch/q90/pjr563/openmethane-beta/mcip/'
     ctmDir='/scratch/q90/pjr563/openmethane-beta/cmaq/'
     GridNames = ['o']
-    mcipSuffix = ['1']
+    mcipSuffix = ['2']
     forceUpdate=True
     interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, specTableFile, metDir, ctmDir, GridNames, mcipSuffix, forceUpdate, bias_correct=(1.838-1.771))                        
 if __name__ == "__main__":
