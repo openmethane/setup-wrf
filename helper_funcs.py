@@ -152,38 +152,3 @@ def int_array_to_comma_separated_string(arr):
         Str: comma-separated string
     '''
     return ''.join(['%i, ' % i for i in arr])
-
-
-def source2(script, shell = 'bash'):
-    '''Source a shell script, list all the shell environment variables, return them as a dictionary
-   
-    Args: 
-        script: path to the script to source 
-        shell: which shell to use (e.g. 'csh' or 'bash')
-    
-    Returns:
-        Env: Dictionary of shell environment variables
-    '''
-    command = [shell, '-c', 'source %s && env' % script]
-
-    proc = subprocess.Popen(command, stdout = subprocess.PIPE)
-
-    Env = os.environ.copy()
-    for line in proc.stdout:
-        (key, _, value) = line.decode().partition("=")
-        Env[key] = value
-
-    proc.communicate()
-
-    return Env
-
-## make directories recursively, and safely
-## this function is a copy of: https://stackoverflow.com/a/600612/356426
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:  # Python >2.5
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
