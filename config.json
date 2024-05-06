@@ -3,9 +3,9 @@
     # overall base directory for project
     "project_root": "${HOME}/openmethane-beta",
     # base dir for set up scripts
-    "setup_root" : "${project_root}/setup_wrf",
+    "setup_root" : "${project_root}/setup-wrf",
     # Project name
-    "run_name" : "aust10km",
+    "run_name" : "aust-test",
     # Target environment for running tasks
     "target": "nci",
     # Start date-time of the first simulation:

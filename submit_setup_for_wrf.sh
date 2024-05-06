@@ -9,6 +9,6 @@
 #PBS -l wd
 ###PBS -j oe
 
-source /home/563/pjr563/openmethane-beta/setup_wrf/load_conda_env.sh
+source /home/563/pjr563/openmethane-beta/setup-wrf/load_conda_env.sh
 
 python3 setup_for_wrf.py
