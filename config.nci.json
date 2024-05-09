@@ -10,9 +10,9 @@
     "target": "nci",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
-    "start_date" : "2022-07-31 00:00:00 UTC",
+    "start_date" : "2024-01-01 00:00:00 UTC",
     # The end time of the last simulation (same format as above)
-    "end_date" : "2022-09-02 00:00:00 UTC",
+    "end_date" : "2024-01-02 00:00:00 UTC",
     # Is this a restart run? (bool -> true/false, yes/no)
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     "restart" : "false",
