@@ -74,7 +74,8 @@ def authenticate(session: requests.Session, orcid: str, api_token: str):
         print(ret.text)
         raise RuntimeError("Invalid RDA credentials")
 
-def download_file(session: requests.Session, target_dir: str, url: str):
+
+def download_file(session: requests.Session, target_dir: str, url: str) -> str:
     """
     Download a file from a URL
 
@@ -85,6 +86,9 @@ def download_file(session: requests.Session, target_dir: str, url: str):
             Directory to save the downloaded file
         url:
             URL of the file to download
+
+    Raises:
+        RuntimeError: If the download fails
 
     Returns:
         Path to the downloaded file
@@ -101,21 +105,30 @@ def download_file(session: requests.Session, target_dir: str, url: str):
         raise RuntimeError(f"Error downloading {url}") from e
 
 
-def downloadFNL(orcid: str, api_token: str, targetDir: str, times: list[datetime.datetime]) -> list[str]:
+def download_gdas_fnl_data(
+        orcid: str,
+        api_token: str,
+        target_dir: str,
+        download_dts: list[datetime.datetime]
+    ) -> list[str]:
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3
 
     DOI: 10.5065/D65Q4T4Z
+
+    If any of the files fail to download (after 5 retries),
+    an exception will be raised and any other downloads will be aborted.
+    If that occurs, any files being downloaded may be incomplete and should be deleted.
 
     Args:
         orcid:
             orcid for which you have an account on rda.ucar.edu / CISL
         api_token:
             api_token for rda.ucar.edu / CISL
-        targetDir:
+        target_dir:
             Directory where the data should be downloaded
-        times:
-            times to get analyses.
+        download_dts:
+            Datetimes to download analysis data for
 
             Should be strictly at 00Z, 06Z, 12Z, 18Z and not before 2015-07-08
 
@@ -125,8 +138,8 @@ def downloadFNL(orcid: str, api_token: str, targetDir: str, times: list[datetime
     print('downloading FNL data')
 
     # check that the target directory is indeed a directory
-    assert os.path.exists(targetDir) and os.path.isdir(targetDir), (
-            "Target directory {} not found...".format(targetDir))
+    assert os.path.exists(target_dir) and os.path.isdir(target_dir), (
+            "Target directory {} not found...".format(target_dir))
 
     # Create a new session and authenticate
     print('authenticate credentials')
@@ -136,17 +149,17 @@ def downloadFNL(orcid: str, api_token: str, targetDir: str, times: list[datetime
     FNLstartDate = pytz.UTC.localize(datetime.datetime(2015,7,8,0,0,0))
 
     file_list = []
-    for time in times:
+    for time in download_dts:
         assert (time.hour % 6) == 0 and time.minute == 0 and time.second == 0,\
             "Analysis time should be staggered at 00Z, 06Z, 12Z, 18Z intervals"
         assert time > FNLstartDate, "Analysis times should not be before 2015-07-08"
-        filepath = time.strftime('%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2')
-        file_list.append(filepath)
+        file_path = time.strftime('%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2')
+        file_list.append(file_path)
 
     downloaded_files = list(
         tqdm(
             Parallel(return_as="generator", n_jobs=N_JOBS)(
-                delayed(download_file)(session, targetDir, DATASET_URL + filename)
+                delayed(download_file)(session, target_dir, DATASET_URL + filename)
                 for filename in file_list
             ),
             total=len(file_list),
