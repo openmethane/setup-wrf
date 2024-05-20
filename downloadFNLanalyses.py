@@ -20,10 +20,9 @@ from tqdm import tqdm
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
-
 N_JOBS = 8
 LOGIN_URL = 'https://rda.ucar.edu/cgi-bin/login'
-DATASET_URL = 'https://rda.ucar.edu/ds083.3/'
+DATASET_URL = 'https://data.rda.ucar.edu/ds083.3/'
 
 
 def create_session() -> requests.Session:
@@ -102,6 +101,8 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
                     f.write(chunk)
             return filename
     except requests.exceptions.RequestException as e:
+        if os.path.exists(filename):
+            os.remove(filename)
         raise RuntimeError(f"Error downloading {url}") from e
 
 
