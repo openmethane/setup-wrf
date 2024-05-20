@@ -67,12 +67,17 @@ jobs:
             -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
             setup_wrf \
             data/runs/aust-test/main.sh
+      # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
+      - name: Zip WRF artifacts
+        if: ${{ always() }}
+        run: |
+          tar -cvzf results.tar.gz data/runs
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
-          name: wrf
-          path: ${{ github.workspace }}/data/runs
+          name: results
+          path: ${{ github.workspace }}/results.tar.gz
 
       # Push image to container registry
       - name: Login to Container registry
