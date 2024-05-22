@@ -368,10 +368,10 @@ for ind_job in range(number_of_jobs):
                 print("\t\tThe geo_em files were indeed found")
             else:
                 print("\t\tThe geo_em files did not exist - create them")
-                ## copy the WPS namelist
-                src = WPSnmlPath
+                ## copy the WPS namelist substituting the geog_data_path
+                WPSnml['geogrid']['geog_data_path'] = config['geog_data_path']
                 dst = os.path.join(run_dir_with_date,'namelist.wps')
-                shutil.copyfile(src, dst)
+                WPSnml.write( dst)
                 ## copy the geogrid table
                 src = config['geogrid_tbl']
                 assert os.path.exists(src), "Cannot find GEOGRID.TBL at {} ...".format(src)
