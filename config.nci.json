@@ -69,6 +69,8 @@
     "namelist_wps" : "${nml_dir}/namelist.wps",
     # template namelist for WRF
     "namelist_wrf" : "${nml_dir}/namelist.wrf",
+    # path to the geography data files
+    "geog_data_path" : "/g/data/sx70/data/WPS_GEOG_20190418",
     # path to the GEOGRID.TBL file
     "geogrid_tbl" : "${wps_dir}/geogrid/GEOGRID.TBL",
     # path to the geogrid.exe program

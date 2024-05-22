@@ -482,6 +482,7 @@ for ind_job in range(number_of_jobs):
                         WPSnml['share']['end_date']   = [(job_end.date() + datetime.timedelta(days=1)).strftime(  '%Y-%m-%d_%H:%M:%S')] * nDom
                         WPSnml['share']['interval_seconds'] = 6*60*60 ## 24*60*60
                         WPSnml['ungrib']['prefix']    = 'SST'
+                        WPSnml['geogrid']['geog_data_path']    = config['geog_data_path']
                         ## end edit section #####################################################
                         ## write out the namelist
                         if os.path.exists('namelist.wps'): os.remove('namelist.wps')
