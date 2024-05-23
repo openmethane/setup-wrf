@@ -18,7 +18,7 @@ import resource
 import copy
 import stat
 import netCDF4
-from downloadFNLanalyses import downloadFNL
+from downloadFNLanalyses import download_gdas_fnl_data
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
@@ -619,10 +619,12 @@ for ind_job in range(number_of_jobs):
                         print("\t\tAll FNL files were found - do not repeat the download")
                     else:
                         ## otherwise get it all
-                        FNLfiles = downloadFNL(orcid = config['orcid'],
-                                               api_token = config['rda_ucar_edu_api_token'],
-                                               targetDir = run_dir_with_date,
-                                               times = FNLtimes)
+                        FNLfiles=download_gdas_fnl_data(
+                            orcid=config['orcid'],
+                            api_token=config['rda_ucar_edu_api_token'],
+                            target_dir=run_dir_with_date,
+                            download_dts=FNLtimes
+                        )
                     linkGribCmds = ['./link_grib.csh' ] + FNLfiles
                     ## optionally take a regional subset
                     if config['regional_subset_of_grib_data']:
