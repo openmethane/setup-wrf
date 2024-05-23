@@ -55,26 +55,26 @@ def main():
     ################ MOST USER INPUT SHOULD BE BELOW HERE ###################
 
     ## directories    
-    CMAQdir = "/home/563/sa6589/CMAQv5.0.2_notpollen/" ## base directory for the CMAQ model
-    MCIPdir = "/home/563/sa6589/CMAQv5.0.2_notpollen/scripts/mcip/src" ## directory containing the MCIP executable
+    CMAQdir = "/opt/cmaq/CMAQv5.0.2_notpollen/" ## base directory for the CMAQ model
+    MCIPdir = "/opt/cmaq/CMAQv5.0.2_notpollen/scripts/mcip/src" ## directory containing the MCIP executable
 
-    templateDir = "/home/563/pjr563/openmethane-beta/setup_wrf/templateRunScripts" ## folder containing the template run scripts
-    metDir = "/scratch/q90/pjr563/openmethane-beta/mcip/" ## base directory for the MCIP output
+    templateDir = "/opt/project/templateRunScripts" ## folder containing the template run scripts
+    metDir = "/opt/project/mcip/" ## base directory for the MCIP output
     ## convention for MCIP output is that we have data organised by day and domain, eg metDir/2016-11-29/d03
-    ctmDir = "/scratch/q90/pjr563/openmethane-beta/cmaq/" ## base directory for the CCTM inputs and outputs
+    ctmDir = "/opt/project/cmaq/" ## base directory for the CCTM inputs and outputs
 
     ## same convention for the CMAQ output as for the MCIP output, except with ctmDir
-    wrfDir = "/scratch/q90/pjr563/openmethane-beta/wrf/aust10km" ## directory containing wrfout_* files
+    wrfDir = "/opt/project/data/runs/aust-test" ## directory containing wrfout_* files
     ## convention for WRF output, is wrfDir/2016112900/wrfout_d03_*
-    geoDir = "/home/563/pjr563/openmethane-beta/setup_wrf/templates/aust10km/" ## directory containing geo_em.* files
-    inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
+    geoDir = "/opt/project/templates/aust-test/" ## directory containing geo_em.* files
+    inputCAMSFile = "/opt/project/inputs/cams_eac4_4.nc"
     sufadj="output_newMet"  #this is added by sougol to match the name of the folder created by running adj executable.
 
     domains = ['d01'] ## which domains should be run?
     run = 'openmethane' ## name of the simulation, appears in some filenames (keep this *short* - longer)
     mcipSuffix = ['2']
-    startDate = datetime.datetime(2022,7,1, 0, 0, 0) ## this is the START of the first day
-    endDate = datetime.datetime(2022,7,31, 0, 0) ## this is the START of the last day
+    startDate = datetime.datetime(2024, 1,1, 0, 0, 0) ## this is the START of the first day
+    endDate = datetime.datetime(2024,1,1, 0, 0) ## this is the START of the last day
     nhoursPerRun = 24 ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1 ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
 
