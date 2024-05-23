@@ -99,7 +99,15 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             WRFfiles.append( nextDayFile)
             outPaths = ['{}/{}'.format(mcipDir, os.path.basename(WRFfile)) for WRFfile in WRFfiles]
             for src, dst in  zip(WRFfiles, outPaths):
-                assert os.path.exists(src), "file {} not found...".format(src)
+                file_exists = os.path.exists(src)
+                if not file_exists:
+                    if src != nextDayFile:
+                        raise AssertionError(f"WRF output {src} not found")
+                    else:
+                        print("WRF output {} for last timestep not found".format(src))
+                        WRFfiles.remove(src)
+                        outPaths.remove(dst)
+                        continue
                 copyfile( src,dst)
                 ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
 
@@ -183,8 +191,8 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             stdout, stderr = p.communicate()
             if stdout.split(b'\n')[-2] != b'NORMAL TERMINATION':
-                print ("stdout = " + str(stdout))
-                print ("stderr = " + str(stderr))
+                print ("stdout = " + str(stdout.decode()))
+                print ("stderr = " + str(stderr.decode()))
                 raise RuntimeError("Error from run.mcip ...")
             ##
 

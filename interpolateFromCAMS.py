@@ -216,7 +216,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
             ## check that the output directory exists - if not, create it
             os.makedirs(chemdir, exist_ok=True)
 
-n            do_BCs = (dom == doms[0])
+            do_BCs = (dom == doms[0])
 
             if not (do_ICs or do_BCs):
                 continue
@@ -413,8 +413,8 @@ def main():
     inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
     templateIconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/icon.nc']
     templateBconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/bcon.nc']
-    metDir='/scratch/q90/pjr563/openmethane-beta/mcip/'
-    ctmDir='/scratch/q90/pjr563/openmethane-beta/cmaq/'
+    metDir='/tmp/q90/pjr563/openmethane-beta/mcip/'
+    ctmDir='/tmp/q90/pjr563/openmethane-beta/cmaq/'
     GridNames = ['o']
     mcipSuffix = ['2']
     forceUpdate=True

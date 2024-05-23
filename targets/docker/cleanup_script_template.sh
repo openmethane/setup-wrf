@@ -15,7 +15,7 @@ rm -r -f metgrid
 rm -f metgrid.exe metgrid.log*
 rm -f myoutfields*
 rm -f namelist.output
-rm -r realrsl rsl*
+#rm -r realrsl rsl*
 rm -f wrf.log wrf.exe ungrib.exe ungrib.log real.exe real.log
 rm -f FILE* GRIB* *DATA *TBL
 rm -r -f ei_tmp analysis_tmp sst_tmp

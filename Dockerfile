@@ -13,7 +13,7 @@ RUN apt-get update && \
 RUN wget -c ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz.$WGRIB2_VERSION && \
     tar -xzvf wgrib2.tgz.$WGRIB2_VERSION && \
     cd grib2 && \
-    CC=gcc FC=gfortran make
+    CC=gcc FC=gfortran make -j 4
 
 
 # Container for running WRF
@@ -49,6 +49,7 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 # Copy in WRF and wgrib2 binaries
 # https://github.com/climate-resource/wrf-container
 COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
+COPY --from=ghcr.io/openmethane/cmaq:5.0.2 /opt/cmaq /opt/cmaq
 COPY --from=wgrib2 /src/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
 
 # Setup project dependencies
