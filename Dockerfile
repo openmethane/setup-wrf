@@ -36,7 +36,7 @@ ENV PYTHONFAULTHANDLER=1 \
 # Preference the libraries built in the WRF container
 ENV LD_LIBRARY_PATH="/opt/wrf/libs/lib:${LD_LIBRARY_PATH}"
 
-WORKDIR /project
+WORKDIR /opt/project
 
 # Install additional apt dependencies
 RUN apt-get update && \
@@ -46,18 +46,18 @@ RUN apt-get update && \
 # Setup poetry
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+# Setup project dependencies
+COPY pyproject.toml /opt/project/
+RUN poetry install  --no-interaction --no-ansi
+
 # Copy in WRF and wgrib2 binaries
 # https://github.com/climate-resource/wrf-container
 COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
 COPY --from=ghcr.io/openmethane/cmaq:5.0.2 /opt/cmaq /opt/cmaq
 COPY --from=wgrib2 /src/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
 
-# Setup project dependencies
-COPY pyproject.toml /project/
-RUN poetry install  --no-interaction --no-ansi
-
 # Copy in the rest of the project
-# For testing it might be easier to mount $(PWD):/project so that local changes are reflected in the container
-COPY . /project
+# For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
+COPY . /opt/project
 
 CMD ["/bin/bash"]

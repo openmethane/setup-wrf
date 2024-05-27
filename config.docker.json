@@ -1,9 +1,9 @@
 # naming convention should be: CAPS = environment variable, lower-case = internal
 {
     # overall base directory for project
-    "project_root": "/project",
+    "project_root": "/opt/project",
     # base dir for set up scripts
-    "setup_root" : "/project",
+    "setup_root" : "/opt/project",
     # Project name
     "run_name" : "aust-test",
     # Target environment for running tasks
@@ -33,7 +33,7 @@
     "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
 
     # top-level directory for the WRF and WPS outputs
-    "run_dir" : "/project/data/runs/${run_name}",
+    "run_dir" : "/opt/project/data/runs/${run_name}",
 
     # filename of the template run-script
     "run_script_template" : "${target_dir}/run_script_template.sh",
