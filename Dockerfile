@@ -13,7 +13,7 @@ RUN apt-get update && \
 RUN wget -c ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz.$WGRIB2_VERSION && \
     tar -xzvf wgrib2.tgz.$WGRIB2_VERSION && \
     cd grib2 && \
-    CC=gcc FC=gfortran make -j 4
+    CC=gcc FC=gfortran make
 
 
 # Container for running WRF
