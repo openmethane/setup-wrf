@@ -21,7 +21,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: read
+      packages: write
 
     # Builds, tests and pushes the container
     # This is performed via a single GH job because sharing images between jobs is somewhat clumsy.
