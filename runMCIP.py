@@ -93,24 +93,13 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             print('\tdom =',dom)
             ##
             mcipDir = '{}/{}/{}'.format(metDir,yyyymmdd_dashed,dom)
-            nextDate = date + datetime.timedelta(days = 1)
             ##
             times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24)]
             WRFfiles = [os.path.join(wrfDir, yyyymmddhh, to_wrf_filename(dom, time)) for time in times]
-            next_yyyymmddhh = nextDate.strftime('%Y%m%d%H')
-            nextDayFile = os.path.join(wrfDir, next_yyyymmddhh, to_wrf_filename(dom, nextDate))
-            WRFfiles.append( nextDayFile)
             outPaths = ['{}/{}'.format(mcipDir, os.path.basename(WRFfile)) for WRFfile in WRFfiles]
             for src, dst in  zip(WRFfiles, outPaths):
-                file_exists = os.path.exists(src)
-                if not file_exists:
-                    if src != nextDayFile:
-                        raise AssertionError(f"WRF output {src} not found")
-                    else:
-                        print("WRF output {} for last timestep not found".format(src))
-                        WRFfiles.remove(src)
-                        outPaths.remove(dst)
-                        continue
+                if not os.path.exists(src):
+                    raise AssertionError(f"WRF output {src} not found")
                 copyfile( src,dst)
                 ## print 1. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
 
@@ -165,7 +154,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     ['set InMetFiles = ( TEMPLATE )', 'set InMetFiles = ( {} )'.format(' '.join(outPaths))],
                     ['set InTerFile  = TEMPLATE', 'set InTerFile  = {}/geo_em.{}.nc'.format(geoDir,dom)],
                     ['set MCIP_START = TEMPLATE', 'set MCIP_START = {}:00:00.0000'.format(date.strftime('%Y-%m-%d-%H'))],
-                    ['set MCIP_END   = TEMPLATE', 'set MCIP_END   = {}:00:00.0000'.format(nextDate.strftime('%Y-%m-%d-%H'))],
+                    ['set MCIP_END   = TEMPLATE', 'set MCIP_END   = {}:00:00.0000'.format(times[-1].strftime('%Y-%m-%d-%H'))],
                     ['set INTVL      = TEMPLATE', 'set INTVL      = {}'.format(int(round(nMinsPerInterval[idom])))],
                     ['set APPL       = TEMPLATE', 'set APPL       = {}'.format(APPL[idom])],
                     ['set CoordName  = TEMPLATE', 'set CoordName  = {}'.format(CoordName[idom])],
