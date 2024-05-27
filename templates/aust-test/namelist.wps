@@ -17,7 +17,7 @@
  j_parent_start    = 200,
  e_we          = 10,
  e_sn          = 10,
- geog_data_res     = 'default','default','default','default',
+ geog_data_res     = 'usgs_lakes+default',
  dx = 10000,
  dy = 10000,
  map_proj =  'lambert',
