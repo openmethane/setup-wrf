@@ -26,7 +26,7 @@
  truelat1  = -15.,
  truelat2  = -40.,
  stand_lon = 133.302,
- geog_data_path = '/opt/wrf/geog',
+ geog_data_path = '/opt/project/data/geog/WPS_GEOG',
  ref_x = 233.5,
  ref_y = 221.5,
 /
