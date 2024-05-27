@@ -34,6 +34,9 @@ import glob
 import tempfile
 from shutil import copyfile
 
+def to_wrf_filename(domain: str, time: datetime.datetime) -> str:
+    return f'WRFOUT_{domain}_{time.strftime("%Y-%m-%dT%H%M")}Z.nc'
+
 def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, GridName, scripts,
             compressWithNco = True, fix_simulation_start_date = True, fix_truelat2 = False, truelat2 = None, wrfRunName = None, doArchiveWrf = False, add_qsnow = False):
     '''Function to run MCIP from python
@@ -93,9 +96,9 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
             nextDate = date + datetime.timedelta(days = 1)
             ##
             times = [date + datetime.timedelta(seconds = h*60*60) for h in range(24)]
-            WRFfiles = [ '{}/{}/WRFOUT_{}_{}'.format(wrfDir, yyyymmddhh, dom, time.strftime('%Y-%m-%d_%H:%M:%S')) for time in times ]
+            WRFfiles = [os.path.join(wrfDir, yyyymmddhh, to_wrf_filename(dom, time)) for time in times]
             next_yyyymmddhh = nextDate.strftime('%Y%m%d%H')
-            nextDayFile ='{}/{}/WRFOUT_{}_{}'.format(wrfDir, next_yyyymmddhh, dom, nextDate.strftime('%Y-%m-%d_%H:%M:%S'))
+            nextDayFile = os.path.join(wrfDir, next_yyyymmddhh, to_wrf_filename(dom, nextDate))
             WRFfiles.append( nextDayFile)
             outPaths = ['{}/{}'.format(mcipDir, os.path.basename(WRFfile)) for WRFfile in WRFfiles]
             for src, dst in  zip(WRFfiles, outPaths):

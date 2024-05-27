@@ -41,12 +41,16 @@ rm -f wrfbdy* wrfinput* wrflow* nco* wrffdda*
 
 echo "Remove files during the spinup period "
 for wrfoutfile in `find . -type f -iname 'wrfout_*'` ; do
-    datetime=`basename $wrfoutfile | cut -c12-24`
-    datetime=${datetime}:00:00
+    datetime=`basename $wrfoutfile | cut -c12-26`
     if [[ "$datetime" < "${firstTimeToKeep}" ]] ; then
-	rm -fv $wrfoutfile
+	    rm -fv $wrfoutfile
     fi
 done
+
+for file in wrfout_*; do
+  echo "WARNING: $file remains unprocessed"
+done
+
 
 echo "Compress files"
 ./nccopy_compress_output.sh .

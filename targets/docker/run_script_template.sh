@@ -12,7 +12,7 @@ echo running with $PBS_NCPUS mpi ranks
 time mpirun -np $PBS_NCPUS ./wrf.exe >& wrf.log
 
 ## give the python script a chance to finish
-sleep 20
+sleep 30
 
 ## kill the process that was running in the background
 kill $backgroundPID
