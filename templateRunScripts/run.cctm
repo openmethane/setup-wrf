@@ -21,7 +21,6 @@
  set APPL     = CH4only
  set CFG = TEMPLATE
  set MECH = TEMPLATE
- set EXEC_ID= Linux2_x86_64intel
  set EXEC   = CCTM_${APPL}_${EXEC_ID}
 
  
@@ -354,8 +353,8 @@ endif
  source $BASE/outck.q
 
  ls -l $BLD/$EXEC; size $BLD/$EXEC
- unlimit
- limit
+# unlimit
+# limit
 
 #> Executable call for single PE, uncomment to invoke
 if ( $PROC == 'serial' ) then

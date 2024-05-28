@@ -31,7 +31,6 @@
  set APPL     = CH4only
  set CFG      = TEMPLATE
  set MECH     = TEMPLATE
- set EXEC_ID = Linux2_x86_64intel
  set EXEC     = ICON_${APPL}_${EXEC_ID}_${IC}_${MECH}
 
 #> Set the working directory:
@@ -78,7 +77,7 @@
 # =====================================================================
 
  if ( $IC == profile ) then
-    setenv IC_PROFILE   /home/563/sa6589/CMAQv5.0.2_notpollen/scripts/icon/BLD_CH4only/ic_profile_CH4only.dat
+    setenv IC_PROFILE   ${BLD}/ic_profile_CH4only.dat
  endif
  
  if ( $IC == m3conc ) then 
@@ -113,8 +112,8 @@
  if ( ! -d "$OUTDIR" ) mkdir -p $OUTDIR
 
  ls -l $BLD/$EXEC; size $BLD/$EXEC
- unlimit
- limit
+# unlimit
+# limit
 
 #> Executable call:
  time $BLD/$EXEC
