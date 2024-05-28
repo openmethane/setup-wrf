@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: data/geog
-          key: ${{ runner.os }}
+          key: geog-data-${{ runner.os }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
