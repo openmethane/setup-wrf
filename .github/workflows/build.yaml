@@ -89,17 +89,16 @@ jobs:
           # Run setup_for_wrf.py
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
-            -v ${{ github.workspace }}/data/geog/WPS_GEOG:/opt/project/data/geog \
             setup_wrf \
             python setup_for_wrf.py -c config.docker.json
           # Run WRF
           docker run --rm \
-            -v ${{ github.workspace }}:/project \
+            -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
             data/runs/aust-test/main.sh
           # Prepare CMAQ
           docker run --rm \
-            -v ${{ github.workspace }}:/project \
+            -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
             python setupCMAQinputs.py
       # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
