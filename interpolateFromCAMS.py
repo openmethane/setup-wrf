@@ -216,7 +216,7 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
             ## check that the output directory exists - if not, create it
             os.makedirs(chemdir, exist_ok=True)
 
-n            do_BCs = (dom == doms[0])
+            do_BCs = (dom == doms[0])
 
             if not (do_ICs or do_BCs):
                 continue
