@@ -68,7 +68,7 @@ def main():
     wrfDir = "/opt/project/data/runs/aust-test"  ## directory containing wrfout_* files
     ## convention for WRF output, is wrfDir/2016112900/wrfout_d03_*
     geoDir = "/opt/project/templates/aust-test/"  ## directory containing geo_em.* files
-    inputCAMSFile = "/opt/project/data/inputs/levtype_pl.nc"
+    inputCAMSFile = "/opt/project/data/inputs/cams_eac4_methane.nc"
     sufadj = "output_newMet"  # this is added by sougol to match the name of the folder created by running adj executable.
 
     domains = ["d01"]  ## which domains should be run?
@@ -100,7 +100,7 @@ def main():
     gridName = "openmethane"  # Grid name (for MCIP). 16-character maximum
 
     doCompress = True  ## compress the output from netCDF3 to netCDF4 during the CMAQ run
-    compressScript = "/home/563/ns0890/runCMAQ/Melb_Sch01/find_and_compress_netcdf3_to_netcdf4"  ## script to find and compress netCDF3 to netCDF4
+    compressScript = "/opt/project/nccopy_compress_output.sh"  ## script to find and compress netCDF3 to netCDF4
 
     ## This is a dictionary with paths to each of the
     ## run-scripts. Elements of the dictionary should themselves be

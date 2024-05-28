@@ -358,7 +358,7 @@ endif
 
 #> Executable call for single PE, uncomment to invoke
 if ( $PROC == 'serial' ) then
- /usr/bin/time  $BLD/$EXEC
+ time  $BLD/$EXEC
 else
 #> Executable call for multi PE, configure for your system 
  ## set MPIRUN = mpirun
@@ -366,7 +366,7 @@ else
  set MPIRUN = mpirun
  ## time $MPIRUN -r ssh -np $NPROCS $BLD/$EXEC
  ## /usr/bin/time $MPIRUN -r ssh -np $NPROCS $BLD/$EXEC
- /usr/bin/time $MPIRUN -np $NPROCS $BLD/$EXEC
+ time $MPIRUN -np $NPROCS $BLD/$EXEC
 
 endif
  

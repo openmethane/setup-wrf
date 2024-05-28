@@ -40,7 +40,7 @@ WORKDIR /opt/project
 
 # Install additional apt dependencies
 RUN apt-get update && \
-    apt-get install -y libgfortran5 nco csh mpich && \
+    apt-get install -y libgfortran5 nco csh mpich bc libopenmpi-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Setup poetry
@@ -59,5 +59,6 @@ COPY --from=wgrib2 /src/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
 # Copy in the rest of the project
 # For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
 COPY . /opt/project
+COPY targets/docker/nccopy_compress_output.sh /opt/project/nccopy_compress_output.sh
 
 CMD ["/bin/bash"]
