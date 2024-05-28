@@ -51,6 +51,20 @@ jobs:
           mkdir -p data/geog
           curl "https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz" -o data/geog/geog_low_res_mandatory.tar.gz
           tar -xvzf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
+      - name: Cache CAMS data
+        id: cache-cams
+        uses: actions/cache@v4
+        with:
+          path: data/inputs
+          key: cams
+      - name: Download CAMS input data
+        if: steps.cache-cams.outputs.cache-hit != 'true'
+        run: |
+          # This can take a few minutes as the CAMS data is stored on tape
+          docker run --rm \
+            -v ${{ github.workspace }}:/project \
+            setup_wrf \
+            python download_cams_input.py
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data
@@ -71,7 +85,7 @@ jobs:
       - name: Zip WRF artifacts
         if: ${{ always() }}
         run: |
-          tar -cvzf results.tar.gz data/runs
+          tar -cvzf results.tar.gz data/runs data/cmaq data/mcip
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
