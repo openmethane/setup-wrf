@@ -68,7 +68,7 @@ def main():
     wrfDir = "/opt/project/data/runs/aust-test"  ## directory containing wrfout_* files
     ## convention for WRF output, is wrfDir/2016112900/wrfout_d03_*
     geoDir = "/opt/project/templates/aust-test/"  ## directory containing geo_em.* files
-    inputCAMSFile = "/opt/project/inputs/cams_eac4_4.nc"
+    inputCAMSFile = "/opt/project/data/inputs/levtype_pl.nc"
     sufadj = "output_newMet"  # this is added by sougol to match the name of the folder created by running adj executable.
 
     domains = ["d01"]  ## which domains should be run?

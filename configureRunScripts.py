@@ -237,8 +237,8 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
           if output.decode().find('Program  BCON completed successfully') < 0:
               print(outBconFile)
               print('exit_code = ',exit_code)
-              print('err =',err)
-              print('output =', output)
+              print('err =',err.decode())
+              print('output =', output.decode())
               raise RuntimeError('failure in bcon')
         except Exception:
             raise
