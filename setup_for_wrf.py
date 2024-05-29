@@ -23,7 +23,7 @@ from downloadFNLanalyses import download_gdas_fnl_data
 ## get command line arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-c", "--configFile", help="Path to configuration file", default = 'config.json')
+parser.add_argument("-c", "--configFile", help="Path to configuration file", default = 'config.nci.json')
 args = parser.parse_args()
 configFile = args.configFile
 
