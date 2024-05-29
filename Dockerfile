@@ -31,7 +31,9 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VIRTUALENVS_CREATE=false \
   POETRY_CACHE_DIR='/var/cache/pypoetry' \
   POETRY_HOME='/usr/local' \
-  POETRY_VERSION=1.8.2
+  POETRY_VERSION=1.8.2 \
+  OMPI_ALLOW_RUN_AS_ROOT=1 \
+  OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 # Preference the libraries built in the WRF container
 ENV LD_LIBRARY_PATH="/opt/wrf/libs/lib:${LD_LIBRARY_PATH}"
