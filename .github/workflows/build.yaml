@@ -44,13 +44,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: data/geog
-          key: ${{ runner.os }}
+          key: geog-data-${{ hashFiles('scripts/download-geog.sh') }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
-          mkdir -p data/geog
-          curl "https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz" -o data/geog/geog_low_res_mandatory.tar.gz
-          tar -xvzf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
+          ./scripts/download-geog.sh --low-res
       - name: Cache CAMS data
         id: cache-cams
         uses: actions/cache@v4
@@ -72,17 +70,17 @@ jobs:
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data
-          sed -i "s/geog_data_res.*/geog_data_res = 'lowres',/g" templates/aust-test/namelist.wps
+          sed -i "s/geog_data_res.*/geog_data_res = 'usgs_10m+lowres',/g" templates/aust-test/namelist.wps
           # Run setup_for_wrf.py
           docker run --rm \
             -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
+            -v ${{ github.workspace }}/data/geog/WPS_GEOG:/opt/wrf/geog \
             setup_wrf \
             python setup_for_wrf.py -c config.docker.json
           # Run WRF
           docker run --rm \
             -v ${{ github.workspace }}:/project \
-            -v ${{ github.workspace }}/data/geog/WPS_GEOG_LOW_RES:/opt/wrf/geog \
+            -v ${{ github.workspace }}/data/geog/WPS_GEOG:/opt/wrf/geog \
             setup_wrf \
             data/runs/aust-test/main.sh
       # The WRF directory contains filenames with : in them, which are not supported by upload-artifact

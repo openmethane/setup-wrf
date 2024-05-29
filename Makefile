@@ -7,7 +7,5 @@ virtual-environment:  ## update virtual environment, create a new one if it does
 	poetry install --all-extras
 
 
-data/geog: ## Download static geography data
-	mkdir -p data/geog
-	curl https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_high_res_mandatory.tar.gz -o data/geog/geog_high_res_mandatory.tar.gz
-	tar -xvzf data/geog/geog_high_res_mandatory.tar.gz -C data/geog
+data/geog: scripts/download-geog.sh ## Download static geography data
+	./scripts/download-geog.sh
