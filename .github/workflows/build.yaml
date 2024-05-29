@@ -44,16 +44,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: data/geog
-          key: geog-data-${{ runner.os }}
+          key: geog-data-${{ hashFiles('scripts/download-geog.sh') }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
-          mkdir -p data/geog
-          wget -qN https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_low_res_mandatory.tar.gz -P data/geog
-          wget -qN https://www2.mmm.ucar.edu/wrf/src/wps_files/landuse_10m.tar.bz2 -P data/geog
-          tar -xf data/geog/geog_low_res_mandatory.tar.gz -C data/geog
-          tar -xf data/geog/landuse_10m.tar.bz2 -C data/geog/WPS_GEOG_LOW_RES
-          mv data/geog/WPS_GEOG_LOW_RES data/geog/WPS_GEOG
+          ./scripts/download-geog.sh --low-res
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data

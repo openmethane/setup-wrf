@@ -52,7 +52,9 @@ else
   wget -N -nv https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_high_res_mandatory.tar.gz -P $output_dir
 	wget -N -nv https://www2.mmm.ucar.edu/wrf/src/wps_files/landuse_30s.tar.bz2 -P $output_dir
 	echo "Extracting data to $output_dir/WPS_GEOG..."
-	echo "This may take a few minutes"
+	echo "  This may take a few minutes"
 	tar -xzf $output_dir/geog_high_res_mandatory.tar.gz -C $output_dir
 	tar -xzf $output_dir/landuse_30s.tar.bz2 -C $output_dir/WPS_GEOG
 fi
+
+echo "Completed downloading and extracting WRF geog data."
