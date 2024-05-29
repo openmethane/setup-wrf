@@ -1,13 +1,13 @@
 # naming convention should be: CAPS = environment variable, lower-case = internal
 {
     # overall base directory for project
-    "project_root": "/project",
+    "project_root": "${HOME}/openmethane-beta",
     # base dir for set up scripts
-    "setup_root" : "/project",
+    "setup_root" : "${project_root}/setup-wrf",
     # Project name
     "run_name" : "aust-test",
     # Target environment for running tasks
-    "target": "docker",
+    "target": "nci",
     # Start date-time of the first simulation:
     # format = "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" if the time-zone is UTC
     "start_date" : "2024-01-01 00:00:00 UTC",
@@ -33,7 +33,7 @@
     "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
 
     # top-level directory for the WRF and WPS outputs
-    "run_dir" : "/project/data/runs/${run_name}",
+    "run_dir" : "/scratch/q90/pjr563/openmethane-beta/wrf/${run_name}",
 
     # filename of the template run-script
     "run_script_template" : "${target_dir}/run_script_template.sh",
@@ -51,16 +51,16 @@
     "use_high_res_sst_data" : "true",
     
     # the top-level WPS directory
-    "wps_dir" : "/opt/wrf/WPS",
+    "wps_dir" : "${project_root}/wrf/coecms/WPS",
     # the top-level directory containing the WRF executables and data-tables
-    "wrf_dir" : "/opt/wrf/WRF",
-    # this directory (the directory with template namelists)
+    "wrf_dir" : "${project_root}/wrf/coecms/WRF",
+    # the directory containining the run specific configuration (the directory with template namelists)
     "nml_dir" : "${setup_root}/templates/${run_name}",
     # the directory containing the target-specific configuration
     "target_dir" : "${setup_root}/targets/${target}",
     # scripts to copy from directory ${nml_dir} to each day
     "scripts_to_copy_from_nml_dir":"add_remove_var.txt",
-    # scripts to copy from directory ${target_dir} to each day
+    # scripts to copy from directory targets/${target} to each day
     "scripts_to_copy_from_target_dir":"nccopy_compress_output.sh,load_wrf_env.sh",
     # output location for the met_em files
     "metem_dir" : "${run_dir}/metem",
@@ -70,7 +70,7 @@
     # template namelist for WRF
     "namelist_wrf" : "${nml_dir}/namelist.wrf",
     # path to the geography data files
-    "geog_data_path" : "/opt/wrf/geog",
+    "geog_data_path" : "/g/data/sx70/data/WPS_GEOG_20190418",
     # path to the GEOGRID.TBL file
     "geogrid_tbl" : "${wps_dir}/geogrid/GEOGRID.TBL",
     # path to the geogrid.exe program
