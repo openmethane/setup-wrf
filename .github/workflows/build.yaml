@@ -61,11 +61,11 @@ jobs:
           # This can take a few minutes as the CAMS data is stored on tape
           docker run --rm \
             -v ${{ github.workspace }}:/project \
-            -e CDSAPI_KEY=${{ secrets.CDSAPI_KEY }} \
+            -e CDSAPI_KEY=${{ secrets.CDSAPI_ADS_KEY }} \
             setup_wrf \
             python scripts/download_cams_input.py \
-            -s 2023-12-01 \
-            -e 2023-12-01 \
+            -s 2022-07-01 \
+            -e 2022-07-01 \
             data/inputs/cams_eac4_methane.nc
       - name: Run test
         run: |
