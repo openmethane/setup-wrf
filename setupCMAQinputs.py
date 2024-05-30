@@ -73,9 +73,8 @@ def main():
 
     domains = ["d01"]  ## which domains should be run?
     run = "openmethane"  ## name of the simulation, appears in some filenames (keep this *short* - longer)
-    mcipSuffix = ["2"]
-    startDate = datetime.datetime(2024, 1, 1, 0, 0, 0)  ## this is the START of the first day
-    endDate = datetime.datetime(2024, 1, 1, 0, 0)  ## this is the START of the last day
+    startDate = datetime.datetime(2022, 7, 1, 0, 0, 0)  ## this is the START of the first day
+    endDate = datetime.datetime(2022, 7, 1, 0, 0)  ## this is the START of the last day
     nhoursPerRun = 24  ## number of hours to run at a time (24 means run a whole day at once)
     printFreqHours = 1  ## frequency of the CMAQ output (1 means hourly output) - so far it is not set up to run for sub-hourly
 
@@ -95,9 +94,9 @@ def main():
     )
     forceUpdateRunScripts = True  # force an update to the run scripts
 
-    scenarioTag = "220701_10km"  # scenario tag (for MCIP). 16-character maximum
-    mapProjName = "LamCon_34S_150E"  # Map projection name (for MCIP). 16-character maximum
-    gridName = "openmethane"  # Grid name (for MCIP). 16-character maximum
+    scenarioTag = ["220701_aust-test"]  # scenario tag (for MCIP). 16-character maximum
+    mapProjName = ["LamCon_34S_150E"]  # Map projection name (for MCIP). 16-character maximum
+    gridName = ["openmethane" ] # Grid name (for MCIP). 16-character maximum
 
     doCompress = True  ## compress the output from netCDF3 to netCDF4 during the CMAQ run
     compressScript = "/opt/project/nccopy_compress_output.sh"  ## script to find and compress netCDF3 to netCDF4
@@ -205,8 +204,8 @@ def main():
             metDir,
             ctmDir,
             GridNames,
-            mcipSuffix,
-            forceUpdateICandBC,
+            mcipsuffix=APPL,
+            forceUpdate=forceUpdateICandBC,
             bias_correct=(1.838 - 1.771),
         )
 
