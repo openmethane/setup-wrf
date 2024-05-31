@@ -4,10 +4,13 @@ version = "0.1.0"
 description = "Scripts for running WRF "
 authors = [
     "Peter Rayner <peter.rayner@superpowerinstitute.com.au>",
-    "Jeremy Silver"
+    "Jeremy Silver",
+    "Jared Lewis <jared.lewis@climate-resource.com>"
 ]
 readme = "README.md"
-packages = []
+packages = [
+    {include = "openmethane_prior", from = "src"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.10,<3.12"
