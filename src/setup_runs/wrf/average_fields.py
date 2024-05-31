@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import netCDF4
 import numpy
 
 
-def average_fields(inFile, outFile, outputTime):
+def average_fields(inFile: str | Path, outFile: str | Path, outputTime: str):
     dimensions = {}
     variables = {}
     attributes = {}

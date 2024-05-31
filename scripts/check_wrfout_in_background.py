@@ -1,12 +1,31 @@
+"""
+Watches the WRF output directory for new files and processes them in the background
+
+Each output file is averaged into a single timestep and saved with a new filename.
+This is required because WRF reports instantaneous values at each timestep.
+Instead we want to average the values over a time period (in this case hourly).
+If the file is successfully processed, the original file is removed.
+"""
+
 import datetime
+from pathlib import Path
+
 import netCDF4
 import os
 import time
-import resource
+import logging
 
 from setup_runs.wrf.average_fields import average_fields
 
-resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
+EXPECTED_TIMESTEPS = 12
+"""
+Number of timesteps in a completed file
+
+Derived from the `frames_per_outfile` variable in the WRF namelist
+"""
+
+logger = logging.getLogger("check_wrfout_in_background")
 
 
 def generate_out_filename(in_file: str):
@@ -28,30 +47,40 @@ def generate_out_filename(in_file: str):
     return out_file, time_str
 
 
-while True:
-    time.sleep(1)
-    Files = os.listdir('..')
-    Files = [File for File in Files if File.startswith('wrfout_')]
-    for inFile in Files:
-        mtimeAgo = time.time() - os.path.getmtime(inFile)
-        ## print File, mtimeAgo
-        if mtimeAgo > 10.0:
-            nc = netCDF4.Dataset(inFile)
-            ntimes = len(nc.dimensions['Time'])
-            nc.close()
-            ##
-            if ntimes == 12:
-                outFile, timestr = generate_out_filename(inFile)
+def process_file(in_file: Path):
+    """
+    Process a WRF output file into a single time step
+    """
+    nc = netCDF4.Dataset(in_file)
+    ntimes = len(nc.dimensions['Time'])
+    nc.close()
+    if ntimes != EXPECTED_TIMESTEPS:
+        logger.debug("File %s has %d timesteps, expected %d", in_file, ntimes, EXPECTED_TIMESTEPS)
+        return
 
-                try:
-                    average_fields(inFile, outFile, timestr)
-                except Exception as e:
-                    print(f"Error processing {inFile}")
-                    print(f"Exception: {e}")
-                    continue
+    out_file, time_str = generate_out_filename(in_file.name)
 
-                if not os.path.exists(outFile):
-                    print("output file not created:",outFile)
-                else:
-                    ## if the process completed successfully and the output file is found, then delete the input file
-                    os.remove(inFile)
+    logger.info(f"Averaging {in_file} to {out_file}")
+    try:
+        average_fields(in_file, out_file, time_str)
+    except Exception:
+        logger.exception(f"Error processing {in_file}")
+        return
+
+    if not os.path.exists(out_file):
+        logger.error("output file not created")
+    else:
+        logger.info("successfully processed. Removing old file")
+        os.remove(in_file)
+
+def main():
+    while True:
+        time.sleep(1)
+        for inFile in Path(".").glob("wrfout_*"):
+            mtimeAgo = time.time() - os.path.getmtime(inFile)
+            logger.debug("found file %s mtimeago %d s",inFile, mtimeAgo)
+            if mtimeAgo > 10.0:
+                process_file(inFile)
+
+if __name__ == "__main__":
+    main()
