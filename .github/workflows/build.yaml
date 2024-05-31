@@ -100,7 +100,7 @@ jobs:
       - name: Zip WRF artifacts
         if: ${{ always() }}
         run: |
-          tar -cvzf results.tar.gz data/runs data/mcip data/cmaq
+          tar -cvzf results.tar.gz --exclude data/geog data
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
