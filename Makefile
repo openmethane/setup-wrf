@@ -18,6 +18,6 @@ clean: ## Remove any previous local runs
 	rm -rf data/mcip
 
 run: ## Run the required steps
-	docker run --rm -it -v $(PWD):/opt/project setup_wrf -- python setup_for_wrf.py -c config.docker.json
+	docker run --rm -it -v $(PWD):/opt/project setup_wrf python setup_for_wrf.py -c config.docker.json
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf /opt/project/data/runs/aust-test/main.sh
-	docker run --rm -it -v $(PWD):/opt/project setup_wrf -- python setupCMAQinputs.py
+	docker run --rm -it -v $(PWD):/opt/project setup_wrf python setupCMAQinputs.py
