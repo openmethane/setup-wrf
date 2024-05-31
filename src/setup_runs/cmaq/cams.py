@@ -6,7 +6,9 @@ import netCDF4
 import os
 import shutil
 import warnings
-import helper_funcs
+
+from setup_runs.utils import getDistanceFromLatLonInKm
+
 moleMass = {'air':28.96, 'ch4_c':16}
 
 def match_two_sorted_arrays(arr1,arr2):
@@ -314,14 +316,14 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
 
                 for irow in range(LON.shape[0]):
                     for icol in range(LON.shape[1]):
-                        dists = helper_funcs.getDistanceFromLatLonInKm(LAT[irow,icol],LON[irow,icol],LATMZ,LONMZ)
+                        dists = getDistanceFromLatLonInKm(LAT[irow,icol], LON[irow,icol], LATMZ, LONMZ)
                         minidx = numpy.argmin(dists)
                         ix, iy = numpy.unravel_index(minidx, LONMZ.shape)
                         near_interior[irow,icol,0] = ix
                         near_interior[irow,icol,1] = iy
 
                 for iperim in range(LONP.shape[0]):
-                    dists = helper_funcs.getDistanceFromLatLonInKm(LATP[iperim],LONP[iperim],LATMZ,LONMZ)
+                    dists = getDistanceFromLatLonInKm(LATP[iperim], LONP[iperim], LATMZ, LONMZ)
                     minidx = numpy.argmin(dists)
                     ix, iy = numpy.unravel_index(minidx, LONMZ.shape)
                     near_boundary[iperim,0] = ix
@@ -404,22 +406,3 @@ def interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIcon
                     ncouti.close()
                 if do_BCs:
                     ncoutb.close()
-
-
-def main():
-    dates=[datetime.datetime(2022, 7, 1, 0, 0)]
-    doms=['d01']
-    mech='CH4only'
-    inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
-    templateIconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/icon.nc']
-    templateBconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/bcon.nc']
-    metDir='/tmp/q90/pjr563/openmethane-beta/mcip/'
-    ctmDir='/tmp/q90/pjr563/openmethane-beta/cmaq/'
-    GridNames = ['o']
-    mcipSuffix = ['2']
-    forceUpdate=True
-    interpolateFromCAMSToCmaqGrid(dates, doms, mech, inputCAMSFile, templateIconFiles, templateBconFiles, metDir, ctmDir, GridNames, mcipSuffix, forceUpdate, bias_correct=(1.838-1.771))
-
-if __name__ == "__main__":
-    main()
-

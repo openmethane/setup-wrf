@@ -28,7 +28,7 @@ endfor
 import netCDF4
 import datetime
 import subprocess
-import helper_funcs
+from setup_runs.utils import replace_and_write
 import os
 import glob
 import tempfile
@@ -162,7 +162,7 @@ def runMCIP(dates, domains, metDir, wrfDir, geoDir, ProgDir, APPL, CoordName, Gr
                     ['set ProgDir    = TEMPLATE', 'set ProgDir    = {}'.format(ProgDir)]]
             ##
             tmpRunMcipPath = '{}/run.mcip.{}.csh'.format(mcipDir,dom)
-            helper_funcs.replace_and_write(lines = scripts['mcipRun']['lines'], outfile = tmpRunMcipPath, substitutions = subs, strict = False, makeExecutable = True)
+            replace_and_write(lines = scripts['mcipRun']['lines'], outfile = tmpRunMcipPath, substitutions = subs, strict = False, makeExecutable = True)
             ##
             ## print '4. # WRF files =',len([f for f in os.listdir(mcipDir) if f.startswith('wrfout_')])
             command = tmpRunMcipPath

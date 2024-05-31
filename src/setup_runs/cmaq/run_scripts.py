@@ -1,7 +1,7 @@
 '''Autogenerate run scripts for the CCTM, BCON and ICON, as well as higher-level run scripts
 '''
 import os
-import helper_funcs
+from setup_runs.utils import replace_and_write, compressNCfile
 import subprocess
 
 def prepareCctmRunScripts(dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, mechCMAQ, GridNames, mcipsuffix, scripts, EXEC, SZpath, forceUpdate,nhours = 24, printFreqHours = 1):
@@ -101,7 +101,7 @@ def prepareCctmRunScripts(dates, domains, ctmDir, metDir, CMAQdir, CFG, mech, me
             ##
             ## adjust CCTM script
             print("Prepare CMAQ script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain))
-            helper_funcs.replace_and_write(scripts['cctmRun']['lines'], outCctmFile, subsCctm)
+            replace_and_write(scripts['cctmRun']['lines'], outCctmFile, subsCctm)
             print(outCctmFile)
             os.chmod(outCctmFile,0o0744)
     return
@@ -165,7 +165,7 @@ def prepareBconRunScripts(sufadjname, dates, domains, ctmDir, metDir, CMAQdir, C
                             ['setenv MET_CRO_3D_FIN TEMPLATE',               'setenv MET_CRO_3D_FIN {}'.format(MetCro3dFin)]]
                 ##
                 print("Prepare BCON script for date = {} and domain = {}".format(date.strftime('%Y%m%d'),domain))
-                helper_funcs.replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
+                replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
                 os.chmod(outBconFile,0o0744)
     return
 
@@ -225,7 +225,7 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
                     ['setenv OUTFILE TEMPLATE',                       'setenv OUTFILE {}'.format(outfile)]]
         ##
         print("Prepare BCON script for domain = {}".format(domain))
-        helper_funcs.replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
+        replace_and_write(scripts['bconRun']['lines'], outBconFile, subsBcon)
         os.chmod(outBconFile,0o0744)
         ##
         print("Run BCON")
@@ -245,7 +245,7 @@ def prepareTemplateBconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
         ##
         print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
-        helper_funcs.compressNCfile(filename)
+        compressNCfile(filename)
         outputFiles[idomain] = filename
     ##
     
@@ -285,7 +285,7 @@ def prepareMainRunScript(dates, domains, ctmDir, CMAQdir, scripts, doCompress, c
                 ['compressScript=TEMPLATE',  'compressScript={}'.format(compressScript)]]
     ##
     print("Prepare the global CMAQ run script")
-    helper_funcs.replace_and_write(scripts['cmaqRun']['lines'], outpath, subsCMAQ)
+    replace_and_write(scripts['cmaqRun']['lines'], outpath, subsCMAQ)
     os.chmod(outpath,0o0744)
     return
 
@@ -345,7 +345,7 @@ def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
                     ['setenv OUTFILE TEMPLATE',                    'setenv OUTFILE {}'.format(outfile)]]
         ##
         print("Prepare ICON script for domain = {}".format(domain))
-        helper_funcs.replace_and_write(scripts['iconRun']['lines'], outIconFile, subsIcon)
+        replace_and_write(scripts['iconRun']['lines'], outIconFile, subsIcon)
         os.chmod(outIconFile,0o0744)
         ##
         print("Run ICON")
@@ -362,7 +362,7 @@ def prepareTemplateIconFiles(date, domains, ctmDir, metDir, CMAQdir, CFG, mech, 
         ##
         print("Compress the output file")
         filename = '{}/{}'.format(ctmDir, outfile)
-        helper_funcs.compressNCfile(filename)
+        compressNCfile(filename)
     ##
     return outputFiles
                
