@@ -26,7 +26,7 @@
  truelat1  = -15.,
  truelat2  = -40.,
  stand_lon = 133.302,
- geog_data_path = '/g/data/sx70/data/WPS_GEOG_20190418',
+ geog_data_path = 'TEMPLATE',
  ref_x = 233.5,
  ref_y = 221.5,
 /
