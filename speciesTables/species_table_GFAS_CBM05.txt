@@ -1,3 +1,0 @@
-GFAS variable ; CMAQ variable; coef  ; Description
-CH4FIRE_GDS0_SFC_ave24h ; CH4; 1.0 ; CH4
-
