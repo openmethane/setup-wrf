@@ -85,7 +85,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
-            python setup_for_wrf.py -c config.docker.json
+            python scripts/setup_for_wrf.py -c config.docker.json
           # Run WRF
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
@@ -95,7 +95,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
-            python setupCMAQinputs.py
+            python scripts/setup_for_cmaq.py
       # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
       - name: Zip WRF artifacts
         if: ${{ always() }}

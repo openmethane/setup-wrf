@@ -133,7 +133,7 @@ Inside the container, the wrf setup process can be run using the following comma
 (this might take some time):
 
 ```
-python setup_for_wrf.py -c config.docker.json
+python scripts/setup_for_wrf.py -c config.docker.json
 ```
 
 This command will generate all the required configuration
@@ -178,7 +178,7 @@ The location of the non-templated files is define using the `scripts_to_copy_fro
 
 The templated files are configured based on the results of `config.*.json`
 The tokens to replace are identified with the following format: `${keyword}`. 
-Generally speaking, the values for substitution are defined within the python script (`setup_for_wrf.py`). 
+Generally speaking, the values for substitution are defined within the python script (`scripts/setup_for_wrf.py`). 
 To change the substitutions, edit the python script in the sections between the lines bounded by `## EDIT:` and `## end edit section`.
 
 The `load_wrf_env.sh` script should contain the *same* environment modules that were used to compile WRF. 
