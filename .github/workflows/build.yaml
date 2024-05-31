@@ -70,7 +70,7 @@ jobs:
         run: |
           # This can take a few minutes as the CAMS data is stored on tape
           docker run --rm \
-            -v ${{ github.workspace }}:/project \
+            -v ${{ github.workspace }}:/opt/project \
             -e CDSAPI_KEY=${{ secrets.CDSAPI_ADS_KEY }} \
             setup_wrf \
             python scripts/download_cams_input.py \
