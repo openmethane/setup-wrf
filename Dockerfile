@@ -58,7 +58,7 @@ WORKDIR /opt/project
 
 # Install additional apt dependencies
 RUN apt-get update && \
-    apt-get install -y csh bc && \
+    apt-get install -y csh bc file && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy across the virtual environment
