@@ -7,7 +7,8 @@ COPY environment.yml /opt/environment.yml
 RUN conda env create -f /opt/environment.yml
 RUN conda install -c conda-forge conda-pack poetry=1.8.2
 RUN conda-pack -n setup_wrf -o /tmp/env.tar && \
-  mkdir /opt/venv && cd /opt/venv && tar xf /tmp/env.tar && \
+  mkdir /opt/venv && cd /opt/venv && \
+  tar xf /tmp/env.tar && \
   rm /tmp/env.tar
 
 # We've put venv in same path it'll be in final image,
@@ -20,13 +21,19 @@ ENV POETRY_NO_INTERACTION=1 \
     POETRY_VIRTUALENVS_CREATE=false \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
+# This is deliberately outside of the work directory
+# so that the local directory can be mounted as a volume of testing
+ENV VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
+
 WORKDIR /opt/venv
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
 
 # This installs the python dependencies into /opt/venv
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --no-ansi --no-root
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
+    /opt/conda/bin/poetry install --no-ansi --no-root
 
 # Container for running the project
 # This isn't a hyper optimised container but it's a good starting point
@@ -63,7 +70,7 @@ COPY --from=builder /opt/venv /opt/venv
 # TODO: temporarily pinned staging builds until this is verified to work
 # Otherwise the CI will be broken for main
 COPY --from=ghcr.io/climate-resource/wrf:pr-1 /opt/wrf /opt/wrf
-COPY --from=ghcr.io/openmethane/cmaq:pr-2 /opt/cmaq /opt/cmaq
+COPY --from=ghcr.io/openmethane/cmaq:pr-4 /opt/cmaq /opt/cmaq
 
 # Copy in the rest of the project
 # For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
@@ -71,6 +78,6 @@ COPY . /opt/project
 COPY targets/docker/nccopy_compress_output.sh /opt/project/nccopy_compress_output.sh
 
 # Install the local package in editable mode
-#RUN pip install -e .
+RUN pip install -e .
 
 CMD ["/bin/bash"]
