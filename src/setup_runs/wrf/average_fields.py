@@ -1,5 +1,3 @@
-import argparse
-
 import netCDF4
 import numpy
 
@@ -77,6 +75,8 @@ def average_fields(inFile, outFile, outputTime):
 
 
 if __name__ == "__main__":
+    import argparse
+
     parser = argparse.ArgumentParser(description='Average times over wrfout file.')
     parser.add_argument('-i', '--input', help='Input filepath')
     parser.add_argument('-o', '--output', help='Output filepath')
