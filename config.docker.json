@@ -41,7 +41,7 @@
     "cleanup_script_template" : "${target_dir}/cleanup_script_template.sh",
     # filename of the template script to coordinate the process
     "main_script_template" : "${target_dir}/main_script_template.sh",
-    "check_wrfout_in_background_script" : "${setup_root}/scripts/checkWrfoutInBackground.py",
+    "check_wrfout_in_background_script" : "${setup_root}/scripts/check_wrfout_in_background.py",
     
     # should the only task performed by the python script be to edit the WRF namelists and the shell scripts (the daily run-script, the daily clean-up script and the main coordination script)
     "only_edit_namelists" : "false",
