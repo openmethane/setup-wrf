@@ -219,7 +219,9 @@ set MKGRID = T
 #     information in X0, Y0, NCOLS, and NROWS.
 #-----------------------------------------------------------------------
 
-set BTRIM = 5
+
+# TESTING: needs to be smaller otherwise no domain would remain
+set BTRIM = 1
 
 #-----------------------------------------------------------------------
 # Define MCIP subset domain.  (Only used if BTRIM = -1.  Otherwise,

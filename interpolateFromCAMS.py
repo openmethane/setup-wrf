@@ -413,8 +413,8 @@ def main():
     inputCAMSFile = "/scratch/q90/pjr563/tmp/levtype_pl.nc"
     templateIconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/icon.nc']
     templateBconFiles = ['/home/563/pjr563/scratch/openmethane-beta/run-py4dvar/input/bcon.nc']
-    metDir='/scratch/q90/pjr563/openmethane-beta/mcip/'
-    ctmDir='/scratch/q90/pjr563/openmethane-beta/cmaq/'
+    metDir='/tmp/q90/pjr563/openmethane-beta/mcip/'
+    ctmDir='/tmp/q90/pjr563/openmethane-beta/cmaq/'
     GridNames = ['o']
     mcipSuffix = ['2']
     forceUpdate=True

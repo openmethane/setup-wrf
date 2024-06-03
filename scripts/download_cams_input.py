@@ -2,7 +2,12 @@
 """
 Download CAMS data on pressure levels
 
+Here we use EAC4 data product,
+which is the latest generation of the Copernicus Atmosphere Monitoring Service (CAMS)
+reanalysis data products.
+
 Download volume: ~1.4GB / month
+Description: https://www.copernicus.eu/en/access-data/copernicus-services-catalogue/cams-global-reanalysis-eac4
 
 Assumes that the user has a valid ADS account and has set up the necessary credentials
 in `~/.cdsapirc`.

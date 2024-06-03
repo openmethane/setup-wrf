@@ -21,7 +21,6 @@
  set APPL     = CH4only
  set CFG = TEMPLATE
  set MECH = TEMPLATE
- set EXEC_ID= Linux2_x86_64intel
  set EXEC   = CCTM_${APPL}_${EXEC_ID}
 
  
@@ -354,12 +353,12 @@ endif
  source $BASE/outck.q
 
  ls -l $BLD/$EXEC; size $BLD/$EXEC
- unlimit
- limit
+# unlimit
+# limit
 
 #> Executable call for single PE, uncomment to invoke
 if ( $PROC == 'serial' ) then
- /usr/bin/time  $BLD/$EXEC
+ time  $BLD/$EXEC
 else
 #> Executable call for multi PE, configure for your system 
  ## set MPIRUN = mpirun
@@ -367,7 +366,7 @@ else
  set MPIRUN = mpirun
  ## time $MPIRUN -r ssh -np $NPROCS $BLD/$EXEC
  ## /usr/bin/time $MPIRUN -r ssh -np $NPROCS $BLD/$EXEC
- /usr/bin/time $MPIRUN -np $NPROCS $BLD/$EXEC
+ time $MPIRUN -np $NPROCS $BLD/$EXEC
 
 endif
  

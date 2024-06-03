@@ -1,4 +1,7 @@
-# WRF coordination scripts
+# WRF/CMAQ coordination scripts
+
+This repository contains the code used to generate the scripts needed to run WRF and CMAQ
+according to a set of configuration.
 
 
 ## WRF runs
@@ -29,6 +32,39 @@ The `setup_for_wrf.py` script does the following:
     * Link to the `met_em` files (in the `METEM` directory), configure the WRF namelist, run `real.exe`
   * Configure the daily "run" and "cleanup" scripts
 
+After the `setup_for_wrf.py` script has been run successfully, 
+the `main.sh` script in the runs output directory can be used to run all the WRF jobs sequentially.
+For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and domain.
+
+## CMAQ runs
+
+The `setupCMAQinputs.py` script generates the required configuration and data to run CMAQ for a given domain and time.
+
+Currently, the configuration for CMAQ is not as flexible as for WRF
+and is specified directly in `setupCMAQinputs.py`.
+
+Before runnning this script, the WRF model must be run to generate the meteorological data and the CAMS data must be downloaded
+(`scripts/download_cams_input.py`) for the period of interest.
+[CAMS](https://www.copernicus.eu/en/access-data/copernicus-services-catalogue/cams-global-reanalysis-eac4) 
+is a global atmospheric reanalysis data set that can be used to provide boundary conditions for CMAQ.
+
+The `setupCMAQinputs.py` script does the following:
+* Checks if the required input files are available (WRF output files from the above section)
+* Run MCIP to extract the meteorological data from the WRF output files and interpolate onto the CMAQ grid
+* Prepares the initial and boundary conditions for CMAQ (using ICON and BCON respectively)
+* Interpolate CAMS data to the CMAQ grid
+* Generate the run script for CMAQ for each job
+
+TODO: Expand on the CMAQ run process
+
+Depending on the configuration of the script, 
+multiple CMAQ jobs may be generated.
+
+After the `setupCMAQinputs.py` script has been run successfully,
+there should be results in the `data/mcip` and `data/cmaq` directory.
+The `data/cmaq/runCMAQ.sh` script in the runs output directory can be used to run CMAQ for all jobs sequentially.
+
+TODO: Document how to run CMAQ (including fetching the CMAQ data files)
 
 ## Getting started
 
@@ -116,7 +152,9 @@ this may take some time.
 `data/runs/<run_name>/<YYYYMMDDHH>/run.sh` can also be run directly 
 to run WRF for a specific time period.
 
-[TODO]: Add instructions for running CMAQ
+
+Once you have a working setup, 
+`make run` can be used to run all the run steps. 
 
 ## Input files
 

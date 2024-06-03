@@ -924,7 +924,7 @@ for ind_job in range(number_of_jobs):
     substitutions = {'RUN_DIR': run_dir_with_date,
                      'RUNSHORT': config["run_name"][:8],
                      'STARTDATE' : job_start_usable.strftime('%Y%m%d'),
-                     'firstTimeToKeep': job_start_usable.strftime('%Y-%m-%d_%H:%M:%S')}
+                     'firstTimeToKeep': job_start_usable.strftime('%Y-%m-%dT%H%M')}
     ########## end edit section #####################################################
 
     ## write out the run and cleanup script

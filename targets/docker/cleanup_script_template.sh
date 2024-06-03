@@ -15,7 +15,7 @@ rm -r -f metgrid
 rm -f metgrid.exe metgrid.log*
 rm -f myoutfields*
 rm -f namelist.output
-rm -r realrsl rsl*
+#rm -r realrsl rsl*
 rm -f wrf.log wrf.exe ungrib.exe ungrib.log real.exe real.log
 rm -f FILE* GRIB* *DATA *TBL
 rm -r -f ei_tmp analysis_tmp sst_tmp
@@ -27,11 +27,14 @@ rm -f wrfbdy* wrfinput* wrflow* nco* wrffdda*
 
 echo "Remove files during the spinup period "
 for wrfoutfile in `find . -type f -iname 'wrfout_*'` ; do
-    datetime=`basename $wrfoutfile | cut -c12-24`
-    datetime=${datetime}:00:00
+    datetime=`basename $wrfoutfile | cut -c12-26`
     if [[ "$datetime" < "${firstTimeToKeep}" ]] ; then
-	rm -fv $wrfoutfile
+	    rm -fv $wrfoutfile
     fi
+done
+
+for file in wrfout_*; do
+  echo "WARNING: $file remains unprocessed"
 done
 
 echo "Compress files"
