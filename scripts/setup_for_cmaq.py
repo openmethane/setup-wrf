@@ -13,11 +13,12 @@
 
 import datetime
 
-import checkWrfMcipDomainSizes
-import configureRunScripts
-import helper_funcs
-import interpolateFromCAMS
-import runMCIP
+from setup_runs import utils
+from setup_runs.cmaq.run_scripts import prepareMainRunScript, prepareBconRunScripts, prepareCctmRunScripts, prepareTemplateBconFiles, prepareTemplateIconFiles
+from setup_runs.cmaq.mcip import runMCIP
+from setup_runs.cmaq.mcip_preparation import checkInputMetAndOutputFolders, getMcipGridNames
+from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
+
 
 
 ## The main routine controlling the CMAQ preparation phase
@@ -125,19 +126,19 @@ def main():
     dates = [startDate + datetime.timedelta(days=d) for d in range(ndates)]
 
     ## read in the template run-scripts
-    scripts = helper_funcs.loadScripts(Scripts=scripts)
+    scripts = utils.loadScripts(Scripts=scripts)
 
     ## create output destinations, if need be:
     print(
         "Check that input meteorology files are provided and create output destinations (if need be)"
     )
-    mcipOuputFound = checkWrfMcipDomainSizes.checkInputMetAndOutputFolders(
+    mcipOuputFound = checkInputMetAndOutputFolders(
         ctmDir, metDir, dates, domains
     )
     print("\t... done")
 
     if (not mcipOuputFound) or forceUpdateMcip:
-        runMCIP.runMCIP(
+        runMCIP(
             dates=dates,
             domains=domains,
             metDir=metDir,
@@ -159,12 +160,12 @@ def main():
 
     ## extract some parameters about the MCIP setup
     cctmExec = "ADJOINT_FWD"
-    CoordNames, GridNames, APPL = checkWrfMcipDomainSizes.getMcipGridNames(metDir, dates, domains)
+    CoordNames, GridNames, APPL = getMcipGridNames(metDir, dates, domains)
 
     if prepareICandBC:
         ## prepare the template boundary condition concentration files
         ## from profiles using BCON
-        templateBconFiles = configureRunScripts.prepareTemplateBconFiles(
+        templateBconFiles = prepareTemplateBconFiles(
             date=dates[0],
             domains=domains,
             ctmDir=ctmDir,
@@ -179,7 +180,7 @@ def main():
         )
         ## prepare the template initial condition concentration files
         ## from profiles using ICON
-        templateIconFiles = configureRunScripts.prepareTemplateIconFiles(
+        templateIconFiles = prepareTemplateIconFiles(
             date=dates[0],
             domains=domains,
             ctmDir=ctmDir,
@@ -194,7 +195,7 @@ def main():
         )
         ## use the template initial and boundary condition concentration
         ## files and populate them with values from MOZART output
-        interpolateFromCAMS.interpolateFromCAMSToCmaqGrid(
+        interpolateFromCAMSToCmaqGrid(
             dates,
             domains,
             mech,
@@ -213,7 +214,7 @@ def main():
         # print("gfcbcjucrhcnrcbrbcnrchnrchnrhcrhcnricrhncruicjnrdfic")
         print("Prepare ICON, BCON and CCTM run scripts")
         ## prepare the scripts for CCTM
-        configureRunScripts.prepareCctmRunScripts(
+        prepareCctmRunScripts(
             dates=dates,
             domains=domains,
             ctmDir=ctmDir,
@@ -231,7 +232,7 @@ def main():
             printFreqHours=printFreqHours,
             forceUpdate=forceUpdateRunScripts,
         )  ## prepare the scripts for BCON
-        configureRunScripts.prepareBconRunScripts(
+        prepareBconRunScripts(
             sufadjname=sufadj,
             dates=dates,
             domains=domains,
@@ -247,7 +248,7 @@ def main():
             forceUpdate=forceUpdateRunScripts,
         )
         ## prepare the main run script
-        configureRunScripts.prepareMainRunScript(
+        prepareMainRunScript(
             dates=dates,
             domains=domains,
             ctmDir=ctmDir,

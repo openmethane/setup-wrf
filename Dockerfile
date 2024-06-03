@@ -15,8 +15,25 @@ RUN wget -c ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz.$WGRIB2_VERSION
     cd grib2 && \
     CC=gcc FC=gfortran make
 
+# Build the virtual environment in an isolated container
+FROM python:3.11 as builder
 
-# Container for running WRF
+RUN pip install poetry==1.8.2
+
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_IN_PROJECT=1 \
+    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+
+WORKDIR /app
+
+COPY pyproject.toml poetry.lock ./
+RUN touch README.md
+
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --no-ansi --no-root
+
+# Container for running the project
+# This isn't a hyper optimised container but it's a good starting point
 FROM python:3.11
 
 MAINTAINER Jared Lewis <jared.lewis@climate-resource.com>
@@ -24,18 +41,15 @@ MAINTAINER Jared Lewis <jared.lewis@climate-resource.com>
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
   PYTHONHASHSEED=random \
-  PIP_NO_CACHE_DIR=off \
-  PIP_DISABLE_PIP_VERSION_CHECK=on \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_NO_INTERACTION=1 \
-  POETRY_VIRTUALENVS_CREATE=false \
-  POETRY_CACHE_DIR='/var/cache/pypoetry' \
-  POETRY_HOME='/usr/local' \
-  POETRY_VERSION=1.8.2 \
   OMPI_ALLOW_RUN_AS_ROOT=1 \
   OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
-# Preference the libraries built in the WRF container
+# This is deliberately outside of the work directory
+# so that the local directory can be mounted as a volume of testing
+ENV VIRTUAL_ENV=/app/.venv \
+    PATH="/app/.venv/bin:$PATH"
+
+# Preference the libraries built in the WRF container for consistency
 ENV LD_LIBRARY_PATH="/opt/wrf/libs/lib:${LD_LIBRARY_PATH}"
 
 WORKDIR /opt/project
@@ -45,12 +59,8 @@ RUN apt-get update && \
     apt-get install -y libgfortran5 nco csh mpich bc libopenmpi-dev && \
     rm -rf /var/lib/apt/lists/*
 
-# Setup poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Setup project dependencies
-COPY pyproject.toml /opt/project/
-RUN poetry install  --no-interaction --no-ansi
+# Copy across the virtual environment
+COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 # Copy in WRF and wgrib2 binaries
 # https://github.com/climate-resource/wrf-container
@@ -62,5 +72,8 @@ COPY --from=wgrib2 /src/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
 # For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
 COPY . /opt/project
 COPY targets/docker/nccopy_compress_output.sh /opt/project/nccopy_compress_output.sh
+
+# Install the local package in editable mode
+RUN pip install -e .
 
 CMD ["/bin/bash"]

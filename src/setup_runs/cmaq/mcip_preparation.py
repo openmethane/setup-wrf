@@ -5,7 +5,8 @@ import numpy
 import netCDF4
 import glob
 import warnings
-import helper_funcs
+from setup_runs.utils import getDistanceFromLatLonInKm
+
 
 def checkInputMetAndOutputFolders(ctmDir,metDir,dates,domains):
     '''
@@ -176,7 +177,7 @@ def checkWrfMcipDomainSizes(metDir, date, domains, wrfDir = None):
         icorn = [0] * ncorn
         jcorn = [0] * ncorn
         for i in range(ncorn):
-            dists = helper_funcs.getDistanceFromLatLonInKm(mcipLat[ix[i],iy[i]],mcipLon[ix[i],iy[i]],wrfLat,wrfLon)
+            dists = getDistanceFromLatLonInKm(mcipLat[ix[i],iy[i]], mcipLon[ix[i],iy[i]], wrfLat, wrfLon)
             minidx = numpy.argmin(dists)
             mindist = dists.min()
             if mindist > 0.5:

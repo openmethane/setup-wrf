@@ -1,10 +1,8 @@
 import json
 import datetime
 import pytz
-import io
 import re
 import os
-import errno    
 import argparse
 import math
 import f90nml
@@ -13,12 +11,11 @@ import subprocess
 import glob
 import sys
 import pdb
-import time
 import resource
 import copy
 import stat
 import netCDF4
-from downloadFNLanalyses import download_gdas_fnl_data
+from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
@@ -850,13 +847,6 @@ for ind_job in range(number_of_jobs):
     dst = os.path.join(run_dir_with_date,'wrf.exe')
     if os.path.exists(dst): os.remove(dst)
     os.symlink(src, dst)
-    # get field averaging script
-    src = config["average_field_script"]
-    assert os.path.exists(src), "Cannot find wrfout averaging script at {} ...".format(src)
-    dst = os.path.join(run_dir_with_date,"averageFields.py")
-    if os.path.exists(dst): os.remove(dst)
-    os.symlink(src, dst)
-
     
     # get background checking script to initiate averaging
     src = config["check_wrfout_in_background_script"]

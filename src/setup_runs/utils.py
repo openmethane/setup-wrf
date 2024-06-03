@@ -4,9 +4,7 @@
 import numpy
 import subprocess
 import os
-import re
 import copy
-import pprint
 
 
 def deg2rad(deg):
@@ -80,8 +78,8 @@ def compressNCfile(filename,ppc = None):
         p = subprocess.Popen(commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         if len(stderr) > 0 or len(stdout) > 0:
-            print("stdout = " + stdout)
-            print("stderr = " + stderr)
+            print("stdout = " + stdout.decode())
+            print("stderr = " + stderr.decode())
             raise RuntimeError("Error from ncks...")
     else:
         print("File {} not found...".format(filename))
@@ -141,14 +139,3 @@ def replace_and_write(lines, outfile, substitutions, strict = True, makeExecutab
     f.close()
     if makeExecutable:
         os.chmod(outfile,0o0744)
-
-def int_array_to_comma_separated_string(arr):
-    '''Convert an list of integers to a comma-separated string
-
-    Args:
-        Arr: list of integers
-
-    Returns:
-        Str: comma-separated string
-    '''
-    return ''.join(['%i, ' % i for i in arr])
