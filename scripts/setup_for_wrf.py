@@ -16,66 +16,28 @@ import copy
 import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
+from setup_runs.config_read_functions import (read_config_file,
+                                              parse_config,
+                                              add_environment_variables,
+                                              substitute_variables)
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-c", "--configFile", help="Path to configuration file", default = 'config.nci.json')
+# TODO: change default file path back to `config.nci.json`
+parser.add_argument("-c", "--configFile", help="Path to configuration file", default = '../config.nci.json')
 args = parser.parse_args()
 configFile = args.configFile
 
-## read the config file
-assert os.path.exists(configFile), "No configuration file was found at {}".format(configFile)
 
-try:
-    f = open(configFile,'rt')
-    input_str = f.read()
-    f.close()
-except Exception as e:
-    print("Problem reading in configuration file")
-    print(str(e))
-    sys.exit()
+input_str = read_config_file(configFile)
 
-    
-## parse the config file
-try:
-    ## strip out the comments
-    input_str = re.sub(r'#.*\n', '\n', input_str)
-    config = json.loads(input_str)
-except Exception as e:
-    print("Problem parsing in configuration file")
-    print(str(e))
-    sys.exit()
+config = parse_config(input_str)
 
-## add some environment variables to the config that may be needed for substitutions
-envVarsToInclude = config["environment_variables_for_substitutions"].split(',')
-for envVarToInclude in envVarsToInclude:
-    if envVarToInclude in list(os.environ.keys()):
-        config[envVarToInclude] = os.environ[envVarToInclude]
+config = add_environment_variables(config)
 
-## do the substitutions
-avail_keys = list(config.keys())
-iterationCount = 0
-while iterationCount < 10:
-    ## check if any entries in the config dictionary need populating
-    foundToken = False
-    for key, value in config.items():
-        if isinstance(value, str):
-            if (value.find('${') >= 0):
-                foundToken = True
-    ##
-    if foundToken:
-        for avail_key in avail_keys:
-            key = '${%s}' % avail_key
-            value = config[avail_key]
-            for k in avail_keys:
-                if isinstance(config[k], str):
-                    if config[k].find(key) >= 0:
-                        config[k] = config[k].replace(key,value)
-    else:
-        break
-    ##
-    iterationCount += 1
+config, iterationCount = substitute_variables(config)
+
 
 ## parameters that should agree for the WRF and WPS namelists
 namelistParamsThatShouldAgree = [
@@ -90,12 +52,14 @@ namelistParamsThatShouldAgree = [
     {'wrf_var': 'dx','wrf_group': 'domains', 'wps_var': 'dx','wps_group': 'geogrid'}, 
     {'wrf_var': 'dy','wrf_group': 'domains', 'wps_var': 'dy','wps_group': 'geogrid'}]
 
+# TODO: IterationCount can never exceed 10 based on the logic in substitute_variables()
 assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
 
+# TODO: this should go in a test
 ## check that requisite keys are present
 requisite_keys = ["run_name","start_date", "end_date"]
 for requisite_key in requisite_keys:
-    assert requisite_key in avail_keys, "Key {} was not in the available configuration keys".format(requisite_key)
+    assert requisite_key in config.keys(), "Key {} was not in the available configuration keys".format(requisite_key)
 
 ## parse boolean keys
 truevals = ['true', '1', 't', 'y', 'yes']
