@@ -34,7 +34,7 @@ input_str = read_config_file(configFile)
 
 config = parse_config(input_str)
 
-config = add_environment_variables(config)
+config = add_environment_variables(config=config, environmental_variables=os.environ)
 
 config, iterationCount = substitute_variables(config)
 

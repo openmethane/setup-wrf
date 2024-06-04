@@ -1,6 +1,6 @@
 import pytest
 import os
-from setup_runs.config_read_functions import read_config_file, parse_config
+from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables
 
 
 # Define a fixture for creating and deleting a temporary config file
@@ -63,3 +63,25 @@ def test_parse_config_error_cases(input_str, expected, capsys) :
 
     captured = capsys.readouterr()
     assert "Problem parsing in configuration file" in captured.out
+
+
+def test_add_environment_variable() :
+    config = {"some" : "value",
+              "more" : "values",
+              "environment_variables_for_substitutions" : "HOME,USER,PROJECT,TMPDIR",
+              }
+
+    environmental_variables = {
+        "some" : "value",
+        'USER' : 'test_user',
+        'HOME' : '/Users/test_user',
+    }
+
+    expected = {"some" : "value",
+                "more" : "values",
+                "environment_variables_for_substitutions" : "HOME,USER,PROJECT,TMPDIR",
+                'USER' : 'test_user',
+                'HOME' : '/Users/test_user',
+                }
+
+    assert add_environment_variables(environmental_variables=environmental_variables, config=config) == expected

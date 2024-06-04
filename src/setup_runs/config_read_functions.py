@@ -67,7 +67,7 @@ def parse_config(input_str: str) -> dict :
         sys.exit()
 
 
-def add_environment_variables(config: dict) -> dict :
+def add_environment_variables(config: dict, environmental_variables: dict) -> dict :
     """
     Adds environment variables to the configuration that may be needed for substitutions.
 
@@ -82,8 +82,8 @@ def add_environment_variables(config: dict) -> dict :
     """
     envVarsToInclude = config["environment_variables_for_substitutions"].split(',')
     for envVarToInclude in envVarsToInclude :
-        if envVarToInclude in list(os.environ.keys()) :
-            config[envVarToInclude] = os.environ[envVarToInclude]
+        if envVarToInclude in list(environmental_variables.keys()) :
+            config[envVarToInclude] = environmental_variables[envVarToInclude]
     return config
 
 
