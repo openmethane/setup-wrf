@@ -55,7 +55,7 @@ namelistParamsThatShouldAgree = [
 # TODO: IterationCount can never exceed 10 based on the logic in substitute_variables()
 assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
 
-# TODO: this should go in a test
+# TODO: this should go in a test as well
 ## check that requisite keys are present
 requisite_keys = ["run_name","start_date", "end_date"]
 for requisite_key in requisite_keys:

@@ -1,6 +1,7 @@
 import pytest
 import os
-from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables
+from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables, \
+    substitute_variables
 
 
 # Define a fixture for creating and deleting a temporary config file
@@ -85,3 +86,27 @@ def test_add_environment_variable() :
                 }
 
     assert add_environment_variables(environmental_variables=environmental_variables, config=config) == expected
+
+
+def test_substitute_variables() :
+    config = {
+        'level_zero' : 'level_zero_path',
+        'level_one' : '${level_zero}/test_path',
+        'level_setup' : '${level_one}/level_setup',
+        'run_name' : "test_run_123",
+        'run_dir' : '/scratch/q90/pjr563/openmethane-beta/wrf/${run_name}',
+    }
+
+    expected = {
+        'level_zero' : 'level_zero_path',
+        'level_one' : 'level_zero_path/test_path',
+        'level_setup' : 'level_zero_path/test_path/level_setup',
+        'run_name' : "test_run_123",
+        'run_dir' : '/scratch/q90/pjr563/openmethane-beta/wrf/test_run_123',
+    }
+
+    out, iterationCount = substitute_variables(config)
+
+    assert iterationCount <= 10
+
+    assert out == expected
