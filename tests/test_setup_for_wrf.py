@@ -1,7 +1,7 @@
 import pytest
 import os
 from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables, \
-    substitute_variables
+    substitute_variables, parse_boolean_keys, process_date_string, load_wrf_config
 
 
 # Define a fixture for creating and deleting a temporary config file
@@ -110,3 +110,119 @@ def test_substitute_variables() :
     assert iterationCount <= 10
 
     assert out == expected
+
+
+def test_parse_boolean_keys() :
+    config = {"test_key_1" : "t",
+              "test_key_2" : "1",
+              "test_key_3" : "true",
+              "test_key_4" : "y",
+              "test_key_5" : "yes",
+              "test_key_6" : "false",
+              "test_key_7" : "0",
+              "test_key_8" : "f",
+              "test_key_9" : "n",
+              "test_key_10" : "no",
+              "test_key" : "some string",
+              }
+
+    truevals = ['true', '1', 't', 'y', 'yes']
+
+    falsevals = ['false', '0', 'f', 'n', 'no']
+
+    bool_keys = ["test_key_1",
+                 "test_key_2",
+                 "test_key_3",
+                 "test_key_4",
+                 "test_key_5",
+                 "test_key_6",
+                 "test_key_7",
+                 "test_key_8",
+                 "test_key_9",
+                 "test_key_10", ]
+
+    expected = {"test_key_1" : True,
+                "test_key_2" : True,
+                "test_key_3" : True,
+                "test_key_4" : True,
+                "test_key_5" : True,
+                "test_key_6" : False,
+                "test_key_7" : False,
+                "test_key_8" : False,
+                "test_key_9" : False,
+                "test_key_10" : False,
+                "test_key" : "some string",
+                }
+
+    out = parse_boolean_keys(config=config,
+                             truevals=truevals,
+                             falsevals=falsevals,
+                             bool_keys=bool_keys,
+                             )
+    assert out == expected
+
+
+def test_requisite_keys_exist():
+
+    # TODO: Fixture for config file
+    configFile = '../config.nci.json'
+
+    input_str = read_config_file(configFile)
+
+    config = parse_config(input_str)
+
+    requisite_keys = ["run_name", "start_date", "end_date"]
+    for requisite_key in requisite_keys:
+        assert (
+            requisite_key in config.keys()
+        ), f"Key {requisite_key} was not in the available configuration keys"
+
+
+def test_process_date_string():
+    pass
+
+def test_dates_in_right_order():
+    # TODO: Fixture for config file
+    configFile = '../config.nci.json'
+
+    input_str = read_config_file(configFile)
+
+    config = parse_config(input_str)
+
+    try :
+        start_date = process_date_string(config['start_date'])
+        end_date = process_date_string(config['end_date'])
+
+        ## check that the dates are in the right order
+        assert end_date > start_date, "End date should be after start date"
+    except Exception as e :
+        print("Problem parsing start/end times")
+        raise e
+
+def test_dates_in_right_order():
+    # TODO: Fixture for config file
+    configFile = '../config.nci.json'
+
+    input_str = read_config_file(configFile)
+
+    config = parse_config(input_str)
+    # analysis source
+    assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
+
+def test_config_dict_regression():
+    configFile = '../config.nci.json'
+
+    input_str = read_config_file(configFile)
+
+    config = parse_config(input_str)
+
+    config = add_environment_variables(config=config, environmental_variables=os.environ)
+
+    config, iterationCount = substitute_variables(config)
+
+    ## parse boolean keys
+    config = parse_boolean_keys(config)
+
+    config_class = load_wrf_config(configFile)
+
+    assert config == config_class.__getstate__()

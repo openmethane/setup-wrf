@@ -19,7 +19,9 @@ from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.config_read_functions import (read_config_file,
                                               parse_config,
                                               add_environment_variables,
-                                              substitute_variables)
+                                              substitute_variables,
+                                              parse_boolean_keys,
+                                              process_date_string)
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
@@ -29,7 +31,6 @@ parser.add_argument("-c", "--configFile", help="Path to configuration file", def
 args = parser.parse_args()
 configFile = args.configFile
 
-
 input_str = read_config_file(configFile)
 
 config = parse_config(input_str)
@@ -38,44 +39,39 @@ config = add_environment_variables(config=config, environmental_variables=os.env
 
 config, iterationCount = substitute_variables(config)
 
+## parse boolean keys
+config = parse_boolean_keys(config)
 
-## parameters that should agree for the WRF and WPS namelists
-namelistParamsThatShouldAgree = [
-    {'wrf_var': 'max_dom','wrf_group': 'domains', 'wps_var': 'max_dom','wps_group': 'share'},
-    {'wrf_var': 'interval_seconds','wrf_group': 'time_control', 'wps_var': 'interval_seconds','wps_group': 'share'},
-    {'wrf_var': 'parent_id','wrf_group': 'domains', 'wps_var': 'parent_id','wps_group': 'geogrid'}, 
-    {'wrf_var': 'parent_grid_ratio','wrf_group': 'domains', 'wps_var': 'parent_grid_ratio','wps_group': 'geogrid'}, 
-    {'wrf_var': 'i_parent_start','wrf_group': 'domains', 'wps_var': 'i_parent_start','wps_group': 'geogrid'}, 
-    {'wrf_var': 'j_parent_start','wrf_group': 'domains', 'wps_var': 'j_parent_start','wps_group': 'geogrid'}, 
-    {'wrf_var': 'e_we','wrf_group': 'domains', 'wps_var': 'e_we','wps_group': 'geogrid'}, 
-    {'wrf_var': 'e_sn','wrf_group': 'domains', 'wps_var': 'e_sn','wps_group': 'geogrid'}, 
-    {'wrf_var': 'dx','wrf_group': 'domains', 'wps_var': 'dx','wps_group': 'geogrid'}, 
-    {'wrf_var': 'dy','wrf_group': 'domains', 'wps_var': 'dy','wps_group': 'geogrid'}]
+# parse start and end date
+try:
+    start_date = process_date_string(config['start_date'])
+    end_date   = process_date_string(config['end_date'])
 
-# TODO: IterationCount can never exceed 10 based on the logic in substitute_variables()
+    ## check that the dates are in the right order
+    assert end_date > start_date, "End date should be after start date"
+except Exception as e:
+    print("Problem parsing start/end times")
+    raise e
+
+
+# Perform some checks
+# Iteration count for filling variables
 assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
 
-# TODO: this should go in a test as well
-## check that requisite keys are present
+# check that requisite keys are present
 requisite_keys = ["run_name","start_date", "end_date"]
 for requisite_key in requisite_keys:
     assert requisite_key in config.keys(), "Key {} was not in the available configuration keys".format(requisite_key)
 
-## parse boolean keys
-truevals = ['true', '1', 't', 'y', 'yes']
-falsevals = ['false', '0', 'f', 'n', 'no']
-boolvals = truevals + falsevals
-bool_keys = ["run_as_one_job", "submit_wrf_now", "submit_wps_component", "only_edit_namelists","restart",'delete_metem_files',"use_high_res_sst_data", 'regional_subset_of_grib_data']
-for bool_key in bool_keys:
-    assert config[bool_key].lower() in boolvals,'Key {} not a recognised boolean value'.format(bool_key)
-    config[bool_key] = (config[bool_key].lower() in truevals)
-
+# analysis source
 assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
 
-# execfile("/opt/Modules/default/init/python")
 
+
+# execfile("/opt/Modules/default/init/python")
 ## make the stack size unlimited (the equivalent of `ulimit -s unlimited` in bash)
 resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+
 
 scripts = {}
 dailyScriptNames = ['run','cleanup']
@@ -93,20 +89,7 @@ for scriptName in scriptNames:
         print(str(e))
 
 
-## function to parse times
-def process_date_string(datestring):
-    datestring = datestring.strip().rstrip()
-    ## get the timezone
-    if len(datestring) <= 19:
-        tz = pytz.UTC
-    else:
-        tzstr = datestring[20:]
-        tz = pytz.timezone(tzstr)
-    ##
-    date = datetime.datetime.strptime(datestring,'%Y-%m-%d %H:%M:%S %Z')
-    date = tz.localize(date)
-    ##
-    return date
+
 
 def decode_bytes(x):
     if isinstance(x, bytes):
@@ -194,16 +177,7 @@ def compressNCfile(filename,ppc = None):
 
 
 
-## parse the times
-try:
-    start_date = process_date_string(config['start_date'])
-    end_date   = process_date_string(config['end_date'])
 
-    ## check that the dates are in the right order
-    assert end_date > start_date, "End date should be after start date"
-except Exception as e:
-    print("Problem parsing start/end times")
-    raise e
 
 ## calculate the number of jobs
 run_length_hours = (end_date - start_date).total_seconds()/3600.
@@ -220,6 +194,19 @@ WPSnml = f90nml.read(WPSnmlPath)
 WRFnml = f90nml.read(WRFnmlPath)
 
 ## check that the parameters do agree between the WRF and WPS namelists
+## parameters that should agree for the WRF and WPS namelists
+namelistParamsThatShouldAgree = [
+    {'wrf_var': 'max_dom','wrf_group': 'domains', 'wps_var': 'max_dom','wps_group': 'share'},
+    {'wrf_var': 'interval_seconds','wrf_group': 'time_control', 'wps_var': 'interval_seconds','wps_group': 'share'},
+    {'wrf_var': 'parent_id','wrf_group': 'domains', 'wps_var': 'parent_id','wps_group': 'geogrid'},
+    {'wrf_var': 'parent_grid_ratio','wrf_group': 'domains', 'wps_var': 'parent_grid_ratio','wps_group': 'geogrid'},
+    {'wrf_var': 'i_parent_start','wrf_group': 'domains', 'wps_var': 'i_parent_start','wps_group': 'geogrid'},
+    {'wrf_var': 'j_parent_start','wrf_group': 'domains', 'wps_var': 'j_parent_start','wps_group': 'geogrid'},
+    {'wrf_var': 'e_we','wrf_group': 'domains', 'wps_var': 'e_we','wps_group': 'geogrid'},
+    {'wrf_var': 'e_sn','wrf_group': 'domains', 'wps_var': 'e_sn','wps_group': 'geogrid'},
+    {'wrf_var': 'dx','wrf_group': 'domains', 'wps_var': 'dx','wps_group': 'geogrid'},
+    {'wrf_var': 'dy','wrf_group': 'domains', 'wps_var': 'dy','wps_group': 'geogrid'}]
+
 print('\t\tCheck for consistency between key parameters of the WRF and WPS namelists')
 for paramDict in namelistParamsThatShouldAgree:
     WRFval = WRFnml[paramDict['wrf_group']][paramDict['wrf_var']]
