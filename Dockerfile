@@ -26,6 +26,9 @@ ENV POETRY_NO_INTERACTION=1 \
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
+# Needed for wgrib2
+RUN ln -s /opt/venv/lib/libnetcdf.so /opt/venv/lib/libnetcdf.so.13
+
 WORKDIR /opt/venv
 
 COPY pyproject.toml poetry.lock ./

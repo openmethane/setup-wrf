@@ -8,6 +8,6 @@ dependencies:
   - netcdf-fortran=4.6.1
   - gfortran=10.4
   - jasper=1.900.1
-  - wgrib2=2.0.8
+  - wgrib2
   - nco
   - python=3.11
