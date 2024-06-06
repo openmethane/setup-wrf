@@ -7,72 +7,73 @@ import datetime
 import pytz
 from attrs import define
 
-@define
-class WRFConfig:
-    project_root : str # overall base directory for project
-    setup_root : str  # base dir for set up scripts
-    run_name : str  # Project name
-    target : str  # Target environment for running tasks
-    start_date : str  # start first simulation, "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" for UTC
-    end_date : str  # The end time of the last simulation (same format as above)
-    # FIXME: this hasn't been fully implemented yet (only working for 'false')
-    restart : str  # Is this a restart run? (bool -> true/false, yes/no)
-    num_hours_per_run : int  # Number of hours of simulation of each run (excluding spin-up)
-    num_hours_spin_up : int  # Number of hours of spin-up simulation of each run
-    # TODO: add comments here? Or maybe better somewhere else?
-    run_as_one_job : str
-    submit_wrf_now : str
-    submit_wps_component : str
-    environment_variables_for_substitutions : str
-    run_dir : str
-    run_script_template : str
-    cleanup_script_template : str
-    main_script_template : str
-    check_wrfout_in_background_script : str
-    only_edit_namelists : str
-    use_high_res_sst_data : str
-    wps_dir : str
-    wrf_dir : str
-    nml_dir : str
-    target_dir : str
-    scripts_to_copy_from_nml_dir : str
-    scripts_to_copy_from_target_dir : str
-    metem_dir : str
-    namelist_wps : str
-    namelist_wrf : str
-    geog_data_path : str
-    geogrid_tbl : str
-    geogrid_exe : str
-    ungrib_exe : str
-    metgrid_tbl : str
-    metgrid_exe : str
-    linkgrib_script : str
-    wrf_exe : str
-    real_exe : str
-    delete_metem_files : str
-    analysis_source : str
-    orcid : str
-    rda_ucar_edu_api_token : str
-    regional_subset_of_grib_data : str
-    sst_monthly_dir : str
-    sst_daily_dir : str
-    sst_monthly_pattern : str
-    sst_daily_pattern : str
-    sst_vtable : str
-    analysis_pattern_upper : str
-    analysis_pattern_surface : str
-    analysis_vtable : str
-    wrf_run_dir : str
-    wrf_run_tables_pattern : str
-    HOME : str
-    USER : str
-    TMPDIR : str
 
-    def to_dict(self):
+@define
+class WRFConfig :
+    project_root: str  # overall base directory for project
+    setup_root: str  # base dir for set up scripts
+    run_name: str  # Project name
+    target: str  # Target environment for running tasks
+    start_date: str  # start first simulation, "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" for UTC
+    end_date: str  # The end time of the last simulation (same format as above)
+    # FIXME: this hasn't been fully implemented yet (only working for 'false')
+    restart: str  # Is this a restart run? (bool -> true/false, yes/no)
+    num_hours_per_run: int  # Number of hours of simulation of each run (excluding spin-up)
+    num_hours_spin_up: int  # Number of hours of spin-up simulation of each run
+    # TODO: add comments here? Or maybe better somewhere else?
+    run_as_one_job: str
+    submit_wrf_now: str
+    submit_wps_component: str
+    environment_variables_for_substitutions: str
+    run_dir: str
+    run_script_template: str
+    cleanup_script_template: str
+    main_script_template: str
+    check_wrfout_in_background_script: str
+    only_edit_namelists: str
+    use_high_res_sst_data: str
+    wps_dir: str
+    wrf_dir: str
+    nml_dir: str
+    target_dir: str
+    scripts_to_copy_from_nml_dir: str
+    scripts_to_copy_from_target_dir: str
+    metem_dir: str
+    namelist_wps: str
+    namelist_wrf: str
+    geog_data_path: str
+    geogrid_tbl: str
+    geogrid_exe: str
+    ungrib_exe: str
+    metgrid_tbl: str
+    metgrid_exe: str
+    linkgrib_script: str
+    wrf_exe: str
+    real_exe: str
+    delete_metem_files: str
+    analysis_source: str
+    orcid: str
+    rda_ucar_edu_api_token: str
+    regional_subset_of_grib_data: str
+    sst_monthly_dir: str
+    sst_daily_dir: str
+    sst_monthly_pattern: str
+    sst_daily_pattern: str
+    sst_vtable: str
+    analysis_pattern_upper: str
+    analysis_pattern_surface: str
+    analysis_vtable: str
+    wrf_run_dir: str
+    wrf_run_tables_pattern: str
+    HOME: str
+    USER: str
+    TMPDIR: str
+
+    def to_dict(self) :
         d = {}
-        for key in self.__dir__():
+        for key in self.__dir__() :
             d[d] = self.key
-        return {key : self.key for key in self.__dir__() if not key.startswith('__') }
+        return {key : self.key for key in self.__dir__() if not key.startswith('__')}
 
 
 def read_config_file(configFile: str) -> str :
@@ -206,7 +207,6 @@ def parse_boolean_keys(config: dict,
                                                'delete_metem_files', "use_high_res_sst_data",
                                                'regional_subset_of_grib_data']
                        ) :
-
     boolvals = truevals + falsevals
 
     for bool_key in bool_keys :
@@ -217,22 +217,26 @@ def parse_boolean_keys(config: dict,
 
     return config
 
+
 ## function to parse times
-def process_date_string(datestring):
+def process_date_string(datestring) :
     datestring = datestring.strip().rstrip()
+
     ## get the timezone
-    if len(datestring) <= 19:
+    if len(datestring) <= 19 :
         tz = pytz.UTC
-    else:
-        tzstr = datestring[20:]
+        date = datetime.datetime.strptime(datestring, '%Y-%m-%d %H:%M:%S')
+    else :
+        tzstr = datestring[20 :]
         tz = pytz.timezone(tzstr)
-    ##
-    date = datetime.datetime.strptime(datestring,'%Y-%m-%d %H:%M:%S %Z')
+        date = datetime.datetime.strptime(datestring, '%Y-%m-%d %H:%M:%S %Z')
+
     date = tz.localize(date)
-    ##
+
     return date
 
-def load_wrf_config(filename: str) -> WRFConfig:
+
+def load_wrf_config(filename: str) -> WRFConfig :
     input_str = read_config_file(filename)
 
     config = parse_config(input_str)

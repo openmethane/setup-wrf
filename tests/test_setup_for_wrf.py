@@ -6,16 +6,19 @@ from setup_runs.config_read_functions import read_config_file, parse_config, add
 
 
 @pytest.fixture
-def root_dir():
+def root_dir() :
     return Path(__file__).parent.parent
 
-@pytest.fixture
-def config_path(root_dir):
-    return os.path.join(root_dir, "config.nci.json")
 
 @pytest.fixture
-def input_str(config_path):
+def config_path(root_dir) :
+    return os.path.join(root_dir, "config.nci.json")
+
+
+@pytest.fixture
+def input_str(config_path) :
     return read_config_file(config_path)
+
 
 # Define a fixture for creating and deleting a temporary config file
 @pytest.fixture
@@ -24,8 +27,6 @@ def temp_config_file(tmp_path, request) :
     temp_file = tmp_path / "temp_config.json"
     temp_file.write_text(content)
     return str(temp_file)
-
-
 
 
 @pytest.mark.parametrize(
@@ -177,23 +178,31 @@ def test_parse_boolean_keys() :
     assert out == expected
 
 
-def test_requisite_keys_exist(input_str):
-
+def test_requisite_keys_exist(input_str) :
     config = parse_config(input_str)
 
     requisite_keys = ["run_name", "start_date", "end_date"]
 
-    for requisite_key in requisite_keys:
+    for requisite_key in requisite_keys :
         assert (
-            requisite_key in config.keys()
+                requisite_key in config.keys()
         ), f"Key {requisite_key} was not in the available configuration keys"
 
 
-def test_process_date_string():
-    pass
+@pytest.mark.parametrize("datestring, expected",
+                         [
+                             pytest.param('2024-01-01 00:00:00 UTC', '2024-01-01 00:00:00+00:00', id="UTC"),
+                             pytest.param('2024-01-01 00:00:00 CET', '2024-01-01 00:00:00+01:00', id="CET"),
+                             pytest.param('2024-01-01 00:00:00', '2024-01-01 00:00:00+00:00', id="no time zone"),
+                         ]
+                         )
+def test_process_date_string(datestring, expected) :
+    out = process_date_string(datestring)
 
-def test_dates_in_right_order(input_str):
+    assert str(out) == expected
 
+
+def test_dates_in_right_order(input_str) :
     config = parse_config(input_str)
 
     try :
@@ -206,14 +215,14 @@ def test_dates_in_right_order(input_str):
         print("Problem parsing start/end times")
         raise e
 
-def test_valid_analysis_source():
 
+def test_valid_analysis_source() :
     config = parse_config(input_str)
 
     assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
 
-def test_config_object(input_str, config_path):
 
+def test_config_object(input_str, config_path) :
     # load config dict
     config = parse_config(input_str)
 
