@@ -15,6 +15,7 @@ import resource
 import copy
 import stat
 import netCDF4
+import attrs
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.config_read_functions import (read_config_file,
                                               parse_config,
@@ -27,7 +28,6 @@ from setup_runs.config_read_functions import (read_config_file,
 ## get command line arguments
 parser = argparse.ArgumentParser()
 
-# TODO: change default file path back to `config.nci.json`
 parser.add_argument("-c", "--configFile", help="Path to configuration file", default = '../config.nci.json')
 args = parser.parse_args()
 configFile = args.configFile
