@@ -63,13 +63,6 @@ for requisite_key in requisite_keys:
 # analysis source
 assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
 
-
-
-# execfile("/opt/Modules/default/init/python")
-## make the stack size unlimited (the equivalent of `ulimit -s unlimited` in bash)
-# resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
-
-
 scripts = {}
 dailyScriptNames = ['run','cleanup']
 scriptNames = ['main','run','cleanup']
