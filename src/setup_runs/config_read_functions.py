@@ -241,6 +241,9 @@ def load_wrf_config(filename: str) -> WRFConfig:
 
     config, iterationCount = substitute_variables(config)
 
+    # Iteration count for filling variables
+    assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+
     ## parse boolean keys
     config = parse_boolean_keys(config)
 

@@ -21,7 +21,8 @@ from setup_runs.config_read_functions import (read_config_file,
                                               add_environment_variables,
                                               substitute_variables,
                                               parse_boolean_keys,
-                                              process_date_string)
+                                              process_date_string,
+                                              load_wrf_config)
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
@@ -31,16 +32,9 @@ parser.add_argument("-c", "--configFile", help="Path to configuration file", def
 args = parser.parse_args()
 configFile = args.configFile
 
-input_str = read_config_file(configFile)
+wrf_config = load_wrf_config(configFile)
 
-config = parse_config(input_str)
-
-config = add_environment_variables(config=config, environmental_variables=os.environ)
-
-config, iterationCount = substitute_variables(config)
-
-## parse boolean keys
-config = parse_boolean_keys(config)
+config = wrf_config.__getstate__()
 
 # parse start and end date
 try:
@@ -56,7 +50,8 @@ except Exception as e:
 
 # Perform some checks
 # Iteration count for filling variables
-assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+# Next line moved to load_wrf_config()
+# assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
 
 # check that requisite keys are present
 requisite_keys = ["run_name","start_date", "end_date"]
@@ -70,7 +65,7 @@ assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must b
 
 # execfile("/opt/Modules/default/init/python")
 ## make the stack size unlimited (the equivalent of `ulimit -s unlimited` in bash)
-resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
+# resource.setrlimit(resource.RLIMIT_STACK, (resource.RLIM_INFINITY, resource.RLIM_INFINITY))
 
 
 scripts = {}

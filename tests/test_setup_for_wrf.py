@@ -1,8 +1,21 @@
 import pytest
 import os
+from pathlib import Path
 from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables, \
     substitute_variables, parse_boolean_keys, process_date_string, load_wrf_config
 
+
+@pytest.fixture
+def root_dir():
+    return Path(__file__).parent.parent
+
+@pytest.fixture
+def config_path(root_dir):
+    return os.path.join(root_dir, "config.nci.json")
+
+@pytest.fixture
+def input_str(config_path):
+    return read_config_file(config_path)
 
 # Define a fixture for creating and deleting a temporary config file
 @pytest.fixture
@@ -11,6 +24,8 @@ def temp_config_file(tmp_path, request) :
     temp_file = tmp_path / "temp_config.json"
     temp_file.write_text(content)
     return str(temp_file)
+
+
 
 
 @pytest.mark.parametrize(
@@ -162,16 +177,12 @@ def test_parse_boolean_keys() :
     assert out == expected
 
 
-def test_requisite_keys_exist():
-
-    # TODO: Fixture for config file
-    configFile = '../config.nci.json'
-
-    input_str = read_config_file(configFile)
+def test_requisite_keys_exist(input_str):
 
     config = parse_config(input_str)
 
     requisite_keys = ["run_name", "start_date", "end_date"]
+
     for requisite_key in requisite_keys:
         assert (
             requisite_key in config.keys()
@@ -181,11 +192,7 @@ def test_requisite_keys_exist():
 def test_process_date_string():
     pass
 
-def test_dates_in_right_order():
-    # TODO: Fixture for config file
-    configFile = '../config.nci.json'
-
-    input_str = read_config_file(configFile)
+def test_dates_in_right_order(input_str):
 
     config = parse_config(input_str)
 
@@ -199,30 +206,24 @@ def test_dates_in_right_order():
         print("Problem parsing start/end times")
         raise e
 
-def test_dates_in_right_order():
-    # TODO: Fixture for config file
-    configFile = '../config.nci.json'
-
-    input_str = read_config_file(configFile)
+def test_valid_analysis_source():
 
     config = parse_config(input_str)
-    # analysis source
+
     assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
 
-def test_config_dict_regression():
-    configFile = '../config.nci.json'
+def test_config_object(input_str, config_path):
 
-    input_str = read_config_file(configFile)
-
+    # load config dict
     config = parse_config(input_str)
 
     config = add_environment_variables(config=config, environmental_variables=os.environ)
 
     config, iterationCount = substitute_variables(config)
 
-    ## parse boolean keys
     config = parse_boolean_keys(config)
 
-    config_class = load_wrf_config(configFile)
+    # load config object
+    wrf_config = load_wrf_config(config_path)
 
-    assert config == config_class.__getstate__()
+    assert config == wrf_config.__getstate__()
