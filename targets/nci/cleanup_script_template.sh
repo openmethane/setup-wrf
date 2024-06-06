@@ -48,7 +48,13 @@ for wrfoutfile in `find . -type f -iname 'wrfout_*'` ; do
 done
 
 for file in wrfout_*; do
-  echo "WARNING: $file remains unprocessed"
+  echo "WARNING: $file remains unprocessed. Attempting to process"
+  python3 checkWrfoutInBackground.py --no-verify-steps --timeout 0 $file
+
+  if [ -e $file ] ; then
+    echo "Could not process $file. Exiting."
+    exit
+  fi
 done
 
 
