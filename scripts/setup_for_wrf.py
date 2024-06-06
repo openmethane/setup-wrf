@@ -643,6 +643,7 @@ for ind_job in range(number_of_jobs):
                             print("\t\tSubset the grib file",os.path.basename(FNLfile))
                             stdout, stderr = subprocess.Popen(['wgrib2',FNLfile,'-small_grib',geoStrs['XLONG_M'], geoStrs['XLAT_M'],tmpfile], stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
                             if len(stderr) > 0:
+                                print(stderr)
                                 raise RuntimeError("Errors found when running wgrib2...")
                             ## use the subset instead - delete the original and put the subset in its place
                             os.remove(FNLfile)
