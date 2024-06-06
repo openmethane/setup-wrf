@@ -69,12 +69,6 @@ class WRFConfig :
     USER: str
     TMPDIR: str
 
-    def to_dict(self) :
-        d = {}
-        for key in self.__dir__() :
-            d[d] = self.key
-        return {key : self.key for key in self.__dir__() if not key.startswith('__')}
-
 
 def read_config_file(configFile: str) -> str :
     """

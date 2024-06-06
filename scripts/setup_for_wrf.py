@@ -32,8 +32,10 @@ parser.add_argument("-c", "--configFile", help="Path to configuration file", def
 args = parser.parse_args()
 configFile = args.configFile
 
+# load config file and create WRFConfig object
 wrf_config = load_wrf_config(configFile)
 
+# make a dict from WRFConfig object
 config = wrf_config.__getstate__()
 
 # parse start and end date
