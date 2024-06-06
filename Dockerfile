@@ -1,72 +1,79 @@
-FROM ubuntu:20.04 as wgrib2
+# Build the reqired depencies
+FROM continuumio/miniconda3 as builder
 
-WORKDIR /src
+# Install and package up the conda environment
+# Creates a standalone environment in /opt/venv
+COPY environment.yml /opt/environment.yml
+RUN conda env create -f /opt/environment.yml
+RUN conda install -c conda-forge conda-pack poetry=1.8.2
+RUN conda-pack -n setup_wrf -o /tmp/env.tar && \
+  mkdir /opt/venv && cd /opt/venv && \
+  tar xf /tmp/env.tar && \
+  rm /tmp/env.tar
 
-ENV WGRIB2_VERSION="v2.0.8"
+# We've put venv in same path it'll be in final image,
+# so now fix up paths:
+RUN /opt/venv/bin/conda-unpack
 
-# Update the repo
-RUN apt-get update && \
-    apt-get install -y build-essential libaec-dev zlib1g-dev libcurl4-openssl-dev libboost-dev curl wget zip unzip bzip2 gfortran gcc g++
-
-
-# Download the latest wgrib2 source code
-RUN wget -c ftp://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz.$WGRIB2_VERSION && \
-    tar -xzvf wgrib2.tgz.$WGRIB2_VERSION && \
-    cd grib2 && \
-    CC=gcc FC=gfortran make
-
-# Build the virtual environment in an isolated container
-FROM python:3.11 as builder
-
-RUN pip install poetry==1.8.2
-
+# Install the python dependencies using poetry
 ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
+    POETRY_HOME='/opt/venv' \
+    POETRY_VIRTUALENVS_CREATE=false \
     POETRY_CACHE_DIR=/tmp/poetry_cache
 
-WORKDIR /app
+# This is deliberately outside of the work directory
+# so that the local directory can be mounted as a volume of testing
+ENV VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
+
+# Needed for wgrib2
+RUN ln -s /opt/venv/lib/libnetcdf.so /opt/venv/lib/libnetcdf.so.13
+
+WORKDIR /opt/venv
 
 COPY pyproject.toml poetry.lock ./
 RUN touch README.md
 
-RUN --mount=type=cache,target=$POETRY_CACHE_DIR poetry install --no-ansi --no-root
+# This installs the python dependencies into /opt/venv
+RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
+    /opt/conda/bin/poetry install --no-ansi --no-root
 
 # Container for running the project
 # This isn't a hyper optimised container but it's a good starting point
-FROM python:3.11
+FROM debian:bookworm
 
 MAINTAINER Jared Lewis <jared.lewis@climate-resource.com>
 
+# Configure Python
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random \
-  OMPI_ALLOW_RUN_AS_ROOT=1 \
-  OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+  PYTHONHASHSEED=random
 
 # This is deliberately outside of the work directory
 # so that the local directory can be mounted as a volume of testing
-ENV VIRTUAL_ENV=/app/.venv \
-    PATH="/app/.venv/bin:$PATH"
+ENV VIRTUAL_ENV=/opt/venv \
+    PATH="/opt/venv/bin:$PATH"
 
-# Preference the libraries built in the WRF container for consistency
-ENV LD_LIBRARY_PATH="/opt/wrf/libs/lib:${LD_LIBRARY_PATH}"
+# Preference the environment libraries over the system libraries
+ENV LD_LIBRARY_PATH="/opt/venv/lib:${LD_LIBRARY_PATH}"
 
 WORKDIR /opt/project
 
 # Install additional apt dependencies
 RUN apt-get update && \
-    apt-get install -y libgfortran5 nco csh mpich bc libopenmpi-dev && \
+    apt-get install -y csh bc file && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy across the virtual environment
-COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
+COPY --from=builder /opt/venv /opt/venv
 
-# Copy in WRF and wgrib2 binaries
-# https://github.com/climate-resource/wrf-container
-COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
-COPY --from=ghcr.io/openmethane/cmaq:5.0.2 /opt/cmaq /opt/cmaq
-COPY --from=wgrib2 /src/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
+# Copy in WRF and CMAQ binaries
+# https://github.com/climate-resource/docker-wrf
+# https://github.com/openmethane/docker-cmaq
+# TODO: temporarily pinned staging builds until this is verified to work
+# Otherwise the CI will be broken for main
+COPY --from=ghcr.io/climate-resource/wrf:pr-1 /opt/wrf /opt/wrf
+COPY --from=ghcr.io/openmethane/cmaq:pr-4 /opt/cmaq /opt/cmaq
 
 # Copy in the rest of the project
 # For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
