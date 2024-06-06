@@ -10,7 +10,8 @@ from attrs import define
 
 @define
 class WRFConfig :
-    project_root: str  # overall base directory for project
+    project_root: str
+    """overall base directory for project"""
     setup_root: str  # base dir for set up scripts
     run_name: str  # Project name
     target: str  # Target environment for running tasks
