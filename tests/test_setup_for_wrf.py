@@ -121,9 +121,7 @@ def test_substitute_variables() :
         'run_dir' : '/scratch/q90/pjr563/openmethane-beta/wrf/test_run_123',
     }
 
-    out, iterationCount = substitute_variables(config)
-
-    assert iterationCount <= 10
+    out = substitute_variables(config)
 
     assert out == expected
 
@@ -216,10 +214,10 @@ def test_dates_in_right_order(input_str) :
         raise e
 
 
-def test_valid_analysis_source() :
-    config = parse_config(input_str)
-
-    assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
+# def test_valid_analysis_source() :
+#     config = parse_config(input_str)
+#
+#     assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
 
 
 def test_config_object(input_str, config_path) :
@@ -228,7 +226,7 @@ def test_config_object(input_str, config_path) :
 
     config = add_environment_variables(config=config, environmental_variables=os.environ)
 
-    config, iterationCount = substitute_variables(config)
+    config = substitute_variables(config)
 
     config = parse_boolean_keys(config)
 

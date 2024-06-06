@@ -45,8 +45,8 @@ class WRFConfig :
     submit_wrf_now: str = field(converter=boolean_converter)
     """"""
     submit_wps_component: str = field(converter=boolean_converter)
-    """Submit the WRF runs at the end of the script? (bool -> true/false, yes/no)
-    FIXME: this hasn't been fully implemented yet (only working for 'false')"""
+    """Submit the WRF runs at the end of the script? (bool -> true/false, yes/no)"""
+    # FIXME: this hasn't been fully implemented yet (only working for 'false')
     environment_variables_for_substitutions: str
     """shell environment variables to be used for substitutions in this script"""
     run_dir: str
@@ -102,8 +102,12 @@ class WRFConfig :
     """path to the real.exe program"""
     delete_metem_files: str = field(converter=boolean_converter)
     """delete met_em files once they have been used"""
-    analysis_source: str
+    analysis_source: str = field()
     """analysis source - can be ERAI or FNL"""
+    @analysis_source.validator
+    def check(self, attribute, value) :
+        if value not in ['FNL', 'ERAI']:
+            raise ValueError("analysis_source must be one of ERAI or FNL")
     orcid: str
     """if analysis_source is "FNL", you will need a login for CISL/rda.ucar.edu"""
     rda_ucar_edu_api_token: str
@@ -251,7 +255,10 @@ def substitute_variables(config: dict) -> tuple[dict, int] :
         ##
         iterationCount += 1
 
-    return config, iterationCount
+    # Iteration count for filling variables
+    assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+
+    return config
 
 
 def parse_boolean_keys(config: dict,
@@ -299,10 +306,9 @@ def load_wrf_config(filename: str) -> WRFConfig :
 
     config = add_environment_variables(config=config, environmental_variables=os.environ)
 
-    config, iterationCount = substitute_variables(config)
+    config = substitute_variables(config)
 
-    # Iteration count for filling variables
-    assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+
 
     ## parse boolean keys
     # config = parse_boolean_keys(config)
@@ -367,7 +373,4 @@ def load_wrf_config(filename: str) -> WRFConfig :
         analysis_vtable=config['analysis_vtable'],
         wrf_run_dir=config['wrf_run_dir'],
         wrf_run_tables_pattern=config['wrf_run_tables_pattern'],
-        HOME=config['HOME'],
-        USER=config['USER'],
-        TMPDIR=config['TMPDIR'],
     )
