@@ -36,7 +36,7 @@ configFile = args.configFile
 wrf_config = load_wrf_config(configFile)
 
 # make a dict from WRFConfig object
-config = wrf_config.__getstate__()
+config = attrs.asdict(wrf_config)
 
 # parse start and end date
 try:
