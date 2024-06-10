@@ -2,16 +2,32 @@ import os
 import sys
 import json
 import re
-from typing import Tuple
 import datetime
 import pytz
-# import attr
 from attrs import define, field
 
 
-def boolean_converter(value) :
-    truevals = ['true', '1', 't', 'y', 'yes']
-    falsevals = ['false', '0', 'f', 'n', 'no']
+def boolean_converter(value: str,
+                      truevals: list[str] = ['true', '1', 't', 'y', 'yes'],
+                      falsevals: list[str] = ['false', '0', 'f', 'n', 'no']) :
+    """
+    Convert a string value to a boolean based on predefined true and false values.
+
+    Parameters
+    ----------
+    value
+        The string value to be converted.
+    truevals
+        List of strings considered as True values.
+    falsevals
+        List of strings considered as False values.
+
+    Returns
+    -------
+        True if the value matches any of the truevals, False otherwise.
+
+    """
+
     boolvals = truevals + falsevals
 
     assert (value.lower() in boolvals), f'Key {value} not a recognised boolean value'
@@ -104,10 +120,12 @@ class WRFConfig :
     """delete met_em files once they have been used"""
     analysis_source: str = field()
     """analysis source - can be ERAI or FNL"""
+
     @analysis_source.validator
     def check(self, attribute, value) :
-        if value not in ['FNL', 'ERAI']:
+        if value not in ['FNL', 'ERAI'] :
             raise ValueError("analysis_source must be one of ERAI or FNL")
+
     orcid: str
     """if analysis_source is "FNL", you will need a login for CISL/rda.ucar.edu"""
     rda_ucar_edu_api_token: str
@@ -138,7 +156,7 @@ class WRFConfig :
 
 def read_config_file(configFile: str) -> str :
     """
-    Reads and returns the content of a configuration file.
+    Read and return the content of a configuration file.
 
     Parameters
     ----------
@@ -149,10 +167,6 @@ def read_config_file(configFile: str) -> str :
     -------
         The content of the configuration file.
 
-    Raises
-    ------
-    AssertionError
-        If the configuration file does not exist.
     """
 
     assert os.path.exists(
@@ -169,9 +183,9 @@ def read_config_file(configFile: str) -> str :
         sys.exit()
 
 
-def parse_config(input_str: str) -> dict :
+def parse_config(input_str: str) -> dict[str, str | bool | int] :
     """
-    Parses the input string containing configuration data and returns a JSON object.
+    Parse the input string  and remove comments.
 
     Parameters
     ----------
@@ -181,15 +195,10 @@ def parse_config(input_str: str) -> dict :
     Returns
     -------
         The parsed configuration data.
-
-    Raises
-    ------
-    Exception
-        If there is an issue with parsing the configuration data.
     """
 
     try :
-        ## strip out the comments
+        # strip out the comments
         input_str = re.sub(r'#.*\n', '\n', input_str)
         return json.loads(input_str)
     except Exception as e :
@@ -198,9 +207,10 @@ def parse_config(input_str: str) -> dict :
         sys.exit()
 
 
-def add_environment_variables(config: dict, environmental_variables: dict) -> dict :
+def add_environment_variables(config: dict[str, str | bool | int], environmental_variables: dict[str, str]) -> dict[
+    str, str | bool | int] :
     """
-    Adds environment variables to the configuration that may be needed for substitutions.
+    Add environment variables to the configuration that may be needed for substitutions.
 
     Parameters
     ----------
@@ -210,17 +220,22 @@ def add_environment_variables(config: dict, environmental_variables: dict) -> di
     Returns
     -------
         The updated configuration dictionary with added environment variables.
+
     """
     envVarsToInclude = config["environment_variables_for_substitutions"].split(',')
+
     for envVarToInclude in envVarsToInclude :
-        if envVarToInclude in list(environmental_variables.keys()) :
+        # assert envVarToInclude in list(
+        #     environmental_variables.keys()), f"{envVarToInclude} is not found in environment variables."
+        if envVarToInclude in list(environmental_variables.keys()):
             config[envVarToInclude] = environmental_variables[envVarToInclude]
+
     return config
 
 
-def substitute_variables(config: dict) -> tuple[dict, int] :
+def substitute_variables(config: dict) -> dict[str, str | bool | int] :
     """
-    Performs variable substitutions in the configuration dictionary.
+    Perform variable substitutions in the configuration dictionary.
 
     Parameters
     ----------
@@ -230,59 +245,45 @@ def substitute_variables(config: dict) -> tuple[dict, int] :
     Returns
     -------
         The updated configuration dictionary after variable substitutions.
-        The number of iterations performed for substitutions.
     """
     avail_keys = list(config.keys())
     iterationCount = 0
     while iterationCount < 10 :
         ## check if any entries in the config dictionary need populating
         foundToken = False
-        for key, value in config.items() :
-            if isinstance(value, str) :
-                if (value.find('${') >= 0) :
-                    foundToken = True
-        ##
-        if foundToken :
-            for avail_key in avail_keys :
-                key = '${%s}' % avail_key
-                value = config[avail_key]
-                for k in avail_keys :
-                    if isinstance(config[k], str) :
-                        if config[k].find(key) >= 0 :
-                            config[k] = config[k].replace(key, value)
-        else :
+        for value in config.values() :
+            if isinstance(value, str) and value.find('${') >= 0 :
+                foundToken = True
+        if not foundToken :
             break
-        ##
+        for avail_key in avail_keys :
+            key = '${%s}' % avail_key
+            value = config[avail_key]
+            for k in avail_keys :
+                if isinstance(config[k], str) and config[k].find(key) >= 0 :
+                    config[k] = config[k].replace(key, value)
+
         iterationCount += 1
 
     # Iteration count for filling variables
-    assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+    assert iterationCount < 10, "Config key substitution exceeded iteration limit."
 
     return config
 
 
-def parse_boolean_keys(config: dict,
-                       truevals: list[str] = ['true', '1', 't', 'y', 'yes'],
-                       falsevals: list[str] = ['false', '0', 'f', 'n', 'no'],
-                       bool_keys: list[str] = ["run_as_one_job", "submit_wrf_now", "submit_wps_component",
-                                               "only_edit_namelists",
-                                               "restart",
-                                               'delete_metem_files', "use_high_res_sst_data",
-                                               'regional_subset_of_grib_data']
-                       ) :
-    boolvals = truevals + falsevals
-
-    for bool_key in bool_keys :
-        assert (
-                config[bool_key].lower() in boolvals
-        ), f'Key {bool_key} not a recognised boolean value'
-        config[bool_key] = (config[bool_key].lower() in truevals)
-
-    return config
-
-
-## function to parse times
 def process_date_string(datestring) :
+    """
+    Process a date string to a datetime object with the appropriate timezone.
+
+    Parameters
+    ----------
+    datestring
+        The input date string to be processed.
+
+    Returns
+    -------
+        The processed datetime object with the correct timezone
+    """
     datestring = datestring.strip().rstrip()
 
     ## get the timezone
@@ -300,77 +301,34 @@ def process_date_string(datestring) :
 
 
 def load_wrf_config(filename: str) -> WRFConfig :
+    """
+    Load and processes a WRF configuration file and create a WRFConfig object.
+
+    Parameters
+    ----------
+    filename
+        The path to the WRF configuration file.
+
+    Returns
+    -------
+    WRFConfig
+        An instance of the WRFConfig class initialized with the processed configuration data.
+    """
+
     input_str = read_config_file(filename)
 
     config = parse_config(input_str)
 
+    # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
     config = add_environment_variables(config=config, environmental_variables=os.environ)
 
+    # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
     config = substitute_variables(config)
 
+    # remove environment variables
+    for env_var in config["environment_variables_for_substitutions"].split(','):
+        if env_var in config.keys():
+            config.pop(env_var)
 
 
-    ## parse boolean keys
-    # config = parse_boolean_keys(config)
-
-    return WRFConfig(
-        project_root=config['project_root'],
-        setup_root=config['setup_root'],
-        run_name=config['run_name'],
-        target=config['target'],
-        start_date=config['start_date'],
-        end_date=config['end_date'],
-        restart=config['restart'],
-        num_hours_per_run=config['num_hours_per_run'],
-        num_hours_spin_up=config['num_hours_spin_up'],
-        run_as_one_job=config['run_as_one_job'],
-        submit_wrf_now=config['submit_wrf_now'],
-        submit_wps_component=config['submit_wps_component'],
-        environment_variables_for_substitutions=config[
-            'environment_variables_for_substitutions'
-        ],
-        run_dir=config['run_dir'],
-        run_script_template=config['run_script_template'],
-        cleanup_script_template=config['cleanup_script_template'],
-        main_script_template=config['main_script_template'],
-        check_wrfout_in_background_script=config[
-            'check_wrfout_in_background_script'
-        ],
-        only_edit_namelists=config['only_edit_namelists'],
-        use_high_res_sst_data=config['use_high_res_sst_data'],
-        wps_dir=config['wps_dir'],
-        wrf_dir=config['wrf_dir'],
-        nml_dir=config['nml_dir'],
-        target_dir=config['target_dir'],
-        scripts_to_copy_from_nml_dir=config['scripts_to_copy_from_nml_dir'],
-        scripts_to_copy_from_target_dir=config[
-            'scripts_to_copy_from_target_dir'
-        ],
-        metem_dir=config['metem_dir'],
-        namelist_wps=config['namelist_wps'],
-        namelist_wrf=config['namelist_wrf'],
-        geog_data_path=config['geog_data_path'],
-        geogrid_tbl=config['geogrid_tbl'],
-        geogrid_exe=config['geogrid_exe'],
-        ungrib_exe=config['ungrib_exe'],
-        metgrid_tbl=config['metgrid_tbl'],
-        metgrid_exe=config['metgrid_exe'],
-        linkgrib_script=config['linkgrib_script'],
-        wrf_exe=config['wrf_exe'],
-        real_exe=config['real_exe'],
-        delete_metem_files=config['delete_metem_files'],
-        analysis_source=config['analysis_source'],
-        orcid=config['orcid'],
-        rda_ucar_edu_api_token=config['rda_ucar_edu_api_token'],
-        regional_subset_of_grib_data=config['regional_subset_of_grib_data'],
-        sst_monthly_dir=config['sst_monthly_dir'],
-        sst_daily_dir=config['sst_daily_dir'],
-        sst_monthly_pattern=config['sst_monthly_pattern'],
-        sst_daily_pattern=config['sst_daily_pattern'],
-        sst_vtable=config['sst_vtable'],
-        analysis_pattern_upper=config['analysis_pattern_upper'],
-        analysis_pattern_surface=config['analysis_pattern_surface'],
-        analysis_vtable=config['analysis_vtable'],
-        wrf_run_dir=config['wrf_run_dir'],
-        wrf_run_tables_pattern=config['wrf_run_tables_pattern'],
-    )
+    return WRFConfig(**config)

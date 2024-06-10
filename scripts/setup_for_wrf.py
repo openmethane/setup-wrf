@@ -18,10 +18,8 @@ import netCDF4
 import attrs
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.config_read_functions import (read_config_file,
-                                              parse_config,
                                               add_environment_variables,
                                               substitute_variables,
-                                              parse_boolean_keys,
                                               process_date_string,
                                               load_wrf_config)
 
@@ -37,6 +35,12 @@ wrf_config = load_wrf_config(configFile)
 
 # make a dict from WRFConfig object
 config = attrs.asdict(wrf_config)
+
+# # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
+# config = add_environment_variables(config=config, environmental_variables=os.environ)
+#
+# # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
+# config = substitute_variables(config)
 
 # parse start and end date
 try:
