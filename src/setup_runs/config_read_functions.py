@@ -325,7 +325,7 @@ def load_wrf_config(filename: str) -> WRFConfig :
     # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
     config = substitute_variables(config)
 
-    # remove environment variables
+    # remove environment variables that were previously added
     for env_var in config["environment_variables_for_substitutions"].split(','):
         if env_var in config.keys():
             config.pop(env_var)

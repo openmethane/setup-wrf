@@ -36,12 +36,6 @@ wrf_config = load_wrf_config(configFile)
 # make a dict from WRFConfig object
 config = attrs.asdict(wrf_config)
 
-# # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
-# config = add_environment_variables(config=config, environmental_variables=os.environ)
-#
-# # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
-# config = substitute_variables(config)
-
 # parse start and end date
 try:
     start_date = process_date_string(config['start_date'])

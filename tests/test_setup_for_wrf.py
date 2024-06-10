@@ -209,7 +209,18 @@ def test_012_config_object(input_str, config_path) :
                              "regional_subset_of_grib_data", ] :
         config[value_to_boolean] = boolean_converter(config[value_to_boolean])
 
-    # load config object
+    # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
+    config = add_environment_variables(config=config, environmental_variables=os.environ)
+
+    # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
+    config = substitute_variables(config)
+
+    # remove environment variables that were previously added
+    for env_var in config["environment_variables_for_substitutions"].split(','):
+        if env_var in config.keys():
+            config.pop(env_var)
+
+    # load config object (performs all of the above steps)
     wrf_config = load_wrf_config(config_path)
 
     assert config == asdict(wrf_config)
