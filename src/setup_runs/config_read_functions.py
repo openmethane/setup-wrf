@@ -225,10 +225,7 @@ def add_environment_variables(config: dict[str, str | bool | int], environmental
     envVarsToInclude = config["environment_variables_for_substitutions"].split(',')
 
     for envVarToInclude in envVarsToInclude :
-        # assert envVarToInclude in list(
-        #     environmental_variables.keys()), f"{envVarToInclude} is not found in environment variables."
-        if envVarToInclude in list(environmental_variables.keys()):
-            config[envVarToInclude] = environmental_variables[envVarToInclude]
+        config[envVarToInclude] = environmental_variables[envVarToInclude]
 
     return config
 
@@ -327,8 +324,7 @@ def load_wrf_config(filename: str) -> WRFConfig :
 
     # remove environment variables that were previously added
     for env_var in config["environment_variables_for_substitutions"].split(','):
-        if env_var in config.keys():
-            config.pop(env_var)
+        config.pop(env_var)
 
 
     return WRFConfig(**config)

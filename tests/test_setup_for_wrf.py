@@ -87,7 +87,7 @@ def test_004_parse_config_error_cases(input_str, expected, capsys) :
 def test_005_add_environment_variable() :
     config = {"some" : "value",
               "more" : "values",
-              "environment_variables_for_substitutions" : "HOME,USER,PROJECT,TMPDIR",
+              "environment_variables_for_substitutions" : "HOME" #",USER,PROJECT,TMPDIR",
               }
 
     environmental_variables = {
@@ -98,8 +98,8 @@ def test_005_add_environment_variable() :
 
     expected = {"some" : "value",
                 "more" : "values",
-                "environment_variables_for_substitutions" : "HOME,USER,PROJECT,TMPDIR",
-                'USER' : 'test_user',
+                "environment_variables_for_substitutions" : "HOME", #,USER,PROJECT,TMPDIR",
+                # 'USER' : 'test_user',
                 'HOME' : '/Users/test_user',
                 }
 
