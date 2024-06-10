@@ -30,7 +30,7 @@
     "submit_wps_component" : "false",
 
     # shell environment variables to be used for substitutions in this script
-    "environment_variables_for_substitutions":"HOME,USER,PROJECT,TMPDIR",
+    "environment_variables_for_substitutions":"HOME"
 
     # top-level directory for the WRF and WPS outputs
     "run_dir" : "/opt/project/data/runs/${run_name}",
