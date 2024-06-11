@@ -92,10 +92,11 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
     Returns:
         Path to the downloaded file
     """
+    filename = os.path.join(target_dir, os.path.basename(url))
+
     try:
         with session.get(url, stream=True) as r:
             r.raise_for_status()
-            filename = os.path.join(target_dir, os.path.basename(url))
             with open(filename, "wb") as f:
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)

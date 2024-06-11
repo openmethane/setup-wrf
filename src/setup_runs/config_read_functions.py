@@ -8,8 +8,8 @@ from attrs import define, field
 
 
 def boolean_converter(value: str,
-                      truevals: list[str] = ['True', 'true', '1', 't', 'y', 'yes'],
-                      falsevals: list[str] = ['False' ,'false', '0', 'f', 'n', 'no']) :
+                      truevals: list[str] = ('True', 'true', '1', 't', 'y', 'yes'),
+                      falsevals: list[str] = ('False' ,'false', '0', 'f', 'n', 'no')) :
     """
     Convert a string value to a boolean based on predefined true and false values.
 
@@ -216,6 +216,8 @@ def add_environment_variables(config: dict[str, str | bool | int], environmental
     ----------
     config
         The configuration dictionary.
+    environment_variables
+        Process environment variables.
 
     Returns
     -------
