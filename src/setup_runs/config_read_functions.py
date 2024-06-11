@@ -8,8 +8,8 @@ from attrs import define, field
 
 
 def boolean_converter(value: str,
-                      truevals: list[str] = ['true', '1', 't', 'y', 'yes'],
-                      falsevals: list[str] = ['false', '0', 'f', 'n', 'no']) :
+                      truevals: list[str] = ('true', '1', 't', 'y', 'yes'),
+                      falsevals: list[str] = ('false', '0', 'f', 'n', 'no')) :
     """
     Convert a string value to a boolean based on predefined true and false values.
 
@@ -207,8 +207,8 @@ def parse_config(input_str: str) -> dict[str, str | bool | int] :
         sys.exit()
 
 
-def add_environment_variables(config: dict[str, str | bool | int], environment_variables: dict[str, str]) -> dict[
-    str, str | bool | int] :
+def add_environment_variables(config: dict[str, str | bool | int],
+                              environment_variables: dict[str, str]) -> dict[str, str | bool | int] :
     """
     Add environment variables to the configuration that may be needed for substitutions.
 
@@ -216,6 +216,8 @@ def add_environment_variables(config: dict[str, str | bool | int], environment_v
     ----------
     config
         The configuration dictionary.
+    environment_variables
+        Process environment variables.
 
     Returns
     -------
@@ -225,7 +227,7 @@ def add_environment_variables(config: dict[str, str | bool | int], environment_v
     envVarsToInclude = config["environment_variables_for_substitutions"].split(',')
 
     for envVarToInclude in envVarsToInclude :
-        config[envVarToInclude] = environmental_variables[envVarToInclude]
+        config[envVarToInclude] = environment_variables[envVarToInclude]
 
     return config
 
@@ -323,8 +325,7 @@ def load_wrf_config(filename: str) -> WRFConfig :
     config = substitute_variables(config)
 
     # remove environment variables that were previously added
-    for env_var in config["environment_variables_for_substitutions"].split(','):
+    for env_var in config["environment_variables_for_substitutions"].split(',') :
         config.pop(env_var)
-
 
     return WRFConfig(**config)

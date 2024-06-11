@@ -53,14 +53,6 @@ except Exception as e:
 # Next line moved to load_wrf_config()
 # assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
 
-# check that requisite keys are present
-requisite_keys = ["run_name","start_date", "end_date"]
-for requisite_key in requisite_keys:
-    assert requisite_key in config.keys(), "Key {} was not in the available configuration keys".format(requisite_key)
-
-# analysis source
-assert config['analysis_source'] in ['ERAI', 'FNL'], 'Key analysis_source must be one of ERAI or FNL'
-
 scripts = {}
 dailyScriptNames = ['run','cleanup']
 scriptNames = ['main','run','cleanup']
