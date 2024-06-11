@@ -9,7 +9,6 @@ def boolean_tuple(x):
     return (boolean_converter(x))
 
 
-
 @define
 class CMAQConfig :
     CMAQdir : str

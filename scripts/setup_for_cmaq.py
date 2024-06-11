@@ -27,7 +27,7 @@ from setup_runs.config_read_functions import process_date_string
 def main() :
     # load configuration object
     # TODO: fix file path
-    setup_cmaq = load_cmaq_config("../CMAQ.config.json")
+    setup_cmaq = load_cmaq_config("CMAQ.config.json")
 
     # define date range
     start_date = process_date_string(setup_cmaq.startDate)
