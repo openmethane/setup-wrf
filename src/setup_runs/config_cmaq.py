@@ -42,7 +42,7 @@ import datetime
 
 # TODO: Remove comments here. Docs should go in Class definition
 
-templateDir = "/opt/project/templateRunScripts"  ## folder containing the template run scripts
+# templateDir = "/opt/project/templateRunScripts"  ## folder containing the template run scripts
 
 config = {
     ## directories
@@ -95,10 +95,12 @@ config = {
     # cctmRun - CCTM run script
     # cmaqRun - main CMAQ run script
     "scripts" : {
-        "mcipRun" : {"path" : f"{templateDir}/run.mcip"},
-        "bconRun" : {"path" : f"{templateDir}/run.bcon"},
-        "iconRun" : {"path" : f"{templateDir}/run.icon"},
-        "cctmRun" : {"path" : f"{templateDir}/run.cctm"},
-        "cmaqRun" : {"path" : f"{templateDir}/runCMAQ.sh"},
+        "mcipRun" : {"path" : "/opt/project/templateRunScripts/run.mcip"},
+        "bconRun" : {"path" : "/opt/project/templateRunScripts/run.bcon"},
+        "iconRun" : {"path" : "/opt/project/templateRunScripts/run.icon"},
+        "cctmRun" : {"path" : "/opt/project/templateRunScripts/run.cctm"},
+        "cmaqRun" : {"path" : "/opt/project/templateRunScripts/runCMAQ.sh"},
     },
+    "cctmExec" : "ADJOINT_FWD",
+    "CAMSToCmaqBiasCorrect" : (1.838 - 1.771),
 }

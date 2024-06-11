@@ -74,6 +74,11 @@ class CMAQConfig :
     iconRun - ICON run script
     cctmRun - CCTM run script
     cmaqRun - main CMAQ run script"""
+    cctmExec : str
+    # TODO: Add description for cctmExec?
+    CAMSToCmaqBiasCorrect : float
+    # TODO: Add description for CAMSToCmaqBiasCorrect?
+
 
 def load_cmaq_config(config):
     return CMAQConfig(**config)
