@@ -26,11 +26,10 @@ from setup_runs.config_read_functions import process_date_string
 
 def main() :
     # load configuration object
-    # TODO: fix file path
     setup_cmaq = load_cmaq_config("CMAQ.config.json")
 
     # define date range
-    ndates = (setup_cmaq.end_date - setup_cmaq.start_date).days + 1
+    ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1
     dates = [setup_cmaq.startDate + datetime.timedelta(days=d) for d in range(ndates)]
 
     # read in the template run-scripts
