@@ -26,7 +26,7 @@ from setup_runs.config_read_functions import process_date_string
 
 def main() :
     # load configuration object
-    setup_cmaq = load_cmaq_config("CMAQ.config.json")
+    setup_cmaq = load_cmaq_config("config/cmaq/CMAQ.config.json")
 
     # define date range
     ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1
