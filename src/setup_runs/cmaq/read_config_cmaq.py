@@ -1,6 +1,14 @@
 import datetime
 
 from attrs import define, field
+import json
+from setup_runs.config_read_functions import boolean_converter, process_date_string
+
+
+def boolean_tuple(x):
+    return (boolean_converter(x))
+
+
 
 @define
 class CMAQConfig :
@@ -28,10 +36,10 @@ class CMAQConfig :
     """which domains should be run?"""
     run : str
     """name of the simulation, appears in some filenames (keep this *short* - longer)"""
-    startDate : datetime.datetime
-    """this is the START of the first day"""
-    endDate : datetime.datetime
-    """this is the START of the last day"""
+    startDate : str = field(converter=process_date_string)
+    """this is the START of the FIRST day, use the format 2022-07-01 00:00:00 UTC (time zone optional)"""
+    endDate : str = field(converter=process_date_string)
+    """this is the START of the LAST day, use the format 2022-07-01 00:00:00 UTC (time zone optional)"""
     # TODO: Check if int is the right type. Perhaps time units between full hours are supported.
     nhoursPerRun : int
     """number of hours to run at a time (24 means run a whole day at once)"""
@@ -43,17 +51,18 @@ class CMAQConfig :
     """name of chemical mechanism given to CMAQ (should be one of: cb05e51_ae6_aq, cb05mp51_ae6_aq,
     cb05tucl_ae6_aq, cb05tump_ae6_aq, racm2_ae6_aq, saprc07tb_ae6_aq, saprc07tc_ae6_aq,
     saprc07tic_ae6i_aq, saprc07tic_ae6i_aqkmti)"""
-    prepareICandBC : bool
+    prepareICandBC : bool = field(converter=boolean_converter)
     """prepare the initial and boundary conditions from global CAMS output"""
-    prepareRunScripts : bool
+    prepareRunScripts : bool = field(converter=boolean_converter)
     """prepare the run scripts"""
-    add_qsnow : bool
+    add_qsnow : bool = field(converter=boolean_converter)
     """MCIP option: add the 'QSNOW' variable to the WRFOUT files before running MCIP"""
-    forceUpdateMcip : bool
+    forceUpdateMcip : bool = field(converter=boolean_converter)
     """MCIP option: force the update of the MCIP files"""
-    forceUpdateICandBC : tuple[bool]
+    # TODO maybe needs a converter to tuple
+    forceUpdateICandBC : tuple[bool] = field(converter=boolean_tuple)
     """MCIP option: force an update of the initial and boundary conditions from global MOZART output"""
-    forceUpdateRunScripts : bool
+    forceUpdateRunScripts : bool = field(converter=boolean_converter)
     """MCIP option: force an update to the run scripts"""
     scenarioTag : list[str]
     """MCIP option: scenario tag. 16-character maximum"""
@@ -77,8 +86,14 @@ class CMAQConfig :
     cctmExec : str
     # TODO: Add description for cctmExec?
     CAMSToCmaqBiasCorrect : float
+    """Pre-set is (1.838 - 1.771)"""
     # TODO: Add description for CAMSToCmaqBiasCorrect?
 
 
-def load_cmaq_config(config):
+def load_cmaq_config(filepath):
+
+
+    with open(filepath) as f :
+        config = json.load(f)
+
     return CMAQConfig(**config)

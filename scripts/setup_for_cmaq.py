@@ -21,14 +21,18 @@ from setup_runs.cmaq.mcip_preparation import checkInputMetAndOutputFolders, getM
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
 from setup_runs.config_cmaq import config
+from setup_runs.config_read_functions import process_date_string
 
 
 def main() :
     # load configuration object
-    setup_cmaq = load_cmaq_config(config)
+    # TODO: fix file path
+    setup_cmaq = load_cmaq_config("../CMAQ.config.json")
 
     # define date range
-    ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1
+    start_date = process_date_string(setup_cmaq.startDate)
+    end_date = process_date_string(setup_cmaq.endDate)
+    ndates = (end_date - start_date).days + 1
     dates = [setup_cmaq.startDate + datetime.timedelta(days=d) for d in range(ndates)]
 
     # read in the template run-scripts
