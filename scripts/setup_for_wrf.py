@@ -9,24 +9,19 @@ import f90nml
 import shutil
 import subprocess
 import glob
-import sys
 import pdb
-import resource
 import copy
 import stat
 import netCDF4
 import attrs
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
-from setup_runs.config_read_functions import (read_config_file,
-                                              add_environment_variables,
-                                              substitute_variables,
-                                              process_date_string,
-                                              load_wrf_config)
+from setup_runs.config_read_functions import process_date_string
+from setup_runs.wrf.read_config_wrf import load_wrf_config
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-c", "--configFile", help="Path to configuration file", default = '../config.nci.json')
+parser.add_argument("-c", "--configFile", help="Path to configuration file", default = 'config/wrf/config.nci.json')
 args = parser.parse_args()
 configFile = args.configFile
 

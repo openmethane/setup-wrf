@@ -20,8 +20,6 @@ from setup_runs.cmaq.mcip import runMCIP
 from setup_runs.cmaq.mcip_preparation import checkInputMetAndOutputFolders, getMcipGridNames
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
-from setup_runs.config_cmaq import config
-from setup_runs.config_read_functions import process_date_string
 
 
 def main() :

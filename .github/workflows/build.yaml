@@ -83,7 +83,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
-            python scripts/setup_for_wrf.py -c config.docker.json
+            python scripts/setup_for_wrf.py -c config/wrf/config.docker.json
           # Run WRF
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
