@@ -1,4 +1,4 @@
-from attrs import define, field
+from attrs import define, field, validators
 import os
 from setup_runs.config_read_functions import (boolean_converter, read_config_file,
                                               parse_config, add_environment_variables,

@@ -2,8 +2,8 @@ import pytest
 import os
 from pathlib import Path
 from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables, \
-    substitute_variables, boolean_converter, process_date_string, load_wrf_config
-
+    substitute_variables, boolean_converter, process_date_string
+from setup_runs.wrf.read_config_wrf import load_wrf_config
 from attrs import asdict
 
 
@@ -14,8 +14,11 @@ def root_dir() :
 
 @pytest.fixture
 def config_path(root_dir) :
-    return os.path.join(root_dir, "config.nci.json")
+    return os.path.join(root_dir, "config/wrf/config.nci.json")
 
+@pytest.fixture
+def config_cmaq_docker_path(root_dir):
+    return os.path.join(root_dir, "config/cmaq/config.docker.json")
 
 @pytest.fixture
 def input_str(config_path) :

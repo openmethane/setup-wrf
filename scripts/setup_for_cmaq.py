@@ -24,7 +24,7 @@ from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
 
 def main() :
     # load configuration object
-    setup_cmaq = load_cmaq_config("config/cmaq/CMAQ.config.json")
+    setup_cmaq = load_cmaq_config("config/cmaq/config.docker.json")
 
     # define date range
     ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1

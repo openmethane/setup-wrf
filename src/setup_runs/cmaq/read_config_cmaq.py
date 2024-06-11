@@ -1,4 +1,3 @@
-
 from attrs import define, field
 import json
 from setup_runs.config_read_functions import boolean_converter, process_date_string
@@ -36,6 +35,7 @@ class CMAQConfig :
     domains: list[str]
     """which domains should be run?"""
     run: str
+    # TODO: Clarify what is meant by *short* - longer!
     """name of the simulation, appears in some filenames (keep this *short* - longer)"""
     startDate: str = field(converter=process_date_string)
     """this is the START of the FIRST day, use the format 
@@ -51,11 +51,21 @@ class CMAQConfig :
     - so far it is not set up to run for sub-hourly"""
     mech: str
     """name of chemical mechanism to appear in filenames"""
-    mechCMAQ: str
-    """name of chemical mechanism given to CMAQ (should be one of: cb05e51_ae6_aq,
-    cb05mp51_ae6_aq, cb05tucl_ae6_aq, cb05tump_ae6_aq,
-    racm2_ae6_aq, saprc07tb_ae6_aq, saprc07tc_ae6_aq,
-    saprc07tic_ae6i_aq, saprc07tic_ae6i_aqkmti)"""
+    mechCMAQ: str = field()
+    """name of chemical mechanism given to CMAQ """
+    # TODO: The list of valid values for mechCMAQ is outdated, "ch4only" was not
+    #  in the list in the comment. Get a valid list or delete check.
+    @mechCMAQ.validator
+    def check(self, attribute, value) :
+        chemical_mechanisms = ["cb05e51_ae6_aq",
+                               "cb05mp51_ae6_aq", "cb05tucl_ae6_aq", "cb05tump_ae6_aq",
+                               "racm2_ae6_aq", "saprc07tb_ae6_aq", "saprc07tc_ae6_aq",
+                               "saprc07tic_ae6i_aq", "saprc07tic_ae6i_aqkmti", "CH4only"]
+        if value not in chemical_mechanisms :
+            raise ValueError(
+                f"Configuration value for {attribute.name} must be one of {chemical_mechanisms}"
+            )
+
     prepareICandBC: bool = field(converter=boolean_converter)
     """prepare the initial and boundary conditions from global CAMS output"""
     prepareRunScripts: bool = field(converter=boolean_converter)
@@ -70,17 +80,29 @@ class CMAQConfig :
     and boundary conditions from global MOZART output"""
     forceUpdateRunScripts: bool = field(converter=boolean_converter)
     """MCIP option: force an update to the run scripts"""
-    scenarioTag: list[str]
+    scenarioTag: list[str] = field()
     """MCIP option: scenario tag. 16-character maximum"""
+
+    @scenarioTag.validator
+    def check(self, attribute, value) :
+        if len(value[0]) > 16 :
+            raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
+
     mapProjName: list[str]
-    """MCIP option: Map projection name. 16-character maximum"""
-    gridName: list[str]
+    """MCIP option: Map projection name. """
+    gridName: list[str] = field()
     """MCIP option: Grid name. 16-character maximum"""
+
+    @gridName.validator
+    def check(self, attribute, value) :
+        if len(value[0]) > 16 :
+            raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
+
     doCompress: str
     """compress the output from netCDF3 to netCDF4 during the CMAQ run"""
     compressScript: str
     """script to find and compress netCDF3 to netCDF4"""
-    scripts: dict[str, dict[str, str]]
+    scripts: dict[str, dict[str, str]] = field()
     """This is a dictionary with paths to each of the run-scripts. Elements of 
     the dictionary should themselves be dictionaries, with the key 'path' and 
     the value being the path to that file. The keys of the 'scripts' 
@@ -90,6 +112,16 @@ class CMAQConfig :
     iconRun - ICON run script
     cctmRun - CCTM run script
     cmaqRun - main CMAQ run script"""
+
+    @scripts.validator
+    def check(self, attribute, value) :
+        expected_keys = ["mcipRun", "bconRun", "iconRun", "cctmRun", "cmaqRun"]
+        if sorted(list(value.keys())) != sorted(expected_keys):
+            raise ValueError(f"{attribute.name} must have the keys {expected_keys}")
+        for key in value:
+            if 'path' not in value[key]:
+                raise ValueError(f"{key} in configuration value {attribute.name} must have the key 'path'")
+
     cctmExec: str
     # TODO: Add description for cctmExec?
     CAMSToCmaqBiasCorrect: float
