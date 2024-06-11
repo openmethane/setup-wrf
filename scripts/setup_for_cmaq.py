@@ -30,9 +30,7 @@ def main() :
     setup_cmaq = load_cmaq_config("CMAQ.config.json")
 
     # define date range
-    start_date = process_date_string(setup_cmaq.startDate)
-    end_date = process_date_string(setup_cmaq.endDate)
-    ndates = (end_date - start_date).days + 1
+    ndates = (setup_cmaq.end_date - setup_cmaq.start_date).days + 1
     dates = [setup_cmaq.startDate + datetime.timedelta(days=d) for d in range(ndates)]
 
     # read in the template run-scripts
