@@ -207,7 +207,7 @@ def parse_config(input_str: str) -> dict[str, str | bool | int] :
         sys.exit()
 
 
-def add_environment_variables(config: dict[str, str | bool | int], environmental_variables: dict[str, str]) -> dict[
+def add_environment_variables(config: dict[str, str | bool | int], environment_variables: dict[str, str]) -> dict[
     str, str | bool | int] :
     """
     Add environment variables to the configuration that may be needed for substitutions.
