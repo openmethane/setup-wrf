@@ -4,7 +4,7 @@ from setup_runs.config_read_functions import boolean_converter, process_date_str
 
 
 def boolean_tuple(x) :
-    return (boolean_converter(x))
+    return (boolean_converter(x),)
 
 
 @define
@@ -87,6 +87,8 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
+        if not isinstance(value, list):
+            raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     mapProjName: list[str]
     """MCIP option: Map projection name. """
@@ -97,6 +99,8 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
+        if not isinstance(value, list):
+            raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     doCompress: str
     """compress the output from netCDF3 to netCDF4 during the CMAQ run"""
@@ -129,8 +133,16 @@ class CMAQConfig :
     # TODO: Add description for CAMSToCmaqBiasCorrect?
 
 
-def load_cmaq_config(filepath) :
+def load_json(filepath):
     with open(filepath) as f :
         config = json.load(f)
+    return config
 
+def create_cmaq_config_object(config):
     return CMAQConfig(**config)
+
+def load_cmaq_config(filepath) :
+
+    config = load_json(filepath)
+
+    return create_cmaq_config_object(config)

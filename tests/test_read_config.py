@@ -4,6 +4,7 @@ from pathlib import Path
 from setup_runs.config_read_functions import read_config_file, parse_config, add_environment_variables, \
     substitute_variables, boolean_converter, process_date_string
 from setup_runs.wrf.read_config_wrf import load_wrf_config
+from setup_runs.cmaq.read_config_cmaq import load_json, create_cmaq_config_object
 from attrs import asdict
 
 
@@ -16,9 +17,16 @@ def root_dir() :
 def config_path(root_dir) :
     return os.path.join(root_dir, "config/wrf/config.nci.json")
 
+
 @pytest.fixture
-def config_cmaq_docker_path(root_dir):
+def config_cmaq_docker_path(root_dir) :
     return os.path.join(root_dir, "config/cmaq/config.docker.json")
+
+
+@pytest.fixture
+def config_cmaq_docker_dict(config_cmaq_docker_path) :
+    return load_json(config_cmaq_docker_path)
+
 
 @pytest.fixture
 def input_str(config_path) :
@@ -90,7 +98,7 @@ def test_004_parse_config_error_cases(input_str, expected, capsys) :
 def test_005_add_environment_variable() :
     config = {"some" : "value",
               "more" : "values",
-              "environment_variables_for_substitutions" : "HOME" #",USER,PROJECT,TMPDIR",
+              "environment_variables_for_substitutions" : "HOME"  # ",USER,PROJECT,TMPDIR",
               }
 
     environmental_variables = {
@@ -101,7 +109,7 @@ def test_005_add_environment_variable() :
 
     expected = {"some" : "value",
                 "more" : "values",
-                "environment_variables_for_substitutions" : "HOME", #,USER,PROJECT,TMPDIR",
+                "environment_variables_for_substitutions" : "HOME",  # ,USER,PROJECT,TMPDIR",
                 # 'USER' : 'test_user',
                 'HOME' : '/Users/test_user',
                 }
@@ -219,11 +227,83 @@ def test_012_config_object(input_str, config_path) :
     config = substitute_variables(config)
 
     # remove environment variables that were previously added
-    for env_var in config["environment_variables_for_substitutions"].split(','):
-        if env_var in config.keys():
+    for env_var in config["environment_variables_for_substitutions"].split(',') :
+        if env_var in config.keys() :
             config.pop(env_var)
 
     # load config object (performs all of the above steps)
     wrf_config = load_wrf_config(config_path)
 
     assert config == asdict(wrf_config)
+
+
+@pytest.fixture
+def valid_cmaq_config() :
+    return {'CMAQdir' : '/opt/cmaq/CMAQv5.0.2_notpollen/',
+            'MCIPdir' : '/opt/cmaq/CMAQv5.0.2_notpollen/scripts/mcip/src',
+            'templateDir' : '/opt/project/templateRunScripts', 'metDir' : '/opt/project/data/mcip/',
+            'ctmDir' : '/opt/project/data/cmaq/', 'wrfDir' : '/opt/project/data/runs/aust-test',
+            'geoDir' : '/opt/project/templates/aust-test/',
+            'inputCAMSFile' : '/opt/project/data/inputs/cams_eac4_methane.nc',
+            'sufadj' : 'output_newMet', 'domains' : ['d01'], 'run' : 'openmethane',
+            'startDate' : '2022-07-01 00:00:00 UTC',
+            'endDate' : '2022-07-01 00:00:00 UTC', 'nhoursPerRun' : 24, 'printFreqHours' : 1,
+            'mech' : 'CH4only',
+            'mechCMAQ' : 'CH4only', 'prepareICandBC' : 'True', 'prepareRunScripts' : 'True',
+            'add_qsnow' : 'False',
+            'forceUpdateMcip' : 'False', 'forceUpdateICandBC' : 'True', 'forceUpdateRunScripts' : 'True',
+            'scenarioTag' : ['220701_aust-test'], 'mapProjName' : ['LamCon_34S_150E'],
+            'gridName' : ['openmethane'],
+            'doCompress' : 'True', 'compressScript' : '/opt/project/nccopy_compress_output.sh',
+            'scripts' : {'mcipRun' : {'path' : '/opt/project/templateRunScripts/run.mcip'},
+                         'bconRun' : {'path' : '/opt/project/templateRunScripts/run.bcon'},
+                         'iconRun' : {'path' : '/opt/project/templateRunScripts/run.icon'},
+                         'cctmRun' : {'path' : '/opt/project/templateRunScripts/run.cctm'},
+                         'cmaqRun' : {'path' : '/opt/project/templateRunScripts/runCMAQ.sh'}},
+            'cctmExec' : 'ADJOINT_FWD',
+            'CAMSToCmaqBiasCorrect' : 0.06700000000000017}
+
+
+@pytest.mark.parametrize("value, expected_exception, test_id", [
+    # Valid config tests
+    ("cb05e51_ae6_aq", None, "happy_cb05e51"),
+    ("cb05mp51_ae6_aq", None, "happy_cb05mp51"),
+    ("saprc07tic_ae6i_aqkmti", None, "happy_saprc07tic"),
+    ("CH4only", None, "happy_CH4only"),
+    # Error cases
+    ("cb06e51_ae6_aqooo", ValueError, "error_typo_in_mechanism"),
+    ("", ValueError, "error_empty_string"),
+    ("unknown_mechanism", ValueError, "error_unknown_mechanism"),
+    (123, ValueError, "error_non_string_value"),
+])
+def test_013_check_mechCMAQ_validator(value, expected_exception, test_id, valid_cmaq_config) :
+    cmaq_config = valid_cmaq_config.copy()
+
+    cmaq_config['mechCMAQ'] = value
+
+    if expected_exception :
+        with pytest.raises(expected_exception) as exc_info :
+            create_cmaq_config_object(cmaq_config)
+        assert "Configuration value for mechCMAQ must be one of" in str(exc_info.value), f"Test Failed: {test_id}"
+    else :
+        try :
+            create_cmaq_config_object(cmaq_config)
+        except ValueError as e :
+            pytest.fail(f"Unexpected ValueError raised for {test_id}: {e}")
+
+
+@pytest.mark.parametrize("attribute, value, error_string",
+                         [
+                             ("scenarioTag", ["more_than_16_characters_long"], "16-character maximum length for configuration value "),
+                             ("scenarioTag", "not_a_list", "must be a list"),
+                             ("gridName", ["more_than_16_characters_long"], "16-character maximum length for configuration value "),
+                             ("gridName", "not_a_list", "must be a list"),
+                         ])
+def test_0014_check_max_16_characters_validators(attribute, value, error_string, valid_cmaq_config) :
+    cmaq_config = valid_cmaq_config.copy()
+
+    cmaq_config[attribute] = value
+
+    with pytest.raises(ValueError) as exc_info :
+        create_cmaq_config_object(cmaq_config)
+    assert error_string in str(exc_info.value)
