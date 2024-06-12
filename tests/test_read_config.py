@@ -6,6 +6,7 @@ from setup_runs.config_read_functions import read_config_file, parse_config, add
 from setup_runs.wrf.read_config_wrf import load_wrf_config
 from setup_runs.cmaq.read_config_cmaq import load_json, create_cmaq_config_object
 from attrs import asdict
+import json
 
 
 @pytest.fixture
@@ -294,12 +295,14 @@ def test_013_check_mechCMAQ_validator(value, expected_exception, test_id, valid_
 
 @pytest.mark.parametrize("attribute, value, error_string",
                          [
-                             ("scenarioTag", ["more_than_16_characters_long"], "16-character maximum length for configuration value "),
+                             ("scenarioTag", ["more_than_16_characters_long"],
+                              "16-character maximum length for configuration value "),
                              ("scenarioTag", "not_a_list", "must be a list"),
-                             ("gridName", ["more_than_16_characters_long"], "16-character maximum length for configuration value "),
+                             ("gridName", ["more_than_16_characters_long"],
+                              "16-character maximum length for configuration value "),
                              ("gridName", "not_a_list", "must be a list"),
                          ])
-def test_0014_check_max_16_characters_validators(attribute, value, error_string, valid_cmaq_config) :
+def test_014_check_max_16_characters_validators(attribute, value, error_string, valid_cmaq_config) :
     cmaq_config = valid_cmaq_config.copy()
 
     cmaq_config[attribute] = value
@@ -307,3 +310,63 @@ def test_0014_check_max_16_characters_validators(attribute, value, error_string,
     with pytest.raises(ValueError) as exc_info :
         create_cmaq_config_object(cmaq_config)
     assert error_string in str(exc_info.value)
+
+
+# Parametrized test for happy path scenarios
+@pytest.mark.parametrize("input_value, test_id", [
+    ({"mcipRun" : {"path" : "some/path"}, "bconRun" : {"path" : "some/path"}, "iconRun" : {"path" : "some/path"},
+      "cctmRun" : {"path" : "some/path"}, "cmaqRun" : {"path" : "some/path"}}, "all_keys_present"),
+    ({"mcipRun" : {"path" : "unique/path1"}, "bconRun" : {"path" : "unique/path2"},
+      "iconRun" : {"path" : "unique/path3"}, "cctmRun" : {"path" : "unique/path4"},
+      "cmaqRun" : {"path" : "unique/path5"}}, "unique_paths_for_all"),
+], ids=["all_keys_present", "unique_paths_for_all"])
+def test_015_check_happy_path(input_value, test_id, valid_cmaq_config) :
+    cmaq_config = valid_cmaq_config.copy()
+
+    cmaq_config["scripts"] = input_value
+
+    try :
+        create_cmaq_config_object(cmaq_config)
+    except ValueError :
+        pytest.fail("Unexpected ValueError raised.")
+
+
+@pytest.mark.parametrize("input_value, expected_exception_message, test_id", [
+    ({"mcipRun" : {}, "bconRun" : {}, "iconRun" : {}, "cctmRun" : {}, "cmaqRun" : {}},
+     "mcipRun in configuration value scripts must have the key 'path'", "missing_path_in_all"),
+    ({"mcipRun" : {"path" : "some/path"}, "bconRun" : {"path" : "some/path"}, "iconRun" : {},
+      "cctmRun" : {"path" : "some/path"}, "cmaqRun" : {"path" : "some/path"}},
+     "iconRun in configuration value scripts must have the key 'path'", "missing_path_in_one"),
+    ({"mcipRun" : {"path" : "some/path"}},
+     "scripts must have the keys ['mcipRun', 'bconRun', 'iconRun', 'cctmRun', 'cmaqRun']", "missing_keys"),
+    ({}, "scripts must have the keys ['mcipRun', 'bconRun', 'iconRun', 'cctmRun', 'cmaqRun']", "empty_dict"),
+], ids=["missing_path_in_all", "missing_path_in_one", "missing_keys", "empty_dict"])
+def test_016_check_error_cases(input_value, expected_exception_message, test_id, valid_cmaq_config) :
+    cmaq_config = valid_cmaq_config.copy()
+
+    cmaq_config["scripts"] = input_value
+
+    with pytest.raises(ValueError) as exc_info :
+        create_cmaq_config_object(cmaq_config)
+    assert expected_exception_message in str(exc_info.value), f"Test ID: {test_id}"
+
+
+@pytest.mark.parametrize(
+    "test_input, expected",
+    [
+        pytest.param("test_json_1.json", {'key': 'value'}, id="simple_content"),
+        pytest.param("test_json_2.json", {
+            'more_complex': 'content',
+            'int': 1,
+            'nested_dict' : {'nested': 'dict', 'bool' : "True"}
+        }, id="more_complex_content"),])
+def test_017_read_cmaq_json_config_file_happy_path(test_input, expected, tmp_path) :
+    # Create a temporary directory and write the test data to a file
+    test_file = tmp_path / test_input
+    with open(test_file, "w") as f:
+        json.dump(expected, f)
+    expected_path = str(test_file)
+
+    result = load_json(expected_path)
+
+    assert result == expected, f"Failed to load or match JSON content for {test_input}"
