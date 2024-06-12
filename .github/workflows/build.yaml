@@ -75,6 +75,11 @@ jobs:
             -s 2022-07-01 \
             -e 2022-07-01 \
             data/inputs/cams_eac4_methane.nc
+      - name: Run pytest
+        run: docker run --rm \
+            -v ${{ github.workspace }}:/opt/project \
+            setup_wrf \
+            python pytest -v tests
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data
