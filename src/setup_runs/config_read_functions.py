@@ -6,10 +6,9 @@ import datetime
 import pytz
 
 
-
 def boolean_converter(value: str,
                       truevals: list[str] = ('True', 'true', '1', 't', 'y', 'yes'),
-                      falsevals: list[str] = ('False' ,'false', '0', 'f', 'n', 'no')) :
+                      falsevals: list[str] = ('False', 'false', '0', 'f', 'n', 'no')) :
     """
     Convert a string value to a boolean based on predefined true and false values.
 

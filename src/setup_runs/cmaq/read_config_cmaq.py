@@ -46,7 +46,7 @@ class CMAQConfig :
 
     @endDate.validator
     def check(self, attribute, value) :
-        if value < self.startDate:
+        if value < self.startDate :
             raise ValueError(
                 "End date must be after start date."
             )
@@ -61,6 +61,7 @@ class CMAQConfig :
     """name of chemical mechanism to appear in filenames"""
     mechCMAQ: str = field()
     """name of chemical mechanism given to CMAQ """
+
     # TODO: The list of valid values for mechCMAQ is outdated, "ch4only" was not
     #  in the list in the comment. Get a valid list or delete check.
     @mechCMAQ.validator
@@ -95,7 +96,7 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list):
+        if not isinstance(value, list) :
             raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     mapProjName: list[str]
@@ -107,7 +108,7 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list):
+        if not isinstance(value, list) :
             raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     doCompress: str
@@ -128,10 +129,10 @@ class CMAQConfig :
     @scripts.validator
     def check(self, attribute, value) :
         expected_keys = ["mcipRun", "bconRun", "iconRun", "cctmRun", "cmaqRun"]
-        if sorted(list(value.keys())) != sorted(expected_keys):
+        if sorted(list(value.keys())) != sorted(expected_keys) :
             raise ValueError(f"{attribute.name} must have the keys {expected_keys}")
-        for key in value:
-            if 'path' not in value[key]:
+        for key in value :
+            if 'path' not in value[key] :
                 raise ValueError(f"{key} in configuration value {attribute.name} must have the key 'path'")
 
     cctmExec: str
@@ -141,16 +142,56 @@ class CMAQConfig :
     # TODO: Add description for CAMSToCmaqBiasCorrect?
 
 
-def load_json(filepath):
+def load_json(filepath: str) -> dict[str, str | int | float] :
+    """
+    Loads and parses JSON data from a file.
+
+    Parameters
+    ----------
+    filepath
+        The path to the JSON file to load.
+
+    Returns
+    -------
+        The parsed JSON data.
+    """
+
     with open(filepath) as f :
         config = json.load(f)
     return config
 
-def create_cmaq_config_object(config):
+
+def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfig :
+    """
+    Creates a CMAQConfig object from the provided configuration.
+
+    Parameters
+    ----------
+    config
+        The configuration data to initialize the CMAQConfig object.
+
+    Returns
+    -------
+    CMAQConfig
+        An instance of CMAQConfig initialized with the provided configuration.
+    """
     return CMAQConfig(**config)
 
-def load_cmaq_config(filepath) :
 
+def load_cmaq_config(filepath: str) -> CMAQConfig :
+    """
+    Load a CMAQ configuration from a JSON file and create a CMAQConfig object.
+
+    Parameters
+    ----------
+    filepath
+        The path to the JSON file containing the CMAQ configuration.
+
+    Returns
+    -------
+    CMAQConfig
+        An instance of CMAQConfig initialized with the loaded configuration.
+    """
     config = load_json(filepath)
 
     return create_cmaq_config_object(config)
