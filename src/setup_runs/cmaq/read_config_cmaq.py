@@ -95,8 +95,8 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list) :
-            raise ValueError(f"Configuration value for {attribute.name} must be a list")
+        # if not isinstance(value, list) :
+        #     raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     mapProjName: list[str]
     """MCIP option: Map projection name. """
@@ -107,8 +107,8 @@ class CMAQConfig :
     def check(self, attribute, value) :
         if len(value[0]) > 16 :
             raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list) :
-            raise ValueError(f"Configuration value for {attribute.name} must be a list")
+        # if not isinstance(value, list) :
+        #     raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     doCompress: str
     """compress the output from netCDF3 to netCDF4 during the CMAQ run"""
