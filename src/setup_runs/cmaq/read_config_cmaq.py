@@ -83,7 +83,7 @@ class CMAQConfig :
     """MCIP option: add the 'QSNOW' variable to the WRFOUT files before running MCIP"""
     forceUpdateMcip: bool = field(converter=boolean_converter)
     """MCIP option: force the update of the MCIP files"""
-    forceUpdateICandBC: tuple[bool] = field(converter=boolean_tuple)
+    forceUpdateICandBC: tuple[bool] = field(converter=boolean_converter) #= field(converter=boolean_tuple)
     """MCIP option: force an update of the initial
     and boundary conditions from global MOZART output"""
     forceUpdateRunScripts: bool = field(converter=boolean_converter)
