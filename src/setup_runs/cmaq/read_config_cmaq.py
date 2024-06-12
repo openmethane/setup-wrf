@@ -62,7 +62,7 @@ class CMAQConfig :
     mechCMAQ: str = field()
     """name of chemical mechanism given to CMAQ """
 
-    # TODO: The list of valid values for mechCMAQ is outdated, "ch4only" was not
+    # TODO: The list of valid values for mechCMAQ is outdated, "CH4only" was not
     #  in the list in the comment. Get a valid list or delete check.
     @mechCMAQ.validator
     def check(self, attribute, value) :
@@ -83,7 +83,6 @@ class CMAQConfig :
     """MCIP option: add the 'QSNOW' variable to the WRFOUT files before running MCIP"""
     forceUpdateMcip: bool = field(converter=boolean_converter)
     """MCIP option: force the update of the MCIP files"""
-    # TODO maybe needs a converter to tuple
     forceUpdateICandBC: tuple[bool] = field(converter=boolean_tuple)
     """MCIP option: force an update of the initial
     and boundary conditions from global MOZART output"""
