@@ -3,6 +3,8 @@ import sys
 import json
 import re
 import datetime
+from typing import Mapping
+
 import pytz
 from attrs import define, field
 
@@ -208,7 +210,7 @@ def parse_config(input_str: str) -> dict[str, str | bool | int] :
 
 
 def add_environment_variables(config: dict[str, str | bool | int],
-                              environment_variables: dict[str, str]) -> dict[str, str | bool | int] :
+                              environment_variables: Mapping[str, str]) -> dict[str, str | bool | int] :
     """
     Add environment variables to the configuration that may be needed for substitutions.
 
@@ -319,7 +321,7 @@ def load_wrf_config(filename: str) -> WRFConfig :
     config = parse_config(input_str)
 
     # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
-    config = add_environment_variables(config=config, environmental_variables=os.environ)
+    config = add_environment_variables(config=config, environment_variables=os.environ)
 
     # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
     config = substitute_variables(config)

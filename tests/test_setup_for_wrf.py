@@ -90,7 +90,7 @@ def test_005_add_environment_variable() :
               "environment_variables_for_substitutions" : "HOME" #",USER,PROJECT,TMPDIR",
               }
 
-    environmental_variables = {
+    environment_variables = {
         "some" : "value",
         'USER' : 'test_user',
         'HOME' : '/Users/test_user',
@@ -103,7 +103,7 @@ def test_005_add_environment_variable() :
                 'HOME' : '/Users/test_user',
                 }
 
-    assert add_environment_variables(environmental_variables=environmental_variables, config=config) == expected
+    assert add_environment_variables(environment_variables=environment_variables, config=config) == expected
 
 
 def test_007_substitute_variables() :
@@ -210,7 +210,7 @@ def test_012_config_object(input_str, config_path) :
         config[value_to_boolean] = boolean_converter(config[value_to_boolean])
 
     # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
-    config = add_environment_variables(config=config, environmental_variables=os.environ)
+    config = add_environment_variables(config=config, environment_variables=os.environ)
 
     # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
     config = substitute_variables(config)
