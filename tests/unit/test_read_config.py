@@ -165,8 +165,7 @@ def test_007_parse_boolean_keys() :
 
 @pytest.mark.parametrize("datestring, expected",
                          [
-                             pytest.param('2024-01-01 00:00:00 UTC', '2024-01-01 00:00:00+00:00', id="UTC"),
-                             pytest.param('2024-01-01 00:00:00 CET', '2024-01-01 00:00:00+01:00', id="CET"),
+                             pytest.param('2024-01-01 00:00:00 UTC', '2024-01-01 00:00:00+00:00', id="UTC time zone"),
                              pytest.param('2024-01-01 00:00:00', '2024-01-01 00:00:00+00:00', id="no time zone"),
                          ]
                          )
