@@ -43,6 +43,14 @@ class CMAQConfig :
     endDate: str = field(converter=process_date_string)
     """this is the START of the LAST day, use the format 
     2022-07-01 00:00:00 UTC (time zone optional)"""
+
+    @endDate.validator
+    def check(self, attribute, value) :
+        if value < self.startDate:
+            raise ValueError(
+                "End date must be after start date."
+            )
+
     # TODO: Check if int is the right type. Perhaps time units between full hours are supported.
     nhoursPerRun: int
     """number of hours to run at a time (24 means run a whole day at once)"""

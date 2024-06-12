@@ -20,16 +20,6 @@ def config_path(root_dir) :
 
 
 @pytest.fixture
-def config_cmaq_docker_path(root_dir) :
-    return os.path.join(root_dir, "config/cmaq/config.docker.json")
-
-
-@pytest.fixture
-def config_cmaq_docker_dict(config_cmaq_docker_path) :
-    return load_json(config_cmaq_docker_path)
-
-
-@pytest.fixture
 def input_str(config_path) :
     return read_config_file(config_path)
 
@@ -58,9 +48,9 @@ def test_001_read_config_file_happy_path(temp_config_file, expected_content) :
 
 
 def test_002_read_config_file_error_cases() :
-    config_path = "path/to/non/existant/config.json"
+    config_path = "path/to/non/existent/config.json"
     expected_exception = AssertionError
-    expected_message = "No configuration file was found at path/to/non/existant/config.json"
+    expected_message = "No configuration file was found at path/to/non/existent/config.json"
     with pytest.raises(expected_exception) as exc_info :
         read_config_file(config_path)
     assert expected_message == str(exc_info.value)
@@ -81,16 +71,16 @@ def test_003_parse_config_happy_path(input_str, expected) :
     assert result == expected, "The parsed JSON does not match the expected output."
 
 
-@pytest.mark.parametrize("input_str, expected",
+@pytest.mark.parametrize("input_string, expected",
                          [
-                             pytest.param('{"missing": "trailing comma"', None, id="error_missing_trailing_comma"),
-                             pytest.param('{"unquoted_key": value}', None, id="error_unquoted_key"),
+                             pytest.param('{"missing": "bracket"', None, id="error_missing_bracket"),
+                             pytest.param('{unquoted_key: "value"}', None, id="error_unquoted_key"),
                              pytest.param('not a json', None, id="error_not_json"),
                          ]
                          )
-def test_004_parse_config_error_cases(input_str, expected, capsys) :
+def test_004_parse_config_error_cases(input_string, expected, capsys) :
     with pytest.raises(SystemExit) :
-        parse_config(input_str)
+        parse_config(input_string)
 
     captured = capsys.readouterr()
     assert "Problem parsing in configuration file" in captured.out
@@ -99,7 +89,7 @@ def test_004_parse_config_error_cases(input_str, expected, capsys) :
 def test_005_add_environment_variable() :
     config = {"some" : "value",
               "more" : "values",
-              "environment_variables_for_substitutions" : "HOME"  # ",USER,PROJECT,TMPDIR",
+              "environment_variables_for_substitutions" : "HOME"
               }
 
     environmental_variables = {
@@ -110,15 +100,14 @@ def test_005_add_environment_variable() :
 
     expected = {"some" : "value",
                 "more" : "values",
-                "environment_variables_for_substitutions" : "HOME",  # ,USER,PROJECT,TMPDIR",
-                # 'USER' : 'test_user',
+                "environment_variables_for_substitutions" : "HOME",
                 'HOME' : '/Users/test_user',
                 }
 
     assert add_environment_variables(environmental_variables=environmental_variables, config=config) == expected
 
 
-def test_007_substitute_variables() :
+def test_006_substitute_variables() :
     config = {
         'level_zero' : 'level_zero_path',
         'level_one' : '${level_zero}/test_path',
@@ -140,7 +129,7 @@ def test_007_substitute_variables() :
     assert out == expected
 
 
-def test_008_parse_boolean_keys() :
+def test_007_parse_boolean_keys() :
     config = {"test_key_1" : "t",
               "test_key_2" : "1",
               "test_key_3" : "true",
@@ -151,6 +140,8 @@ def test_008_parse_boolean_keys() :
               "test_key_8" : "f",
               "test_key_9" : "n",
               "test_key_10" : "no",
+              "test_key_11" : "True",
+              "test_key_12" : "False",
               }
 
     expected = {"test_key_1" : True,
@@ -163,22 +154,13 @@ def test_008_parse_boolean_keys() :
                 "test_key_8" : False,
                 "test_key_9" : False,
                 "test_key_10" : False,
+                "test_key_11" : True,
+                "test_key_12" : False,
                 }
 
     out = {k : boolean_converter(v) for k, v in config.items()}
 
     assert out == expected
-
-
-def test_009_requisite_keys_exist(input_str) :
-    config = parse_config(input_str)
-
-    requisite_keys = ["run_name", "start_date", "end_date"]
-
-    for requisite_key in requisite_keys :
-        assert (
-                requisite_key in config.keys()
-        ), f"Key {requisite_key} was not in the available configuration keys"
 
 
 @pytest.mark.parametrize("datestring, expected",
@@ -188,27 +170,13 @@ def test_009_requisite_keys_exist(input_str) :
                              pytest.param('2024-01-01 00:00:00', '2024-01-01 00:00:00+00:00', id="no time zone"),
                          ]
                          )
-def test_010_process_date_string(datestring, expected) :
+def test_008_process_date_string(datestring, expected) :
     out = process_date_string(datestring)
 
     assert str(out) == expected
 
 
-def test_011_dates_in_right_order(input_str) :
-    config = parse_config(input_str)
-
-    try :
-        start_date = process_date_string(config['start_date'])
-        end_date = process_date_string(config['end_date'])
-
-        ## check that the dates are in the right order
-        assert end_date > start_date, "End date should be after start date"
-    except Exception as e :
-        print("Problem parsing start/end times")
-        raise e
-
-
-def test_012_config_object(input_str, config_path) :
+def test_009_config_object(input_str, config_path) :
     config = parse_config(input_str)
 
     for value_to_boolean in ["restart",
@@ -239,7 +207,7 @@ def test_012_config_object(input_str, config_path) :
 
 
 @pytest.fixture
-def valid_cmaq_config() :
+def cmaq_config_dict() :
     return {'CMAQdir' : '/opt/cmaq/CMAQv5.0.2_notpollen/',
             'MCIPdir' : '/opt/cmaq/CMAQv5.0.2_notpollen/scripts/mcip/src',
             'templateDir' : '/opt/project/templateRunScripts', 'metDir' : '/opt/project/data/mcip/',
@@ -265,50 +233,61 @@ def valid_cmaq_config() :
             'CAMSToCmaqBiasCorrect' : 0.06700000000000017}
 
 
+# Test the validation for CMAQ object creation
 @pytest.mark.parametrize("value, expected_exception, test_id", [
     # Valid config tests
-    ("cb05e51_ae6_aq", None, "happy_cb05e51"),
-    ("cb05mp51_ae6_aq", None, "happy_cb05mp51"),
-    ("saprc07tic_ae6i_aqkmti", None, "happy_saprc07tic"),
-    ("CH4only", None, "happy_CH4only"),
+    ("cb05e51_ae6_aq", None, "valid_value_cb05e51"),
+    ("cb05mp51_ae6_aq", None, "valid_value_cb05mp51"),
+    ("saprc07tic_ae6i_aqkmti", None, "valid_value_saprc07tic"),
+    ("CH4only", None, "valid_value_CH4only"),
     # Error cases
-    ("cb06e51_ae6_aqooo", ValueError, "error_typo_in_mechanism"),
+    ("cb06e51_ae6_aqooo", ValueError, "error_typo_in_value"),
     ("", ValueError, "error_empty_string"),
-    ("unknown_mechanism", ValueError, "error_unknown_mechanism"),
+    ("unknown_mechanism", ValueError, "error_unknown_value"),
     (123, ValueError, "error_non_string_value"),
-])
-def test_013_check_mechCMAQ_validator(value, expected_exception, test_id, valid_cmaq_config) :
-    cmaq_config = valid_cmaq_config.copy()
-
-    cmaq_config['mechCMAQ'] = value
+], ids=lambda test_id : test_id)
+def test_010_mechCMAQ_validator(value, expected_exception, test_id, cmaq_config_dict) :
+    cmaq_config_dict['mechCMAQ'] = value
 
     if expected_exception :
         with pytest.raises(expected_exception) as exc_info :
-            create_cmaq_config_object(cmaq_config)
+            create_cmaq_config_object(cmaq_config_dict)
         assert "Configuration value for mechCMAQ must be one of" in str(exc_info.value), f"Test Failed: {test_id}"
     else :
         try :
-            create_cmaq_config_object(cmaq_config)
+            create_cmaq_config_object(cmaq_config_dict)
         except ValueError as e :
             pytest.fail(f"Unexpected ValueError raised for {test_id}: {e}")
 
 
 @pytest.mark.parametrize("attribute, value, error_string",
                          [
-                             ("scenarioTag", ["more_than_16_characters_long"],
-                              "16-character maximum length for configuration value "),
-                             ("scenarioTag", "not_a_list", "must be a list"),
-                             ("gridName", ["more_than_16_characters_long"],
-                              "16-character maximum length for configuration value "),
-                             ("gridName", "not_a_list", "must be a list"),
+                             pytest.param(
+                                 "scenarioTag",
+                                 ["more_than_16_characters_long"],
+                                 "16-character maximum length for configuration value",
+                                 id='scenarioTag_more_than_16_characters_long'),
+                             pytest.param(
+                                 "scenarioTag",
+                                 "not_a_list",
+                                 "must be a list",
+                                 id='scenarioTag_not_a_list'),
+                             pytest.param(
+                                 "gridName",
+                                 ["more_than_16_characters_long"],
+                                 "16-character maximum length for configuration value ",
+                                 id='gridName_more_than_16_characters_long'),
+                             pytest.param(
+                                 "gridName",
+                                 "not_a_list",
+                                 "must be a list",
+                                 id='gridName_not_a_list'),
                          ])
-def test_014_check_max_16_characters_validators(attribute, value, error_string, valid_cmaq_config) :
-    cmaq_config = valid_cmaq_config.copy()
-
-    cmaq_config[attribute] = value
+def test_011_validators_more_than_16_characters(attribute, value, error_string, cmaq_config_dict) :
+    cmaq_config_dict[attribute] = value
 
     with pytest.raises(ValueError) as exc_info :
-        create_cmaq_config_object(cmaq_config)
+        create_cmaq_config_object(cmaq_config_dict)
     assert error_string in str(exc_info.value)
 
 
@@ -319,14 +298,12 @@ def test_014_check_max_16_characters_validators(attribute, value, error_string, 
     ({"mcipRun" : {"path" : "unique/path1"}, "bconRun" : {"path" : "unique/path2"},
       "iconRun" : {"path" : "unique/path3"}, "cctmRun" : {"path" : "unique/path4"},
       "cmaqRun" : {"path" : "unique/path5"}}, "unique_paths_for_all"),
-], ids=["all_keys_present", "unique_paths_for_all"])
-def test_015_check_happy_path(input_value, test_id, valid_cmaq_config) :
-    cmaq_config = valid_cmaq_config.copy()
-
-    cmaq_config["scripts"] = input_value
+], ids=lambda test_id : test_id)
+def test_012_scripts_validator(input_value, test_id, cmaq_config_dict) :
+    cmaq_config_dict["scripts"] = input_value
 
     try :
-        create_cmaq_config_object(cmaq_config)
+        create_cmaq_config_object(cmaq_config_dict)
     except ValueError :
         pytest.fail("Unexpected ValueError raised.")
 
@@ -340,33 +317,62 @@ def test_015_check_happy_path(input_value, test_id, valid_cmaq_config) :
     ({"mcipRun" : {"path" : "some/path"}},
      "scripts must have the keys ['mcipRun', 'bconRun', 'iconRun', 'cctmRun', 'cmaqRun']", "missing_keys"),
     ({}, "scripts must have the keys ['mcipRun', 'bconRun', 'iconRun', 'cctmRun', 'cmaqRun']", "empty_dict"),
-], ids=["missing_path_in_all", "missing_path_in_one", "missing_keys", "empty_dict"])
-def test_016_check_error_cases(input_value, expected_exception_message, test_id, valid_cmaq_config) :
-    cmaq_config = valid_cmaq_config.copy()
-
-    cmaq_config["scripts"] = input_value
+], ids=lambda test_id : test_id)
+def test_013_scripts_validator_error_cases(input_value, expected_exception_message, test_id, cmaq_config_dict) :
+    cmaq_config_dict["scripts"] = input_value
 
     with pytest.raises(ValueError) as exc_info :
-        create_cmaq_config_object(cmaq_config)
+        create_cmaq_config_object(cmaq_config_dict)
     assert expected_exception_message in str(exc_info.value), f"Test ID: {test_id}"
 
 
 @pytest.mark.parametrize(
     "test_input, expected",
     [
-        pytest.param("test_json_1.json", {'key': 'value'}, id="simple_content"),
+        pytest.param("test_json_1.json", {'key' : 'value'}, id="simple_content"),
         pytest.param("test_json_2.json", {
-            'more_complex': 'content',
-            'int': 1,
-            'nested_dict' : {'nested': 'dict', 'bool' : "True"}
-        }, id="more_complex_content"),])
-def test_017_read_cmaq_json_config_file_happy_path(test_input, expected, tmp_path) :
+            'more_complex' : 'content',
+            'int' : 1,
+            'nested_dict' : {'nested' : 'dict', 'bool' : "True"}
+        }, id="more_complex_content"), ])
+def test_014_read_cmaq_json_config(test_input, expected, tmp_path) :
     # Create a temporary directory and write the test data to a file
     test_file = tmp_path / test_input
-    with open(test_file, "w") as f:
+    with open(test_file, "w") as f :
         json.dump(expected, f)
     expected_path = str(test_file)
 
     result = load_json(expected_path)
 
     assert result == expected, f"Failed to load or match JSON content for {test_input}"
+
+
+@pytest.mark.parametrize("startDate, endDate, test_id", [
+    ('2022-07-01 00:00:00 UTC', '2022-07-01 00:00:00 UTC', "test_same_day"),
+    ('2022-07-01 00:00:00 UTC', '2022-07-02 00:00:00 UTC', "test_next_day"),
+    ('2022-07-01 00:00:00 UTC', '2023-07-01 00:00:00 UTC', "test_next_year"),
+], ids=lambda test_id : test_id)
+def test_015_validator_endDate_after_startDate(startDate, endDate, test_id, cmaq_config_dict) :
+    cmaq_config_dict["startDate"] = startDate
+    cmaq_config_dict["endDate"] = endDate
+
+    cmaq_config_obj = create_cmaq_config_object(cmaq_config_dict)
+
+    assert cmaq_config_obj.startDate
+
+    assert cmaq_config_obj.endDate
+
+
+# Error cases
+@pytest.mark.parametrize("startDate, endDate, test_id", [
+    ('2022-07-02 00:00:00 UTC', '2022-07-01 00:00:00 UTC', "test_error_previous_day"),
+    ('2022-08-01 00:00:00 UTC', '2022-07-02 00:00:00 UTC', "test_error_previous_month"),
+    ('2024-07-01 00:00:00 UTC', '2023-07-01 00:00:00 UTC', "test_error_previous_year"),
+], ids=lambda test_id : test_id)
+def test_016_validator_endDate_after_startDate_errors(startDate, endDate, test_id, cmaq_config_dict) :
+    cmaq_config_dict["startDate"] = startDate
+    cmaq_config_dict["endDate"] = endDate
+
+    with pytest.raises(ValueError) as exc_info :
+        create_cmaq_config_object(cmaq_config_dict)
+    assert str(exc_info.value) == "End date must be after start date.", f"{test_id} failed."
