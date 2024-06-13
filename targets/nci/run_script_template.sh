@@ -24,7 +24,7 @@ module load conda/analysis3
 ulimit -s unlimited
 cd ${RUN_DIR}
 
-python3 checkWrfoutInBackground.py &
+python3 checkWrfoutInBackground.py --verify-steps --watch > wrf-background.log 2>&1 &
 backgroundPID=$!
 
 echo running with $PBS_NCPUS mpi ranks

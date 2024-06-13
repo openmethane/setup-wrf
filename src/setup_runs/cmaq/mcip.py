@@ -112,7 +112,7 @@ def runMCIP(
             ##
             mcipDir = "{}/{}/{}".format(metDir, yyyymmdd_dashed, dom)
             ##
-            times = [date + datetime.timedelta(seconds=h * 60 * 60) for h in range(24)]
+            times = [date + datetime.timedelta(hours=h) for h in range(25)]
             WRFfiles = [
                 os.path.join(wrfDir, yyyymmddhh, to_wrf_filename(dom, time))
                 for time in times

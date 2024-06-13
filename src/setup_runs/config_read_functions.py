@@ -3,6 +3,8 @@ import sys
 import json
 import re
 import datetime
+from typing import Mapping
+
 import pytz
 
 
@@ -90,7 +92,7 @@ def parse_config(input_str: str) -> dict[str, str | bool | int]:
 
 
 def add_environment_variables(
-    config: dict[str, str | bool | int], environment_variables: dict[str, str]
+    config: dict[str, str | bool | int], environment_variables: Mapping[str, str]
 ) -> dict[str, str | bool | int]:
     """
     Add environment variables to the configuration that may be needed for substitutions.
