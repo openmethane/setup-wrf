@@ -21,8 +21,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 N_JOBS = 8
-LOGIN_URL = 'https://rda.ucar.edu/cgi-bin/login'
-DATASET_URL = 'https://data.rda.ucar.edu/ds083.3/'
+LOGIN_URL = "https://rda.ucar.edu/cgi-bin/login"
+DATASET_URL = "https://data.rda.ucar.edu/ds083.3/"
 
 
 def create_session() -> requests.Session:
@@ -37,16 +37,22 @@ def create_session() -> requests.Session:
     # Define the retry strategy
     retry_strategy = Retry(
         total=5,  # Maximum number of retries
-        status_forcelist=[408, 429, 500, 502, 503, 504],  # HTTP status codes to retry on
+        status_forcelist=[
+            408,
+            429,
+            500,
+            502,
+            503,
+            504,
+        ],  # HTTP status codes to retry on
     )
     # Create an HTTP adapter with the retry strategy and mount it to session
     adapter = HTTPAdapter(max_retries=retry_strategy)
 
     # Create a new session object
     session = requests.Session()
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
-
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
 
     return session
 
@@ -66,10 +72,10 @@ def authenticate(session: requests.Session, orcid: str, api_token: str):
             API token for the user
     """
 
-    values = {'orcid_id': orcid, 'api_token': api_token, 'action': 'tokenlogin'}
-    ret = session.post(LOGIN_URL,data=values)
+    values = {"orcid_id": orcid, "api_token": api_token, "action": "tokenlogin"}
+    ret = session.post(LOGIN_URL, data=values)
     if ret.status_code != 200:
-        print('Bad Authentication')
+        print("Bad Authentication")
         print(ret.text)
         raise RuntimeError("Invalid RDA credentials")
 
@@ -108,11 +114,8 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
 
 
 def download_gdas_fnl_data(
-        orcid: str,
-        api_token: str,
-        target_dir: str,
-        download_dts: list[datetime.datetime]
-    ) -> list[str]:
+    orcid: str, api_token: str, target_dir: str, download_dts: list[datetime.datetime]
+) -> list[str]:
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3
 
@@ -137,25 +140,27 @@ def download_gdas_fnl_data(
     Returns:
         List of downloaded files
     """
-    print('downloading FNL data')
+    print("downloading FNL data")
 
     # check that the target directory is indeed a directory
-    assert os.path.exists(target_dir) and os.path.isdir(target_dir), (
-            "Target directory {} not found...".format(target_dir))
+    assert os.path.exists(target_dir) and os.path.isdir(
+        target_dir
+    ), "Target directory {} not found...".format(target_dir)
 
     # Create a new session and authenticate
-    print('authenticate credentials')
+    print("authenticate credentials")
     session = create_session()
     authenticate(session, orcid, api_token)
 
-    FNLstartDate = pytz.UTC.localize(datetime.datetime(2015,7,8,0,0,0))
+    FNLstartDate = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
     file_list = []
     for time in download_dts:
-        assert (time.hour % 6) == 0 and time.minute == 0 and time.second == 0,\
-            "Analysis time should be staggered at 00Z, 06Z, 12Z, 18Z intervals"
+        assert (
+            (time.hour % 6) == 0 and time.minute == 0 and time.second == 0
+        ), "Analysis time should be staggered at 00Z, 06Z, 12Z, 18Z intervals"
         assert time > FNLstartDate, "Analysis times should not be before 2015-07-08"
-        file_path = time.strftime('%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2')
+        file_path = time.strftime("%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2")
         file_list.append(file_path)
 
     downloaded_files = list(
