@@ -3,12 +3,12 @@ import json
 from setup_runs.config_read_functions import boolean_converter, process_date_string
 
 
-def boolean_tuple(x) :
+def boolean_tuple(x):
     return (boolean_converter(x),)
 
 
 @define
-class CMAQConfig :
+class CMAQConfig:
     CMAQdir: str
     """ base directory for the CMAQ model """
     MCIPdir: str
@@ -45,11 +45,9 @@ class CMAQConfig :
     2022-07-01 00:00:00 UTC (time zone optional)"""
 
     @endDate.validator
-    def check(self, attribute, value) :
-        if value < self.startDate :
-            raise ValueError(
-                "End date must be after start date."
-            )
+    def check_endDate(self, attribute, value):
+        if value < self.startDate:
+            raise ValueError("End date must be after start date.")
 
     # TODO: Check if int is the right type. Perhaps time units between full hours are supported.
     nhoursPerRun: int
@@ -65,12 +63,20 @@ class CMAQConfig :
     # TODO: The list of valid values for mechCMAQ is outdated, "CH4only" was not
     #  in the list in the comment. Get a valid list or delete check.
     @mechCMAQ.validator
-    def check(self, attribute, value) :
-        chemical_mechanisms = ["cb05e51_ae6_aq",
-                               "cb05mp51_ae6_aq", "cb05tucl_ae6_aq", "cb05tump_ae6_aq",
-                               "racm2_ae6_aq", "saprc07tb_ae6_aq", "saprc07tc_ae6_aq",
-                               "saprc07tic_ae6i_aq", "saprc07tic_ae6i_aqkmti", "CH4only"]
-        if value not in chemical_mechanisms :
+    def check_mechCMAQ(self, attribute, value):
+        chemical_mechanisms = [
+            "cb05e51_ae6_aq",
+            "cb05mp51_ae6_aq",
+            "cb05tucl_ae6_aq",
+            "cb05tump_ae6_aq",
+            "racm2_ae6_aq",
+            "saprc07tb_ae6_aq",
+            "saprc07tc_ae6_aq",
+            "saprc07tic_ae6i_aq",
+            "saprc07tic_ae6i_aqkmti",
+            "CH4only",
+        ]
+        if value not in chemical_mechanisms:
             raise ValueError(
                 f"Configuration value for {attribute.name} must be one of {chemical_mechanisms}"
             )
@@ -92,10 +98,12 @@ class CMAQConfig :
     """MCIP option: scenario tag. 16-character maximum"""
 
     @scenarioTag.validator
-    def check(self, attribute, value) :
-        if len(value[0]) > 16 :
-            raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list) :
+    def check_scenarioTag(self, attribute, value):
+        if len(value[0]) > 16:
+            raise ValueError(
+                f"16-character maximum length for configuration value {attribute.name}"
+            )
+        if not isinstance(value, list):
             raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     mapProjName: list[str]
@@ -104,10 +112,12 @@ class CMAQConfig :
     """MCIP option: Grid name. 16-character maximum"""
 
     @gridName.validator
-    def check(self, attribute, value) :
-        if len(value[0]) > 16 :
-            raise ValueError(f"16-character maximum length for configuration value {attribute.name}")
-        if not isinstance(value, list) :
+    def check_gridName(self, attribute, value):
+        if len(value[0]) > 16:
+            raise ValueError(
+                f"16-character maximum length for configuration value {attribute.name}"
+            )
+        if not isinstance(value, list):
             raise ValueError(f"Configuration value for {attribute.name} must be a list")
 
     doCompress: str
@@ -126,13 +136,15 @@ class CMAQConfig :
     cmaqRun - main CMAQ run script"""
 
     @scripts.validator
-    def check(self, attribute, value) :
+    def check_scripts(self, attribute, value):
         expected_keys = ["mcipRun", "bconRun", "iconRun", "cctmRun", "cmaqRun"]
-        if sorted(list(value.keys())) != sorted(expected_keys) :
+        if sorted(list(value.keys())) != sorted(expected_keys):
             raise ValueError(f"{attribute.name} must have the keys {expected_keys}")
-        for key in value :
-            if 'path' not in value[key] :
-                raise ValueError(f"{key} in configuration value {attribute.name} must have the key 'path'")
+        for key in value:
+            if "path" not in value[key]:
+                raise ValueError(
+                    f"{key} in configuration value {attribute.name} must have the key 'path'"
+                )
 
     cctmExec: str
     # TODO: Add description for cctmExec?
@@ -141,7 +153,7 @@ class CMAQConfig :
     # TODO: Add description for CAMSToCmaqBiasCorrect?
 
 
-def load_json(filepath: str) -> dict[str, str | int | float] :
+def load_json(filepath: str) -> dict[str, str | int | float]:
     """
     Loads and parses JSON data from a file.
 
@@ -155,12 +167,12 @@ def load_json(filepath: str) -> dict[str, str | int | float] :
         The parsed JSON data.
     """
 
-    with open(filepath) as f :
+    with open(filepath) as f:
         config = json.load(f)
     return config
 
 
-def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfig :
+def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfig:
     """
     Creates a CMAQConfig object from the provided configuration.
 
@@ -177,7 +189,7 @@ def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfi
     return CMAQConfig(**config)
 
 
-def load_cmaq_config(filepath: str) -> CMAQConfig :
+def load_cmaq_config(filepath: str) -> CMAQConfig:
     """
     Load a CMAQ configuration from a JSON file and create a CMAQConfig object.
 

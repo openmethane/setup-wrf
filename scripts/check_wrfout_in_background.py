@@ -36,8 +36,8 @@ def generate_out_filename(in_file: str):
     (with a trailing Z to indicate UTC time).
     These filenames play nicer with non-linux filesystems.
     """
-    filename_chunks = in_file.split('_')
-    time_str = '_'.join(filename_chunks[2:])
+    filename_chunks = in_file.split("_")
+    time_str = "_".join(filename_chunks[2:])
 
     # Convert to iso8601 format
     date = datetime.datetime.strptime(time_str, "%Y-%m-%d_%H:%M:%S")
@@ -52,10 +52,12 @@ def process_file(in_file: Path):
     Process a WRF output file into a single time step
     """
     nc = netCDF4.Dataset(in_file)
-    ntimes = len(nc.dimensions['Time'])
+    ntimes = len(nc.dimensions["Time"])
     nc.close()
     if ntimes != EXPECTED_TIMESTEPS:
-        logger.debug("File %s has %d timesteps, expected %d", in_file, ntimes, EXPECTED_TIMESTEPS)
+        logger.debug(
+            "File %s has %d timesteps, expected %d", in_file, ntimes, EXPECTED_TIMESTEPS
+        )
         return
 
     out_file, time_str = generate_out_filename(in_file.name)
@@ -73,14 +75,16 @@ def process_file(in_file: Path):
         logger.info("successfully processed. Removing old file")
         os.remove(in_file)
 
+
 def main():
     while True:
         time.sleep(1)
         for inFile in Path(".").glob("wrfout_*"):
             mtimeAgo = time.time() - os.path.getmtime(inFile)
-            logger.debug("found file %s mtimeago %d s",inFile, mtimeAgo)
+            logger.debug("found file %s mtimeago %d s", inFile, mtimeAgo)
             if mtimeAgo > 10.0:
                 process_file(inFile)
+
 
 if __name__ == "__main__":
     main()

@@ -1,12 +1,16 @@
-from attrs import define, field, validators
+from attrs import define, field
 import os
-from setup_runs.config_read_functions import (boolean_converter, read_config_file,
-                                              parse_config, add_environment_variables,
-                                              substitute_variables)
+from setup_runs.config_read_functions import (
+    boolean_converter,
+    read_config_file,
+    parse_config,
+    add_environment_variables,
+    substitute_variables,
+)
 
 
 @define
-class WRFConfig :
+class WRFConfig:
     project_root: str
     """overall base directory for project"""
     setup_root: str
@@ -92,8 +96,8 @@ class WRFConfig :
     """analysis source - can be ERAI or FNL"""
 
     @analysis_source.validator
-    def check(self, attribute, value) :
-        if value not in ['FNL', 'ERAI'] :
+    def check(self, attribute, value):
+        if value not in ["FNL", "ERAI"]:
             raise ValueError("analysis_source must be one of ERAI or FNL")
 
     orcid: str
@@ -127,7 +131,7 @@ class WRFConfig :
     (within the folder ${wrf_run_dir}"""
 
 
-def load_wrf_config(filename: str) -> WRFConfig :
+def load_wrf_config(filename: str) -> WRFConfig:
     """
     Load and processes a WRF configuration file and create a WRFConfig object.
 
@@ -149,14 +153,14 @@ def load_wrf_config(filename: str) -> WRFConfig :
 
     # fill variables in the values with environment variables
     # - e.g. '${HOME}' to '/Users/danielbusch'
-    config = add_environment_variables(config=config, environmental_variables=os.environ)
+    config = add_environment_variables(config=config, environment_variables=os.environ)
 
     # fill variables that depend on environment variables
     # - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
     config = substitute_variables(config)
 
     # remove environment variables that were previously added
-    for env_var in config["environment_variables_for_substitutions"].split(',') :
+    for env_var in config["environment_variables_for_substitutions"].split(","):
         config.pop(env_var)
 
     return WRFConfig(**config)

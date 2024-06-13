@@ -24,3 +24,10 @@ run: ## Run the required steps
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf python scripts/setup_for_wrf.py -c config.docker.json
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf /opt/project/data/runs/aust-test/main.sh
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf python scripts/setup_for_cmaq.py
+
+.PHONY: ruff-fixes
+ruff-fixes:  # Run ruff on the project
+ 	# Run the formatting first to ensure that is applied even if the checks fail
+	poetry run ruff format .
+	poetry run ruff check --fix .
+	poetry run ruff format .

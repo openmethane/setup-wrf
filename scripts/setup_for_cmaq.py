@@ -14,15 +14,23 @@
 import datetime
 
 from setup_runs import utils
-from setup_runs.cmaq.run_scripts import prepareMainRunScript, prepareBconRunScripts, prepareCctmRunScripts, \
-    prepareTemplateBconFiles, prepareTemplateIconFiles
+from setup_runs.cmaq.run_scripts import (
+    prepareMainRunScript,
+    prepareBconRunScripts,
+    prepareCctmRunScripts,
+    prepareTemplateBconFiles,
+    prepareTemplateIconFiles,
+)
 from setup_runs.cmaq.mcip import runMCIP
-from setup_runs.cmaq.mcip_preparation import checkInputMetAndOutputFolders, getMcipGridNames
+from setup_runs.cmaq.mcip_preparation import (
+    checkInputMetAndOutputFolders,
+    getMcipGridNames,
+)
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
 
 
-def main() :
+def main():
     # load configuration object
     setup_cmaq = load_cmaq_config("config/cmaq/config.docker.json")
 
@@ -42,7 +50,7 @@ def main() :
     )
     print("\t... done")
 
-    if (not mcipOuputFound) or setup_cmaq.forceUpdateMcip :
+    if (not mcipOuputFound) or setup_cmaq.forceUpdateMcip:
         runMCIP(
             dates=dates,
             domains=setup_cmaq.domains,
@@ -64,9 +72,11 @@ def main() :
         )
 
     # extract some parameters about the MCIP setup
-    CoordNames, GridNames, APPL = getMcipGridNames(setup_cmaq.metDir, dates, setup_cmaq.domains)
+    CoordNames, GridNames, APPL = getMcipGridNames(
+        setup_cmaq.metDir, dates, setup_cmaq.domains
+    )
 
-    if setup_cmaq.prepareICandBC :
+    if setup_cmaq.prepareICandBC:
         # prepare the template boundary condition concentration files
         # from profiles using BCON
         templateBconFiles = prepareTemplateBconFiles(
@@ -114,7 +124,7 @@ def main() :
             bias_correct=setup_cmaq.CAMSToCmaqBiasCorrect,
         )
 
-    if setup_cmaq.prepareRunScripts :
+    if setup_cmaq.prepareRunScripts:
         print("Prepare ICON, BCON and CCTM run scripts")
         # prepare the scripts for CCTM
         prepareCctmRunScripts(
@@ -164,5 +174,6 @@ def main() :
             forceUpdate=setup_cmaq.forceUpdateRunScripts,
         )
 
-if __name__ == "__main__" :
+
+if __name__ == "__main__":
     main()
