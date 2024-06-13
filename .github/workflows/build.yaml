@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     # Builds, tests and pushes the container
@@ -47,7 +47,7 @@ jobs:
           push: true
           load: true
           file: ./Dockerfile
-          outputs: type=docker,dest=/tmp/myimage.tar
+          outputs: type=docker,dest=/tmp/setup_wrf.tar
 #      - name: Build and push
 #        uses: docker/build-push-action@v2
 #        with:
