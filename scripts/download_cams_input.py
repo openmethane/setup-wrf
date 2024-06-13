@@ -25,9 +25,19 @@ DATETIME_FORMAT = "%Y-%m-%d"
 
 @click.command()
 @click.option(
-    "-s", "--start-date", required=True, help="Start date in format YYYY-MM-DD", default="2023-01-01"
+    "-s",
+    "--start-date",
+    required=True,
+    help="Start date in format YYYY-MM-DD",
+    default="2023-01-01",
 )
-@click.option("-e", "--end-date", required=True, help="End date in format YYYY-MM-DD", default="2023-01-31")
+@click.option(
+    "-e",
+    "--end-date",
+    required=True,
+    help="End date in format YYYY-MM-DD",
+    default="2023-01-31",
+)
 @click.argument(
     "output",
     type=click.Path(exists=False, path_type=Path),
@@ -44,7 +54,9 @@ def download_cams_input(start_date: str, end_date: str, output: str | Path):
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
 
-    if datetime.strptime(start_date, DATETIME_FORMAT) > datetime.strptime(end_date, DATETIME_FORMAT):
+    if datetime.strptime(start_date, DATETIME_FORMAT) > datetime.strptime(
+        end_date, DATETIME_FORMAT
+    ):
         raise ValueError("Start date must be before end date")
 
     # fmt: off
