@@ -124,7 +124,7 @@ def process_files(file_pattern, expected_steps: int | None, timeout=10.0):
 @click.option(
     "--verify-steps/--no-verify-steps",
     help="Verify the that there are the expected number of steps in an output file."
-         "This assumes that there are 12 x 5 minute steps.",
+    "This assumes that there are 12 x 5 minute steps.",
     default=False,
 )
 @click.argument("file_pattern", default="wrfout_*")
