@@ -8,27 +8,23 @@
  debug_level = 0,
 /
 
-// Same as the aus 10km domain
-// only using a 20x20 grid offset 200, 200
 &geogrid
  parent_id         = 1,
  parent_grid_ratio = 1,
- i_parent_start    = 200,
- j_parent_start    = 200,
+ i_parent_start    = 1,
+ j_parent_start    = 1,
  e_we          = 10,
  e_sn          = 10,
  geog_data_res     = 'usgs_30s+default',
  dx = 10000,
  dy = 10000,
  map_proj =  'lambert',
- ref_lat   = -27.644,
- ref_lon   = 133.302,
+ ref_lat   = -22.838,
+ ref_lon   = 148.646,
  truelat1  = -15.,
  truelat2  = -40.,
  stand_lon = 133.302,
  geog_data_path = 'TEMPLATE',
- ref_x = 233.5,
- ref_y = 221.5,
 /
 
 &ungrib
