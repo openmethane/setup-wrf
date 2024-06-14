@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/superpower-institute/setup_wrf
+  IMAGE: ghcr.io/openmethane/setup_wrf
 
 jobs:
   build:
@@ -123,3 +123,15 @@ jobs:
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
+
+      # Should reuse the image built above
+      - name: Push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
