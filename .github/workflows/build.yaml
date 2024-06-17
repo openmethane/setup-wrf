@@ -247,13 +247,13 @@ jobs:
         with:
           name: results
           path: ${{ github.workspace }}/results.tar.gz
-#      # Push image to container registry
-#      - name: Extract metadata (tags, labels) for Docker
-#        id: meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: "${{ env.IMAGE }}"
-#          tags: |
-#            type=schedule
-#            type=ref,event=branch
-#            type=ref,event=pr
+      # Push image to container registry
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: "${{ env.IMAGE }}"
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
