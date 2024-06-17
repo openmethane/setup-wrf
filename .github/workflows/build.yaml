@@ -44,6 +44,10 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check permissions
+        run: |
+          echo "Permissions for GITHUB_TOKEN:"
+          echo ${{ toJson(github.event) }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -64,6 +68,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
           push: true
+          pull: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
