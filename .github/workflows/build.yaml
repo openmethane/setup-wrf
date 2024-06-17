@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/climate-resource/setup_wrf
+  IMAGE: ghcr.io/openmethane/setup-wrf
   WRF_VERSION: 4.5.1
   WPS_VERSION: 4.5
 
@@ -44,10 +44,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Check permissions
-        run: |
-          echo "Permissions for GITHUB_TOKEN:"
-          echo ${{ toJson(github.event) }}
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
