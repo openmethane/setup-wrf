@@ -26,7 +26,7 @@ jobs:
 
     env:
       REGISTRY: ghcr.io
-      IMAGE: ghcr.io/superpower-institute/setup_wrf
+      IMAGE: ghcr.io/climate-resource/setup_wrf
       WRF_VERSION: 4.5.1
       WPS_VERSION: 4.5
 
@@ -68,6 +68,16 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
+#       Push image to container registry
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: "${{ env.IMAGE }}"
+          tags: |
+            type=schedule
+            type=ref,event=branch
+            type=ref,event=pr
 
 #    steps:
 #      # Build the docker container
