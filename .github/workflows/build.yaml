@@ -86,8 +86,29 @@ jobs:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
-        - name: Pull Docker image
-          run: docker pull ${{ env.IMAGE }}:latest
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: "${{ env.IMAGE }}"
+            tags: |
+              type=schedule
+              type=ref,event=branch
+              type=ref,event=pr
+        - name: Build and push image
+          uses: docker/build-push-action@v5
+          id: build
+          with:
+            build-args: |
+              WRF_VERSION=${{ env.WRF_VERSION }}
+              WPS_VERSION=${{ env.WPS_VERSION }}
+            platforms: ${{ matrix.platform }}
+            labels: ${{ steps.meta.outputs.labels }}
+            tags: ${{ steps.meta.outputs.tags }}
+            push: false
+            pull: true
+#            cache-from: type=gha
+#            cache-to: type=gha,mode=max
         - name: Run pytest
           run:  |
             # Run the unit tests
