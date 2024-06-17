@@ -99,14 +99,15 @@ jobs:
           uses: docker/build-push-action@v5
           id: build
           with:
-            build-args: |
-              WRF_VERSION=${{ env.WRF_VERSION }}
-              WPS_VERSION=${{ env.WPS_VERSION }}
-            platforms: ${{ matrix.platform }}
-            labels: ${{ steps.meta.outputs.labels }}
-            tags: ${{ steps.meta.outputs.tags }}
+            context: .
+            tags: setup-wrf:latest
+#            platforms: ${{ matrix.platform }}
+#            labels: ${{ steps.meta.outputs.labels }}
+#            tags: ${{ steps.meta.outputs.tags }}
+            cache-from: type=gha
+            cache-to: type=gha,mode=max
             push: false
-            pull: true
+            load: true
 #            cache-from: type=gha
 #            cache-to: type=gha,mode=max
         - name: Run pytest
