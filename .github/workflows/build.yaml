@@ -11,7 +11,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/superpower-institute/setup_wrf
+  IMAGE: ghcr.io/climate-resource/setup_wrf
   WRF_VERSION: 4.5.1
   WPS_VERSION: 4.5
 
@@ -34,7 +34,8 @@ jobs:
 
     steps:
       # Build the docker container
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Login to Container registry
