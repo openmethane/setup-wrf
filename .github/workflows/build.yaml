@@ -175,7 +175,7 @@ jobs:
             docker run --rm \
               -v ${{ github.workspace }}:/opt/project \
               -e CDSAPI_KEY=${{ secrets.CDSAPI_ADS_KEY }} \
-              setup_wrf \
+              setup-wrf \
               python scripts/download_cams_input.py \
               -s 2022-07-01 \
               -e 2022-07-01 \
@@ -187,17 +187,17 @@ jobs:
             # Run setup_for_wrf.py
             docker run --rm \
               -v ${{ github.workspace }}:/opt/project \
-              setup_wrf \
+              setup-wrf \
               python scripts/setup_for_wrf.py -c config/wrf/config.docker.json
             # Run WRF
             docker run --rm \
               -v ${{ github.workspace }}:/opt/project \
-              setup_wrf \
+              setup-wrf \
               data/runs/aust-test/main.sh
             # Prepare CMAQ
             docker run --rm \
               -v ${{ github.workspace }}:/opt/project \
-              setup_wrf \
+              setup-wrf \
               python scripts/setup_for_cmaq.py
         # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
         - name: Zip WRF artifacts
