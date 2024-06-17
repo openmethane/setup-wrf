@@ -9,9 +9,9 @@ on:
       - 'v*'
   pull_request:
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE: ghcr.io/superpower-institute/setup_wrf
+#env:
+#  REGISTRY: ghcr.io
+#  IMAGE: ghcr.io/superpower-institute/setup_wrf
 
 jobs:
   build:
