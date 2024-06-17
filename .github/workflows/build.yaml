@@ -12,8 +12,6 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE: ghcr.io/openmethane/setup-wrf
-  WRF_VERSION: 4.5.1
-  WPS_VERSION: 4.5
 
 jobs:
   build:
@@ -29,11 +27,12 @@ jobs:
       contents: read
       packages: write
 
-    # Builds, tests and pushes the container
-    # This is performed via a single GH job because sharing images between jobs is somewhat clumsy.
+    outputs:
+      imageid: ${{ steps.build.outputs.imageid }}
 
+    # Builds and pushes the image
+    # Tags the image with the PR that it is linked to
     steps:
-      # Build the docker container
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -57,9 +56,6 @@ jobs:
         uses: docker/build-push-action@v5
         id: build
         with:
-          build-args: |
-            WRF_VERSION=${{ env.WRF_VERSION }}
-            WPS_VERSION=${{ env.WPS_VERSION }}
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -72,8 +68,9 @@ jobs:
     needs: build
     permissions:
       contents: read
-      packages: write
-
+      packages: read
+    env:
+      IMAGE_ID: ${{ env.IMAGE }}:${{ needs.build.outputs.imageid }}
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -85,31 +82,15 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: "${{ env.IMAGE }}"
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-      - name: Build and push image
-        uses: docker/build-push-action@v5
-        id: build
-        with:
-          context: .
-          tags: setup-wrf:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: false
-          load: true
+      - name: Pull built docker image
+        run: |
+          docker pull ${{ env.IMAGE_ID }}
       - name: Run pytest
         run: |
           # Run the unit tests
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
-            setup-wrf \
+            ${{ env.IMAGE_ID }} \
             pytest -v tests/unit
 
   test-integration:
@@ -117,10 +98,10 @@ jobs:
     needs: build
     permissions:
       contents: read
-      packages: write
-
+      packages: read
+    env:
+      IMAGE_ID: ${{ env.IMAGE }}:${{ needs.build.outputs.imageid }}
     steps:
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Checkout code
@@ -131,26 +112,9 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: "${{ env.IMAGE }}"
-          tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
-      - name: Build and push image
-        uses: docker/build-push-action@v5
-        id: build
-        with:
-          context: .
-          tags: setup-wrf:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          push: false
-          load: true
-          # Test the built image before pushing
+      - name: Pull built docker image
+        run: |
+          docker pull ${{ env.IMAGE_ID }}
       - name: Cache Geog data
         id: cache-geog
         uses: actions/cache@v4
@@ -174,7 +138,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
             -e CDSAPI_KEY=${{ secrets.CDSAPI_ADS_KEY }} \
-            setup-wrf \
+            ${{ env.IMAGE_ID }} \
             python scripts/download_cams_input.py \
             -s 2022-07-01 \
             -e 2022-07-01 \
@@ -186,26 +150,38 @@ jobs:
           # Run setup_for_wrf.py
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
-            setup-wrf \
+            ${{ env.IMAGE_ID }} \
             python scripts/setup_for_wrf.py -c config/wrf/config.docker.json
           # Run WRF
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
-            setup-wrf \
+            ${{ env.IMAGE_ID }} \
             data/runs/aust-test/main.sh
           # Prepare CMAQ
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
-            setup-wrf \
+            ${{ env.IMAGE_ID }} \
             python scripts/setup_for_cmaq.py
+      - name: Zip WRF artifacts
+        if: ${{ always() }}
+        run: |
+          tar -cvzf results.tar.gz
+      - name: Upload WRF artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: results
+          path: ${{ github.workspace }}/results.tar.gz
 
-  push-image:
+  # Tag the latest image if running on the main branch
+  # TODO: Handle tagged builds
+  tag-latest-image:
     runs-on: ubuntu-latest
     needs: [test-integration , test-unit]
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
       packages: write
-
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -217,43 +193,20 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-#      - name: Extract metadata (tags, labels) for Docker
-#        id: meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: "${{ env.IMAGE }}"
-#          tags: |
-#            type=schedule
-#            type=ref,event=branch
-#            type=ref,event=pr
-#      - name: load image
-#        uses: docker/build-push-action@v5
-#        id: build
-#        with:
-#          context: .
-#          tags: setup-wrf:latest
-#          cache-from: type=gha
-#          cache-to: type=gha,mode=max
-#          push: false
-#          load: true
-#      # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
-      - name: Zip WRF artifacts
-        if: ${{ always() }}
-        run: |
-          tar -cvzf results.tar.gz
-      - name: Upload WRF artifacts
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: results
-          path: ${{ github.workspace }}/results.tar.gz
-      # Push image to container registry
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: "${{ env.IMAGE }}"
           tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main'}}
+      - name: load image
+        uses: docker/build-push-action@v5
+        id: build
+        with:
+          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          load: true
