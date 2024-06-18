@@ -70,7 +70,7 @@ jobs:
       contents: read
       packages: read
     env:
-      IMAGE_ID: ${{ env.IMAGE }}:${{ needs.build.outputs.imageid }}
+      IMAGE_ID: ghcr.io/openmethane/setup-wrf:${{ needs.build.outputs.imageid }}
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -100,7 +100,7 @@ jobs:
       contents: read
       packages: read
     env:
-      IMAGE_ID: ${{ env.IMAGE }}:${{ needs.build.outputs.imageid }}
+      IMAGE_ID: ghcr.io/openmethane/setup-wrf:${{ needs.build.outputs.imageid }}
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
