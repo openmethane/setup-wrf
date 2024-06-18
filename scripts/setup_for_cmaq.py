@@ -28,11 +28,23 @@ from setup_runs.cmaq.mcip_preparation import (
 )
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
-
+import argparse
 
 def main():
+    ## get command line arguments
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "-c",
+        "--configFile",
+        help="Path to configuration file",
+        default="config/cmaq/config.nci.json",
+    )
+    args = parser.parse_args()
+    config_filepath = args.configFile
+
     # load configuration object
-    setup_cmaq = load_cmaq_config("config/cmaq/config.docker.json")
+    setup_cmaq = load_cmaq_config(config_filepath)
 
     # define date range
     ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1

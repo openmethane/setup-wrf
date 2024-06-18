@@ -1,6 +1,7 @@
 {
   "CMAQdir": "/home/563/sa6589/CMAQv5.0.2_notpollen/",
   "MCIPdir": "/home/563/sa6589/CMAQv5.0.2_notpollen/scripts/mcip/src",
+  "templateDir" : "/home/563/pjr563/openmethane-beta/setup_wrf/templateRunScripts",
   "metDir": "/scratch/q90/pjr563/openmethane-beta/mcip/",
   "ctmDir": "/scratch/q90/pjr563/openmethane-beta/cmaq/",
   "wrfDir": "/scratch/q90/pjr563/openmethane-beta/wrf/aust10km",
@@ -50,7 +51,7 @@
     "cmaqRun": {
       "path": "/home/563/pjr563/openmethane-beta/setup_wrf/templateRunScripts/runCMAQ.sh"
     }
-  }
+  },
   "cctmExec": "ADJOINT_FWD",
   "CAMSToCmaqBiasCorrect": 0.06700000000000017
 }
