@@ -7,7 +7,11 @@ import xarray as xr
 def root_dir() -> Path:
     return Path(__file__).parent.parent
 
-def _clean_attrs(attrs: dict, excluded_fields: tuple[str, ...] = ("HISTORY",)) -> dict:
+
+def _clean_attrs(
+    attrs: dict,
+    excluded_fields: tuple[str, ...] = ("HISTORY", "CDATE", "CTIME", "WDATE", "WTIME"),
+) -> dict:
     clean = {}
     for key, value in attrs.items():
         if key in excluded_fields:
@@ -28,7 +32,9 @@ def _extract_group(ds: xr.Dataset):
         "attrs": _clean_attrs(ds.attrs),
         "coords": dict(ds.coords),
         "dims": dict(ds.sizes),
-        "variables": {k: {"attrs": dict(v.attrs), "dims": v.dims} for k, v in ds.variables.items()},
+        "variables": {
+            k: {"attrs": dict(v.attrs), "dims": v.dims} for k, v in ds.variables.items()
+        },
     }
 
 
@@ -38,7 +44,7 @@ def compare_dataset(data_regression):
     Check if the structure of xarray dataset/datatree instance has changed
     """
 
-    def compare(ds: xr.Dataset | str, basename: str | None=None):
+    def compare(ds: xr.Dataset | str, basename: str | None = None):
         if isinstance(ds, str) or isinstance(ds, Path):
             ds = xr.load_dataset(ds)
 

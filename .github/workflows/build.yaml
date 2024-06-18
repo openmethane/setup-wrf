@@ -107,7 +107,7 @@ jobs:
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \
             setup_wrf \
-            pytest -v tests/integration
+            python -m pytest -v tests/integration
       # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
       - name: Zip WRF artifacts
         if: ${{ always() }}
