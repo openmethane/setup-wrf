@@ -61,7 +61,7 @@ WORKDIR /opt/project
 
 # Install additional apt dependencies
 RUN apt-get update && \
-    apt-get install -y csh bc file && \
+    apt-get install -y csh bc file make && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy across the virtual environment
@@ -75,12 +75,15 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=ghcr.io/climate-resource/wrf:pr-1 /opt/wrf /opt/wrf
 COPY --from=ghcr.io/openmethane/cmaq:pr-4 /opt/cmaq /opt/cmaq
 
+# Install the local package in editable mode
+# Requires scaffolding the src directories
+COPY pyproject.toml poetry.lock README.md ./
+RUN mkdir -p src/setup_runs && touch src/setup_runs/__init__.py
+RUN pip install -e .
+
 # Copy in the rest of the project
 # For testing it might be easier to mount $(PWD):/opt/project so that local changes are reflected in the container
-COPY . /opt/project
 COPY targets/docker/nccopy_compress_output.sh /opt/project/nccopy_compress_output.sh
-
-# Install the local package in editable mode
-RUN pip install -e .
+COPY . /opt/project
 
 CMD ["/bin/bash"]

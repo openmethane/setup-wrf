@@ -13,5 +13,5 @@ source load_conda_env.sh
 
 ulimit -s unlimited
 
-python setup_for_wrf.py -c config.nci.json
+python setup_for_wrf.py -c config/wrf/config.nci.json
 
