@@ -1,6 +1,5 @@
 *~
 *.pyc
-*.nc
 *.idea
 
 # Virtual environment
