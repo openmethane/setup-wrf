@@ -27,19 +27,16 @@ from setup_runs.cmaq.mcip_preparation import (
     getMcipGridNames,
 )
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
-from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
+from setup_runs.cmaq.read_config_cmaq import load_cmaq_config, CMAQConfig
 
 
-def main():
-    # load configuration object
-    setup_cmaq = load_cmaq_config("config/cmaq/config.docker.json")
-
+def main(setup_cmaq: CMAQConfig):
     # define date range
     ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1
     dates = [setup_cmaq.startDate + datetime.timedelta(days=d) for d in range(ndates)]
 
     # read in the template run-scripts
-    scripts = utils.loadScripts(Scripts=setup_cmaq.scripts)
+    scripts = utils.loadScripts(scripts=setup_cmaq.scripts)
 
     # create output destinations, if need be:
     print(
@@ -176,4 +173,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    config_file: str = "config/cmaq/config.docker.json"
+    setup_cmaq = load_cmaq_config(config_file)
+
+    main(setup_cmaq)
