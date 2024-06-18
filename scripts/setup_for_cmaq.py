@@ -38,7 +38,7 @@ def main():
         "-c",
         "--configFile",
         help="Path to configuration file",
-        default="config/cmaq/config.nci.json",
+        default="config/cmaq/config.docker.json",
     )
     args = parser.parse_args()
     config_filepath = args.configFile
