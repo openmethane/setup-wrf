@@ -183,6 +183,7 @@ def process_date_string(datestring: str) -> datetime.datetime:
 
     return date
 
+
 def load_json(filepath: str) -> dict[str, str | int | float]:
     """
     Loads and parses JSON data from a file.

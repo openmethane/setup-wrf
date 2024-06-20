@@ -3,7 +3,6 @@ import os
 from pathlib import Path
 from setup_runs.config_read_functions import (
     read_config_file,
-    parse_config,
     add_environment_variables,
     substitute_variables,
     boolean_converter,
@@ -238,7 +237,6 @@ def test_008_process_date_string(datestring, expected):
 
 # TODO: The following two tests can probably be parametrised
 def test_009_WRF_NCI_config_object(config_path_wrf_nci):
-
     config = load_json(config_path_wrf_nci)
 
     for value_to_boolean in [

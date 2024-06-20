@@ -1,14 +1,11 @@
 from attrs import define, field
-import json
 import os
 from setup_runs.config_read_functions import (
     boolean_converter,
-    read_config_file,
-    parse_config,
     add_environment_variables,
     substitute_variables,
     process_date_string,
-    load_json
+    load_json,
 )
 
 
@@ -158,7 +155,9 @@ def load_wrf_config(filename: str) -> WRFConfig:
 
     # fill variables in the values with environment variables
     # - e.g. '${HOME}' to '/Users/danielbusch'
-    config = add_environment_variables(config=load_json(filename), environment_variables=os.environ)
+    config = add_environment_variables(
+        config=load_json(filename), environment_variables=os.environ
+    )
 
     # fill variables that depend on environment variables
     # - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"

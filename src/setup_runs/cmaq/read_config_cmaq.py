@@ -1,6 +1,9 @@
 from attrs import define, field
-import json
-from setup_runs.config_read_functions import boolean_converter, process_date_string
+from setup_runs.config_read_functions import (
+    boolean_converter,
+    process_date_string,
+    load_json,
+)
 
 
 def boolean_tuple(x):
@@ -151,9 +154,6 @@ class CMAQConfig:
     CAMSToCmaqBiasCorrect: float
     """Pre-set is (1.838 - 1.771)"""
     # TODO: Add description for CAMSToCmaqBiasCorrect?
-
-
-
 
 
 def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfig:
