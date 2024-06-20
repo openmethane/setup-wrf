@@ -2,7 +2,6 @@ import pytest
 import os
 from pathlib import Path
 from setup_runs.config_read_functions import (
-    read_config_file,
     add_environment_variables,
     substitute_variables,
     boolean_converter,
