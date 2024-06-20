@@ -299,6 +299,10 @@ def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker)
         if env_var in config.keys():
             config.pop(env_var)
 
+    # parse the dates
+    config["end_date"] = process_date_string(config["end_date"])
+    config["start_date"] = process_date_string(config["start_date"])
+
     # load config object (performs all of the above steps)
     wrf_config = load_wrf_config(config_path_wrf_docker)
 
