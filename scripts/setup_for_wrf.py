@@ -34,22 +34,8 @@ wrf_config = load_wrf_config(configFile)
 # make a dict from WRFConfig object
 config = attrs.asdict(wrf_config)
 
-# parse start and end date
-try:
-    start_date = process_date_string(config["start_date"])
-    end_date = process_date_string(config["end_date"])
-
-    ## check that the dates are in the right order
-    assert end_date > start_date, "End date should be after start date"
-except Exception as e:
-    print("Problem parsing start/end times")
-    raise e
-
-
-# Perform some checks
-# Iteration count for filling variables
-# Next line moved to load_wrf_config()
-# assert iterationCount < 10, "Config key substitution exceeded iteration limit..."
+start_date = config["start_date"]
+end_date = config["end_date"]
 
 scripts = {}
 dailyScriptNames = ["run", "cleanup"]

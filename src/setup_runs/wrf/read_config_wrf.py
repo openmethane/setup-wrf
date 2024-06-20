@@ -6,6 +6,7 @@ from setup_runs.config_read_functions import (
     parse_config,
     add_environment_variables,
     substitute_variables,
+    process_date_string
 )
 
 
@@ -19,10 +20,16 @@ class WRFConfig:
     """Project name """
     target: str
     """Target environment for running tasks"""
-    start_date: str
+    start_date: str = field(converter=process_date_string)
     """start first simulation, "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" for UTC"""
-    end_date: str
+    end_date: str = field(converter=process_date_string)
     """The end time of the last simulation (same format as above)"""
+
+    @end_date.validator
+    def check_endDate(self, attribute, value) :
+        if value < self.start_date :
+            raise ValueError("End date must be after start date.")
+
     # FIXME: this hasn't been fully implemented yet (only working for 'false')
     restart: str = field(converter=boolean_converter)
     """Is this a restart run? (bool -> true/false, yes/no)"""
