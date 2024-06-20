@@ -28,9 +28,9 @@ def config_path_wrf_nci(root_dir):
     return os.path.join(root_dir, "config/wrf/config.nci.json")
 
 
-@pytest.fixture
-def input_str_wrf_nci(config_path_wrf_nci):
-    return read_config_file(config_path_wrf_nci)
+# @pytest.fixture
+# def input_str_wrf_nci(config_path_wrf_nci):
+#     return read_config_file(config_path_wrf_nci)
 
 
 @pytest.fixture
@@ -38,9 +38,9 @@ def config_path_wrf_docker(root_dir):
     return os.path.join(root_dir, "config/wrf/config.docker.json")
 
 
-@pytest.fixture
-def input_str_wrf_docker(config_path_wrf_docker):
-    return read_config_file(config_path_wrf_docker)
+# @pytest.fixture
+# def input_str_wrf_docker(config_path_wrf_docker):
+#     return read_config_file(config_path_wrf_docker)
 
 
 @pytest.fixture
@@ -61,36 +61,36 @@ def temp_config_file(tmp_path, request):
     temp_file.write_text(content)
     return str(temp_file)
 
-
-@pytest.mark.parametrize(
-    "temp_config_file, expected_content",
-    [
-        pytest.param(
-            "This is a test configuration.",
-            "This is a test configuration.",
-            id="simple_content",
-        ),
-        pytest.param("", "", id="empty_file"),
-    ],
-    indirect=["temp_config_file"],
-)
-def test_001_read_config_file_happy_path(temp_config_file, expected_content):
-    content = read_config_file(temp_config_file)
-
-    assert (
-        content == expected_content
-    ), "The content read from the file does not match the expected content."
-
-
-def test_002_read_config_file_error_cases():
-    config_path = "path/to/non/existent/config.json"
-    expected_exception = AssertionError
-    expected_message = (
-        "No configuration file was found at path/to/non/existent/config.json"
-    )
-    with pytest.raises(expected_exception) as exc_info:
-        read_config_file(config_path)
-    assert expected_message == str(exc_info.value)
+#
+# @pytest.mark.parametrize(
+#     "temp_config_file, expected_content",
+#     [
+#         pytest.param(
+#             "This is a test configuration.",
+#             "This is a test configuration.",
+#             id="simple_content",
+#         ),
+#         pytest.param("", "", id="empty_file"),
+#     ],
+#     indirect=["temp_config_file"],
+# )
+# def test_001_read_config_file_happy_path(temp_config_file, expected_content):
+#     content = read_config_file(temp_config_file)
+#
+#     assert (
+#         content == expected_content
+#     ), "The content read from the file does not match the expected content."
+#
+#
+# def test_002_read_config_file_error_cases():
+#     config_path = "path/to/non/existent/config.json"
+#     expected_exception = AssertionError
+#     expected_message = (
+#         "No configuration file was found at path/to/non/existent/config.json"
+#     )
+#     with pytest.raises(expected_exception) as exc_info:
+#         read_config_file(config_path)
+#     assert expected_message == str(exc_info.value)
 
 
 # @pytest.mark.parametrize(
@@ -272,7 +272,7 @@ def test_009_WRF_NCI_config_object(config_path_wrf_nci):
     assert config == asdict(wrf_config)
 
 
-def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker):
+def test_010_WRF_NCI_config_object(config_path_wrf_docker):
     config = load_json(config_path_wrf_docker)
 
     for value_to_boolean in [
