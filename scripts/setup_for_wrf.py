@@ -13,7 +13,6 @@ import stat
 import netCDF4
 import attrs
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
-from setup_runs.config_read_functions import process_date_string
 from setup_runs.wrf.read_config_wrf import load_wrf_config
 
 ## get command line arguments

@@ -10,7 +10,11 @@ from setup_runs.config_read_functions import (
     process_date_string,
 )
 from setup_runs.wrf.read_config_wrf import load_wrf_config
-from setup_runs.cmaq.read_config_cmaq import load_json, create_cmaq_config_object, load_cmaq_config
+from setup_runs.cmaq.read_config_cmaq import (
+    load_json,
+    create_cmaq_config_object,
+    load_cmaq_config,
+)
 from attrs import asdict
 import json
 
@@ -29,17 +33,21 @@ def config_path_wrf_nci(root_dir):
 def input_str_wrf_nci(config_path_wrf_nci):
     return read_config_file(config_path_wrf_nci)
 
+
 @pytest.fixture
 def config_path_wrf_docker(root_dir):
     return os.path.join(root_dir, "config/wrf/config.docker.json")
+
 
 @pytest.fixture
 def input_str_wrf_docker(config_path_wrf_docker):
     return read_config_file(config_path_wrf_docker)
 
+
 @pytest.fixture
 def config_path_cmaq_nci(root_dir):
     return os.path.join(root_dir, "config/cmaq/config.nci.json")
+
 
 @pytest.fixture
 def config_path_cmaq_docker(root_dir):
@@ -255,10 +263,15 @@ def test_009_WRF_NCI_config_object(input_str_wrf_nci, config_path_wrf_nci):
         if env_var in config.keys():
             config.pop(env_var)
 
+    # parse the dates
+    config["end_date"] = process_date_string(config["end_date"])
+    config["start_date"] = process_date_string(config["start_date"])
+
     # load config object (performs all of the above steps)
     wrf_config = load_wrf_config(config_path_wrf_nci)
 
     assert config == asdict(wrf_config)
+
 
 def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker):
     config = parse_config(input_str_wrf_docker)
@@ -291,21 +304,24 @@ def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker)
 
     assert config == asdict(wrf_config)
 
-# TODO: Duplicate test? An invalid config would be caught with the integration test as well.
+
+# TODO: Duplicate test? An invalid config would be caught by the integration test as well.
 def test_011_valid_CMAQ_NCI_config_file(config_path_cmaq_nci):
     try:
         setup_cmaq = load_cmaq_config(config_path_cmaq_nci)
+        assert setup_cmaq
     except ValueError:
         pytest.fail(f"{config_path_cmaq_nci} is not a valid configuration file!")
 
 
-
-# TODO: Duplicate test? An invalid config would be caught with the integration test as well.
+# TODO: Duplicate test? An invalid config would be caught by the integration test as well.
 def test_012_valid_CMAQ_Docker_config_file(config_path_cmaq_docker):
-    try :
+    try:
         setup_cmaq = load_cmaq_config(config_path_cmaq_docker)
-    except ValueError :
+        assert setup_cmaq
+    except ValueError:
         pytest.fail(f"{config_path_cmaq_nci} is not a valid configuration file!")
+
 
 @pytest.fixture
 def cmaq_config_dict():

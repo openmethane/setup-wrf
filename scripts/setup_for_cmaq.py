@@ -30,6 +30,7 @@ from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config
 import argparse
 
+
 def main():
     ## get command line arguments
     parser = argparse.ArgumentParser()

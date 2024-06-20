@@ -155,7 +155,7 @@ def substitute_variables(config: dict) -> dict[str, str | bool | int]:
     return config
 
 
-def process_date_string(datestring):
+def process_date_string(datestring: str) -> datetime.datetime:
     """
     Process a date string to a datetime object with the appropriate timezone.
 
