@@ -309,7 +309,6 @@ def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker)
     assert config == asdict(wrf_config)
 
 
-# TODO: Duplicate test? An invalid config would be caught by the integration test as well.
 def test_011_valid_CMAQ_NCI_config_file(config_path_cmaq_nci):
     try:
         setup_cmaq = load_cmaq_config(config_path_cmaq_nci)
@@ -318,7 +317,6 @@ def test_011_valid_CMAQ_NCI_config_file(config_path_cmaq_nci):
         pytest.fail(f"{config_path_cmaq_nci} is not a valid configuration file!")
 
 
-# TODO: Duplicate test? An invalid config would be caught by the integration test as well.
 def test_012_valid_CMAQ_Docker_config_file(config_path_cmaq_docker):
     try:
         setup_cmaq = load_cmaq_config(config_path_cmaq_docker)

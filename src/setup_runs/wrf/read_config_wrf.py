@@ -130,7 +130,7 @@ class WRFConfig:
     """pattern for matching the surface-level analysis files (date-time substitutions 
     recognised as well as shell wildcards)"""
     analysis_vtable: str
-    """VTable file for the SST analysis files"""
+    """VTable file for the SST analysis files - Vtable.GFS or ERA-interim.pl"""
     wrf_run_dir: str
     """directory containing WRF input tables and data-files"""
     wrf_run_tables_pattern: str
