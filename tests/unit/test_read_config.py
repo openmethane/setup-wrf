@@ -11,10 +11,10 @@ from setup_runs.config_read_functions import (
 )
 from setup_runs.wrf.read_config_wrf import load_wrf_config
 from setup_runs.cmaq.read_config_cmaq import (
-    load_json,
     create_cmaq_config_object,
     load_cmaq_config,
 )
+from setup_runs.config_read_functions import load_json
 from attrs import asdict
 import json
 
@@ -94,43 +94,43 @@ def test_002_read_config_file_error_cases():
     assert expected_message == str(exc_info.value)
 
 
-@pytest.mark.parametrize(
-    "sample_string, expected",
-    [
-        pytest.param('{"key": "value"}', {"key": "value"}, id="simple_json"),
-        pytest.param('{"number": 1234}', {"number": 1234}, id="json_with_number"),
-        pytest.param(
-            '# This is a comment\n{"key": "value"}',
-            {"key": "value"},
-            id="json_with_comment",
-        ),
-        pytest.param(
-            '{"nested": {"key": "value"}}',
-            {"nested": {"key": "value"}},
-            id="json_with_nested_object",
-        ),
-    ],
-)
-def test_003_parse_config_happy_path(sample_string, expected):
-    result = parse_config(sample_string)
+# @pytest.mark.parametrize(
+#     "sample_string, expected",
+#     [
+#         pytest.param('{"key": "value"}', {"key": "value"}, id="simple_json"),
+#         pytest.param('{"number": 1234}', {"number": 1234}, id="json_with_number"),
+#         pytest.param(
+#             '# This is a comment\n{"key": "value"}',
+#             {"key": "value"},
+#             id="json_with_comment",
+#         ),
+#         pytest.param(
+#             '{"nested": {"key": "value"}}',
+#             {"nested": {"key": "value"}},
+#             id="json_with_nested_object",
+#         ),
+#     ],
+# )
+# def test_003_parse_config_happy_path(sample_string, expected):
+#     result = parse_config(sample_string)
+#
+#     assert result == expected, "The parsed JSON does not match the expected output."
 
-    assert result == expected, "The parsed JSON does not match the expected output."
 
-
-@pytest.mark.parametrize(
-    "sample_string, expected",
-    [
-        pytest.param('{"missing": "bracket"', None, id="error_missing_bracket"),
-        pytest.param('{unquoted_key: "value"}', None, id="error_unquoted_key"),
-        pytest.param("not a json", None, id="error_not_json"),
-    ],
-)
-def test_004_parse_config_error_cases(sample_string, expected, capsys):
-    with pytest.raises(SystemExit):
-        parse_config(sample_string)
-
-    captured = capsys.readouterr()
-    assert "Problem parsing in configuration file" in captured.out
+# @pytest.mark.parametrize(
+#     "sample_string, expected",
+#     [
+#         pytest.param('{"missing": "bracket"', None, id="error_missing_bracket"),
+#         pytest.param('{unquoted_key: "value"}', None, id="error_unquoted_key"),
+#         pytest.param("not a json", None, id="error_not_json"),
+#     ],
+# )
+# def test_004_parse_config_error_cases(sample_string, expected, capsys):
+#     with pytest.raises(SystemExit):
+#         parse_config(sample_string)
+#
+#     captured = capsys.readouterr()
+#     assert "Problem parsing in configuration file" in captured.out
 
 
 def test_005_add_environment_variable():
@@ -237,8 +237,9 @@ def test_008_process_date_string(datestring, expected):
 
 
 # TODO: The following two tests can probably be parametrised
-def test_009_WRF_NCI_config_object(input_str_wrf_nci, config_path_wrf_nci):
-    config = parse_config(input_str_wrf_nci)
+def test_009_WRF_NCI_config_object(config_path_wrf_nci):
+
+    config = load_json(config_path_wrf_nci)
 
     for value_to_boolean in [
         "restart",
@@ -274,7 +275,7 @@ def test_009_WRF_NCI_config_object(input_str_wrf_nci, config_path_wrf_nci):
 
 
 def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker):
-    config = parse_config(input_str_wrf_docker)
+    config = load_json(config_path_wrf_docker)
 
     for value_to_boolean in [
         "restart",
