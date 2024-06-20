@@ -636,12 +636,12 @@ for ind_job in range(number_of_jobs) :
                         os.makedirs(analysisDir, exist_ok=True)
 
                     ## find the files matching the analysis pattern
-                    patternTypes = [
-                        "analysis_pattern_surface",
-                        "analysis_pattern_upper",
-                    ]
-                    for patternType in patternTypes :
-                        pattern = config[patternType]
+                    # patternTypes = [
+                    #     "analysis_pattern_surface",
+                    #     "analysis_pattern_upper",
+                    # ]
+                    for pattern in [wrf_config.analysis_pattern_surface, wrf_config.analysis_pattern_upper] :
+                        # pattern = patternType
                         files = set([])
                         for iDayWps in range(nDaysWps) :
                             wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
@@ -1025,12 +1025,12 @@ for ind_job in range(number_of_jobs) :
     )
 
     # link to scripts from the namelist and target directories
-    for input_directory_key, scripts_to_copy_key in (
-            ("target_dir", "scripts_to_copy_from_target_dir"),
-            ("nml_dir", "scripts_to_copy_from_nml_dir"),
+    for input_directory, scripts_to_copy in (
+            (wrf_config.target_dir, wrf_config.scripts_to_copy_from_target_dir),
+            (wrf_config.nml_dir, wrf_config.scripts_to_copy_from_nml_dir),
     ) :
-        input_directory = config[input_directory_key]
-        scripts_to_copy = config[scripts_to_copy_key].split(",")
+
+        scripts_to_copy = scripts_to_copy.split(",")
 
         for script_to_copy in scripts_to_copy :
             symlink_file(input_directory, run_dir_with_date, script_to_copy)
