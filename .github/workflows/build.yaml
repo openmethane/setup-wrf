@@ -201,7 +201,7 @@ jobs:
           images: "${{ env.IMAGE }}"
           tags: |
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main'}}
-      - name: load image
+      - name: Push latest image
         uses: docker/build-push-action@v5
         id: build
         with:
