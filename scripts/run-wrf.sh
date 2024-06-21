@@ -15,8 +15,8 @@ set -Eeuo pipefail
 ./scripts/download-geog.sh --low-res
 if [[ ! -f data/inputs/cams_eac4_methane.nc ]]; then
   python scripts/download_cams_input.py \
-      -s 2022-07-01 \
-      -e 2022-07-01 \
+      -s 2022-07-22 \
+      -e 2022-07-22 \
       data/inputs/cams_eac4_methane.nc
 fi
 
