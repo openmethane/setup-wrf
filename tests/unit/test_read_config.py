@@ -26,17 +26,21 @@ def root_dir():
 def config_path_wrf_nci(root_dir):
     return os.path.join(root_dir, "config/wrf/config.nci.json")
 
+
 @pytest.fixture
 def config_path_wrf_docker(root_dir):
     return os.path.join(root_dir, "config/wrf/config.docker.json")
+
 
 @pytest.fixture
 def config_path_cmaq_nci(root_dir):
     return os.path.join(root_dir, "config/cmaq/config.nci.json")
 
+
 @pytest.fixture
 def config_path_cmaq_docker(root_dir):
     return os.path.join(root_dir, "config/cmaq/config.docker.json")
+
 
 # Define a fixture for creating and deleting a temporary config file
 @pytest.fixture
@@ -45,6 +49,7 @@ def temp_config_file(tmp_path, request):
     temp_file = tmp_path / "temp_config.json"
     temp_file.write_text(content)
     return str(temp_file)
+
 
 def test_005_add_environment_variable():
     config = {

@@ -1,7 +1,4 @@
-import os
-import sys
 import json
-import re
 import datetime
 from typing import Mapping
 
@@ -37,35 +34,6 @@ def boolean_converter(
 
     return value.lower() in truevals
 
-#
-# def read_config_file(configFile: str) -> str:
-#     """
-#     Read and return the content of a configuration file.
-#
-#     Parameters
-#     ----------
-#     configFile
-#         The path to the configuration file.
-#
-#     Returns
-#     -------
-#         The content of the configuration file.
-#
-#     """
-#
-#     assert os.path.exists(
-#         configFile
-#     ), f"No configuration file was found at {configFile}"
-#
-#     try:
-#         with open(configFile, "rt") as f:
-#             input_str = f.read()
-#         return input_str
-#     except Exception as e:
-#         print("Problem reading in configuration file")
-#         print(e)
-#         sys.exit()
-
 
 def add_environment_variables(
     config: dict[str, str | bool | int], environment_variables: Mapping[str, str]
@@ -93,7 +61,9 @@ def add_environment_variables(
     return config
 
 
-def substitute_variables(config: dict[str, str | bool | int]) -> dict[str, str | bool | int]:
+def substitute_variables(
+    config: dict[str, str | bool | int],
+) -> dict[str, str | bool | int]:
     """
     Perform variable substitutions in the configuration dictionary.
 

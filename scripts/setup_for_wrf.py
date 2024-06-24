@@ -32,49 +32,52 @@ wrf_config = load_wrf_config(configFile)
 scripts = {}
 dailyScriptNames = ["run", "cleanup"]
 script_names = ["main", "run", "cleanup"]
-script_paths = [wrf_config.main_script_template, wrf_config.run_script_template, wrf_config.cleanup_script_template]
-for script_name, script_path in zip(script_names, script_paths) :
+script_paths = [
+    wrf_config.main_script_template,
+    wrf_config.run_script_template,
+    wrf_config.cleanup_script_template,
+]
+for script_name, script_path in zip(script_names, script_paths):
     ## read the template run script
-    assert os.path.exists(
-        script_path
-    ), f"No template script was found at {script_path}"
-    try :
+    assert os.path.exists(script_path), f"No template script was found at {script_path}"
+    try:
         f = open(script_path, "rt")
         scripts[script_name] = f.readlines()
         f.close()
-    except Exception as e :
+    except Exception as e:
         print("Problem reading in template {} script".format(script_name))
         print(str(e))
 
-def decode_bytes(x) :
-    if isinstance(x, bytes) :
+
+def decode_bytes(x):
+    if isinstance(x, bytes):
         x = x.decode("utf-8")
     return x
 
 
-def purge(dir, pattern) :
-    for f in os.listdir(dir) :
-        if re.search(pattern, f) is not None :
+def purge(dir, pattern):
+    for f in os.listdir(dir):
+        if re.search(pattern, f) is not None:
             print("deleting:", pattern, "- file:", f)
             os.remove(os.path.join(dir, f))
 
 
-def move_pattern_to_dir(sourceDir, pattern, destDir) :
-    for f in os.listdir(sourceDir) :
-        if re.search(pattern, f) is not None :
+def move_pattern_to_dir(sourceDir, pattern, destDir):
+    for f in os.listdir(sourceDir):
+        if re.search(pattern, f) is not None:
             os.rename(os.path.join(sourceDir, f), os.path.join(destDir, f))
 
 
-def link_pattern_to_dir(sourceDir, pattern, destDir) :
-    for f in os.listdir(sourceDir) :
-        if re.search(pattern, f) is not None :
+def link_pattern_to_dir(sourceDir, pattern, destDir):
+    for f in os.listdir(sourceDir):
+        if re.search(pattern, f) is not None:
             src = os.path.join(sourceDir, f)
             dst = os.path.join(destDir, f)
-            if not os.path.exists(dst) :
+            if not os.path.exists(dst):
                 os.symlink(src, dst)
 
 
-def grep_file(regex, inFile) :
+def grep_file(regex, inFile):
     fl = open(inFile, "r")
     lines = fl.readlines()
     fl.close()
@@ -82,22 +85,22 @@ def grep_file(regex, inFile) :
     return out
 
 
-def grep_lines(regex, lines) :
-    if isinstance(lines, str) :
+def grep_lines(regex, lines):
+    if isinstance(lines, str):
         lines = lines.split("\n")
     out = [line for line in lines if line.find(regex) >= 0]
     return out
 
 
-def symlink_file(input_directory, output_directory, filename) :
+def symlink_file(input_directory, output_directory, filename):
     src = os.path.join(input_directory, filename)
     assert os.path.exists(src), "Cannot find script {} ...".format(filename)
     dst = os.path.join(output_directory, filename)
-    if not os.path.exists(dst) :
+    if not os.path.exists(dst):
         os.symlink(src, dst)
 
 
-def compressNCfile(filename, ppc=None) :
+def compressNCfile(filename, ppc=None):
     """Compress a netCDF3 file to netCDF4 using ncks
 
     Args:
@@ -108,21 +111,21 @@ def compressNCfile(filename, ppc=None) :
         Nothing
     """
 
-    if os.path.exists(filename) :
+    if os.path.exists(filename):
         print("Compress file {} with ncks".format(filename))
         command = "ncks -4 -L4 -O {} {}".format(filename, filename)
         print("\t" + command)
         commandList = command.split(" ")
-        if ppc is None :
+        if ppc is None:
             ppcText = ""
-        else :
-            if not isinstance(ppc, int) :
+        else:
+            if not isinstance(ppc, int):
                 raise RuntimeError("Argument ppc should be an integer...")
-            elif ppc < 1 or ppc > 6 :
+            elif ppc < 1 or ppc > 6:
                 raise RuntimeError("Argument ppc should be between 1 and 6...")
-            else :
+            else:
                 ppcText = "--ppc default={}".format(ppc)
-                commandList = [commandList[0]] + ppcText.split(" ") + commandList[1 :]
+                commandList = [commandList[0]] + ppcText.split(" ") + commandList[1:]
         ##
         ##
         p = subprocess.Popen(
@@ -131,16 +134,18 @@ def compressNCfile(filename, ppc=None) :
         stdout, stderr = p.communicate()
         stdout = decode_bytes(stdout)
         stderr = decode_bytes(stderr)
-        if len(stderr) > 0 or len(stdout) > 0 :
+        if len(stderr) > 0 or len(stdout) > 0:
             print("stdout = " + stdout)
             print("stderr = " + stderr)
             raise RuntimeError("Error from ncks...")
-    else :
+    else:
         print("File {} not found...".format(filename))
 
 
 ## calculate the number of jobs
-run_length_hours = (wrf_config.end_date - wrf_config.start_date).total_seconds() / 3600.0
+run_length_hours = (
+    wrf_config.end_date - wrf_config.start_date
+).total_seconds() / 3600.0
 number_of_jobs = int(math.ceil(run_length_hours / float(wrf_config.num_hours_per_run)))
 
 ## check that namelist template files are present
@@ -161,89 +166,89 @@ WRFnml = f90nml.read(WRFnmlPath)
 ## parameters that should agree for the WRF and WPS namelists
 namelistParamsThatShouldAgree = [
     {
-        "wrf_var" : "max_dom",
-        "wrf_group" : "domains",
-        "wps_var" : "max_dom",
-        "wps_group" : "share",
+        "wrf_var": "max_dom",
+        "wrf_group": "domains",
+        "wps_var": "max_dom",
+        "wps_group": "share",
     },
     {
-        "wrf_var" : "interval_seconds",
-        "wrf_group" : "time_control",
-        "wps_var" : "interval_seconds",
-        "wps_group" : "share",
+        "wrf_var": "interval_seconds",
+        "wrf_group": "time_control",
+        "wps_var": "interval_seconds",
+        "wps_group": "share",
     },
     {
-        "wrf_var" : "parent_id",
-        "wrf_group" : "domains",
-        "wps_var" : "parent_id",
-        "wps_group" : "geogrid",
+        "wrf_var": "parent_id",
+        "wrf_group": "domains",
+        "wps_var": "parent_id",
+        "wps_group": "geogrid",
     },
     {
-        "wrf_var" : "parent_grid_ratio",
-        "wrf_group" : "domains",
-        "wps_var" : "parent_grid_ratio",
-        "wps_group" : "geogrid",
+        "wrf_var": "parent_grid_ratio",
+        "wrf_group": "domains",
+        "wps_var": "parent_grid_ratio",
+        "wps_group": "geogrid",
     },
     {
-        "wrf_var" : "i_parent_start",
-        "wrf_group" : "domains",
-        "wps_var" : "i_parent_start",
-        "wps_group" : "geogrid",
+        "wrf_var": "i_parent_start",
+        "wrf_group": "domains",
+        "wps_var": "i_parent_start",
+        "wps_group": "geogrid",
     },
     {
-        "wrf_var" : "j_parent_start",
-        "wrf_group" : "domains",
-        "wps_var" : "j_parent_start",
-        "wps_group" : "geogrid",
+        "wrf_var": "j_parent_start",
+        "wrf_group": "domains",
+        "wps_var": "j_parent_start",
+        "wps_group": "geogrid",
     },
     {
-        "wrf_var" : "e_we",
-        "wrf_group" : "domains",
-        "wps_var" : "e_we",
-        "wps_group" : "geogrid",
+        "wrf_var": "e_we",
+        "wrf_group": "domains",
+        "wps_var": "e_we",
+        "wps_group": "geogrid",
     },
     {
-        "wrf_var" : "e_sn",
-        "wrf_group" : "domains",
-        "wps_var" : "e_sn",
-        "wps_group" : "geogrid",
+        "wrf_var": "e_sn",
+        "wrf_group": "domains",
+        "wps_var": "e_sn",
+        "wps_group": "geogrid",
     },
-    {"wrf_var" : "dx", "wrf_group" : "domains", "wps_var" : "dx", "wps_group" : "geogrid"},
-    {"wrf_var" : "dy", "wrf_group" : "domains", "wps_var" : "dy", "wps_group" : "geogrid"},
+    {"wrf_var": "dx", "wrf_group": "domains", "wps_var": "dx", "wps_group": "geogrid"},
+    {"wrf_var": "dy", "wrf_group": "domains", "wps_var": "dy", "wps_group": "geogrid"},
 ]
 
 print("\t\tCheck for consistency between key parameters of the WRF and WPS namelists")
-for paramDict in namelistParamsThatShouldAgree :
+for paramDict in namelistParamsThatShouldAgree:
     WRFval = WRFnml[paramDict["wrf_group"]][paramDict["wrf_var"]]
     WPSval = WPSnml[paramDict["wps_group"]][paramDict["wps_var"]]
     ## the dx,dy variables need special treatment - they are handled differently in the two namelists
-    if paramDict["wrf_var"] in ["dx", "dy"] :
-        if WPSnml["share"]["max_dom"] == 1 :
-            if isinstance(WRFval, list) :
+    if paramDict["wrf_var"] in ["dx", "dy"]:
+        if WPSnml["share"]["max_dom"] == 1:
+            if isinstance(WRFval, list):
                 assert (
-                        WRFval[0] == WPSval
+                    WRFval[0] == WPSval
                 ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                     paramDict["wrf_var"]
                 )
-            else :
+            else:
                 assert (
-                        WRFval == WPSval
+                    WRFval == WPSval
                 ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                     paramDict["wrf_var"]
                 )
-        else :
+        else:
             expectedVal = [float(WPSnml["geogrid"][paramDict["wps_var"]])]
-            for idom in range(1, WPSnml["share"]["max_dom"]) :
-                try :
+            for idom in range(1, WPSnml["share"]["max_dom"]):
+                try:
                     expectedVal.append(
                         expectedVal[-1]
                         / float(WPSnml["geogrid"]["parent_grid_ratio"][idom])
                     )
-                except Exception :
+                except Exception:
                     pdb.set_trace()
             ##
             assert (
-                    len(WRFval) == len(expectedVal)
+                len(WRFval) == len(expectedVal)
             ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
@@ -252,15 +257,15 @@ for paramDict in namelistParamsThatShouldAgree :
             ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
-    else :
+    else:
         assert type(WRFval) == type(
             WPSval
         ), "Mismatched type for variable {} between the WRF and WPS namelists".format(
             paramDict["wrf_var"]
         )
-        if isinstance(WRFval, list) :
+        if isinstance(WRFval, list):
             assert (
-                    len(WRFval) == len(WPSval)
+                len(WRFval) == len(WPSval)
             ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
@@ -269,9 +274,9 @@ for paramDict in namelistParamsThatShouldAgree :
             ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
-        else :
+        else:
             assert (
-                    WRFval == WPSval
+                WRFval == WPSval
             ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
@@ -291,19 +296,19 @@ print("\t\tGenerate the main coordination script")
 
 ############## EDIT: the following are the substitutions used for the main run script
 substitutions = {
-    "STARTDATE" : wrf_config.start_date.strftime("%Y%m%d%H"),
-    "njobs" : "{}".format(number_of_jobs),
-    "nhours" : "{}".format(wrf_config.num_hours_per_run),
-    "RUNNAME" : wrf_config.run_name,
-    "NUDGING" : "{}".format(not wrf_config.restart).lower(),
-    "runAsOneJob" : "{}".format(wrf_config.run_as_one_job).lower(),
-    "RUN_DIR" : wrf_config.run_dir,
+    "STARTDATE": wrf_config.start_date.strftime("%Y%m%d%H"),
+    "njobs": "{}".format(number_of_jobs),
+    "nhours": "{}".format(wrf_config.num_hours_per_run),
+    "RUNNAME": wrf_config.run_name,
+    "NUDGING": "{}".format(not wrf_config.restart).lower(),
+    "runAsOneJob": "{}".format(wrf_config.run_as_one_job).lower(),
+    "RUN_DIR": wrf_config.run_dir,
 }
 ############## end edit section #####################################################
 
 ## do the substitutions
 thisScript = copy.copy(scripts["main"])
-for avail_key in list(substitutions.keys()) :
+for avail_key in list(substitutions.keys()):
     key = "${%s}" % avail_key
     value = substitutions[avail_key]
     thisScript = [item.replace(key, value) for item in thisScript]
@@ -317,17 +322,16 @@ f.close()
 os.chmod(scriptPath, os.stat(scriptPath).st_mode | stat.S_IEXEC)
 
 ## loop through the different days
-for ind_job in range(number_of_jobs) :
+for ind_job in range(number_of_jobs):
     job_start = (
-            wrf_config.start_date
-            + datetime.timedelta(seconds=3600 * ind_job * int(wrf_config.num_hours_per_run))
-            - datetime.timedelta(seconds=3600 * int(wrf_config.num_hours_spin_up))
+        wrf_config.start_date
+        + datetime.timedelta(seconds=3600 * ind_job * int(wrf_config.num_hours_per_run))
+        - datetime.timedelta(seconds=3600 * int(wrf_config.num_hours_spin_up))
     )
 
     job_start_usable = wrf_config.start_date + datetime.timedelta(
         seconds=3600 * ind_job * int(wrf_config.num_hours_per_run)
     )
-
 
     job_end = wrf_config.start_date + datetime.timedelta(
         seconds=3600 * (ind_job + 1) * int(wrf_config.num_hours_per_run)
@@ -345,7 +349,7 @@ for ind_job in range(number_of_jobs) :
     print("\tCheck that the WRF initialisation files exist")
     wrfbdyPath = os.path.join(run_dir_with_date, "wrfbdy_d01")  ## check for the BCs
     wrfInitFilesExist = os.path.exists(wrfbdyPath)
-    for iDom in range(nDom) :
+    for iDom in range(nDom):
         dom = "d0{}".format(iDom + 1)
         wrfinputPath = os.path.join(
             run_dir_with_date, "wrfinput_{}".format(dom)
@@ -356,22 +360,22 @@ for ind_job in range(number_of_jobs) :
         )  ## check for SSTs
         wrfInitFilesExist = wrfInitFilesExist and os.path.exists(wrflowinpPath)
     ##
-    if not wrf_config.only_edit_namelists :
-        if not wrfInitFilesExist :
+    if not wrf_config.only_edit_namelists:
+        if not wrfInitFilesExist:
             print("\t\tThe WRF initialisation files did not exist...")
             # Check that the topography files exist
             geoFilesExist = True
             print("\tCheck that the geo_em files exist")
-            for iDom in range(nDom) :
+            for iDom in range(nDom):
                 dom = "d0{}".format(iDom + 1)
                 geoFile = "geo_em.{}.nc".format(dom)
                 geoPath = os.path.join(wrf_config.nml_dir, geoFile)
-                if not os.path.exists(geoPath) :
+                if not os.path.exists(geoPath):
                     geoFilesExist = False
             ## If not, produce them
-            if geoFilesExist :
+            if geoFilesExist:
                 print("\t\tThe geo_em files were indeed found")
-            else :
+            else:
                 print("\t\tThe geo_em files did not exist - create them")
                 ## copy the WPS namelist substituting the geog_data_path
                 WPSnml["geogrid"]["geog_data_path"] = wrf_config.geog_data_path
@@ -388,7 +392,7 @@ for ind_job in range(number_of_jobs) :
 
                 ##
                 dst = os.path.join(run_dir_with_date, "geogrid", "GEOGRID.TBL")
-                if os.path.exists(dst) :
+                if os.path.exists(dst):
                     os.remove(dst)
                 os.symlink(src, dst)
                 ## link to the geogrid.exe program
@@ -397,7 +401,7 @@ for ind_job in range(number_of_jobs) :
                     src
                 )
                 dst = os.path.join(run_dir_with_date, "geogrid.exe")
-                if not os.path.exists(dst) :
+                if not os.path.exists(dst):
                     os.symlink(src, dst)
                 ## move to the directory and run geogrid.exe
                 os.chdir(run_dir_with_date)
@@ -432,7 +436,7 @@ for ind_job in range(number_of_jobs) :
                 os.rename(src, dst)
                 ## compress the output
                 print("\tCompress the geo_em files")
-                for iDom in range(nDom) :
+                for iDom in range(nDom):
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
                     compressNCfile(geoFile)
@@ -442,26 +446,26 @@ for ind_job in range(number_of_jobs) :
                     shutil.move(src, dst)
             ##
             ## link to the geo files
-            for iDom in range(nDom) :
+            for iDom in range(nDom):
                 dom = "d0{}".format(iDom + 1)
                 geoFile = "geo_em.{}.nc".format(dom)
                 ## move the file to the namelist directory
                 src = os.path.join(wrf_config.nml_dir, geoFile)
                 dst = os.path.join(run_dir_with_date, geoFile)
-                if not os.path.exists(dst) :
+                if not os.path.exists(dst):
                     os.symlink(src, dst)
             ##
             print("\tCheck that the met_em files exist")
-            if not os.path.exists(wrf_config.metem_dir) :
+            if not os.path.exists(wrf_config.metem_dir):
                 os.makedirs(wrf_config.metem_dir, exist_ok=True)
                 metemFilesExist = False
-            else :
+            else:
                 metemFilesExist = True
                 ## check if the met_em files exist
-                for hour in range(0, run_length_total_hours + 1, 6) :
+                for hour in range(0, run_length_total_hours + 1, 6):
                     metem_time = job_start + datetime.timedelta(seconds=hour * 3600)
                     metem_time_str = metem_time.strftime("%Y-%m-%d_%H:%M:%S")
-                    for iDom in range(nDom) :
+                    for iDom in range(nDom):
                         dom = "d0{}".format(iDom + 1)
                         metem_file = os.path.join(
                             wrf_config.metem_dir,
@@ -469,7 +473,7 @@ for ind_job in range(number_of_jobs) :
                         )
                         metemFilesExist = metemFilesExist and os.path.exists(metem_file)
             ##
-            if not metemFilesExist :
+            if not metemFilesExist:
                 print("\t\tThe met_em files did not exist - create them")
                 ##
                 os.chdir(run_dir_with_date)
@@ -481,7 +485,7 @@ for ind_job in range(number_of_jobs) :
                     src
                 ), "Cannot find link_grib.csh at {} ...".format(src)
                 dst = os.path.join(run_dir_with_date, "link_grib.csh")
-                if os.path.exists(dst) :
+                if os.path.exists(dst):
                     os.remove(dst)
                 os.symlink(src, dst)
                 ## link the ungrib executabble
@@ -490,7 +494,7 @@ for ind_job in range(number_of_jobs) :
                     src
                 )
                 dst = os.path.join(run_dir_with_date, "ungrib.exe")
-                if not os.path.exists(dst) :
+                if not os.path.exists(dst):
                     os.symlink(src, dst)
 
                 wpsStrDate = (job_start - datetime.timedelta(days=1)).date()
@@ -498,33 +502,33 @@ for ind_job in range(number_of_jobs) :
                 nDaysWps = (wpsEndDate - wpsStrDate).days + 1
 
                 ## should we use ERA-Interim analyses?
-                if wrf_config.analysis_source == "ERAI" :
-                    if wrf_config.use_high_res_sst_data :
+                if wrf_config.analysis_source == "ERAI":
+                    if wrf_config.use_high_res_sst_data:
                         ## configure the namelist
                         ## EDIT: the following are the substitutions used for the WPS namelist
                         WPSnml["share"]["start_date"] = [
-                                                            job_start.strftime("%Y-%m-%d_00:00:00")
-                                                        ] * nDom
+                            job_start.strftime("%Y-%m-%d_00:00:00")
+                        ] * nDom
                         WPSnml["share"]["end_date"] = [
-                                                          (job_end.date() + datetime.timedelta(days=1)).strftime(
-                                                              "%Y-%m-%d_%H:%M:%S"
-                                                          )
-                                                      ] * nDom
+                            (job_end.date() + datetime.timedelta(days=1)).strftime(
+                                "%Y-%m-%d_%H:%M:%S"
+                            )
+                        ] * nDom
                         WPSnml["share"]["interval_seconds"] = 6 * 60 * 60  ## 24*60*60
                         WPSnml["ungrib"]["prefix"] = "SST"
                         WPSnml["geogrid"]["geog_data_path"] = wrf_config.geog_data_path
                         ## end edit section #####################################################
                         ## write out the namelist
-                        if os.path.exists("namelist.wps") :
+                        if os.path.exists("namelist.wps"):
                             os.remove("namelist.wps")
                         ##
                         WPSnml.write("namelist.wps")
 
                         sstDir = "sst_tmp"
-                        if not os.path.exists(sstDir) :
+                        if not os.path.exists(sstDir):
                             os.makedirs(sstDir, exist_ok=True)
                         ##
-                        for iDayWps in range(nDaysWps) :
+                        for iDayWps in range(nDaysWps):
                             wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
                             ## check for the monthly file
                             monthlyFile = wpsDate.strftime(
@@ -535,9 +539,9 @@ for ind_job in range(number_of_jobs) :
                             )
                             monthlyFileDst = os.path.join(sstDir, monthlyFile)
                             if os.path.exists(monthlyFileSrc) and (
-                                    not os.path.exists(monthlyFileDst)
-                            ) :
-                                if not os.path.exists(monthlyFileDst) :
+                                not os.path.exists(monthlyFileDst)
+                            ):
+                                if not os.path.exists(monthlyFileDst):
                                     os.symlink(monthlyFileSrc, monthlyFileDst)
                             ## check for the daily file
                             dailyFile = wpsDate.strftime(wrf_config.sst_daily_pattern)
@@ -546,9 +550,9 @@ for ind_job in range(number_of_jobs) :
                             )
                             dailyFileDst = os.path.join(sstDir, dailyFile)
                             if os.path.exists(dailyFileSrc) and (
-                                    not os.path.exists(dailyFileDst)
-                            ) :
-                                if not os.path.exists(dailyFileDst) :
+                                not os.path.exists(dailyFileDst)
+                            ):
+                                if not os.path.exists(dailyFileDst):
                                     os.symlink(dailyFileSrc, dailyFileDst)
                         ##
                         wpsStrDateStr = wpsStrDate.strftime("%Y-%m-%d_%H:%M:%S")
@@ -583,7 +587,7 @@ for ind_job in range(number_of_jobs) :
                             for f in os.listdir(run_dir_with_date)
                             if re.search("GRIBFILE", f) is not None
                         ]
-                        if len(gribmatches) == 0 :
+                        if len(gribmatches) == 0:
                             raise RuntimeError("Gribfiles not linked successfully...")
                         ## link to the SST Vtable
                         src = wrf_config.sst_vtable
@@ -591,7 +595,7 @@ for ind_job in range(number_of_jobs) :
                             src
                         )
                         dst = "Vtable"
-                        if os.path.exists(dst) :
+                        if os.path.exists(dst):
                             os.remove(dst)
                         os.symlink(src, dst)
                         purge(run_dir_with_date, "SST:*")
@@ -622,7 +626,7 @@ for ind_job in range(number_of_jobs) :
                         ## check that it ran
                         ## matches = grep_file('Successful completion of ungrib', logfile)
                         matches = grep_lines("Successful completion of ungrib", stdout)
-                        if len(matches) == 0 :
+                        if len(matches) == 0:
                             raise RuntimeError(
                                 "Success message not found in ungrib logfile..."
                             )
@@ -632,27 +636,25 @@ for ind_job in range(number_of_jobs) :
                         os.rename(src, dst)
 
                     analysisDir = "analysis_tmp"
-                    if not os.path.exists(analysisDir) :
+                    if not os.path.exists(analysisDir):
                         os.makedirs(analysisDir, exist_ok=True)
 
-                    ## find the files matching the analysis pattern
-                    # patternTypes = [
-                    #     "analysis_pattern_surface",
-                    #     "analysis_pattern_upper",
-                    # ]
-                    for pattern in [wrf_config.analysis_pattern_surface, wrf_config.analysis_pattern_upper] :
-                        # pattern = patternType
+                    for pattern in [
+                        wrf_config.analysis_pattern_surface,
+                        wrf_config.analysis_pattern_upper,
+                    ]:
+
                         files = set([])
-                        for iDayWps in range(nDaysWps) :
+                        for iDayWps in range(nDaysWps):
                             wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
                             patternWithDates = wpsDate.strftime(pattern)
                             files = files.union(set(glob.glob(patternWithDates)))
                         ##
                         files = list(files)
                         files.sort()
-                        if patternType == "analysis_pattern_upper" :
+                        if pattern == "analysis_pattern_upper":
                             ## for the upper-level files, be selective and use only those that contain the relevant range of dates
-                            for ifile, filename in enumerate(files) :
+                            for ifile, filename in enumerate(files):
                                 basepieces = os.path.basename(filename).split("_")
                                 fileStartDateStr = os.path.basename(filename).split(
                                     "_"
@@ -668,25 +670,25 @@ for ind_job in range(number_of_jobs) :
                                 ).date()
                                 ##
                                 if (
-                                        fileStartDate <= wpsStrDate
-                                        and wpsStrDate <= fileEndDate
-                                ) :
+                                    fileStartDate <= wpsStrDate
+                                    and wpsStrDate <= fileEndDate
+                                ):
                                     ifileStart = ifile
                                 ##
                                 if (
-                                        fileStartDate <= wpsEndDate
-                                        and wpsEndDate <= fileEndDate
-                                ) :
+                                    fileStartDate <= wpsEndDate
+                                    and wpsEndDate <= fileEndDate
+                                ):
                                     ifileEnd = ifile
-                        else :
+                        else:
                             ## for the surface files use all those that match
                             ifileStart = 0
                             ifileEnd = len(files) - 1
                         ##
-                        for ifile in range(ifileStart, ifileEnd + 1) :
+                        for ifile in range(ifileStart, ifileEnd + 1):
                             src = files[ifile]
                             dst = os.path.join(analysisDir, os.path.basename(src))
-                            if not os.path.exists(dst) :
+                            if not os.path.exists(dst):
                                 os.symlink(src, dst)
 
                         ## prepare to run link_grib.csh
@@ -695,11 +697,11 @@ for ind_job in range(number_of_jobs) :
                             os.path.join(analysisDir, "*"),
                         ]
 
-                else :
+                else:
                     ## consider the case that we are using the FNL datax
                     nIntervals = (
-                            int(round((job_end - job_start).total_seconds() / 3600.0 / 6.0))
-                            + 1
+                        int(round((job_end - job_start).total_seconds() / 3600.0 / 6.0))
+                        + 1
                     )
                     FNLtimes = [
                         job_start + datetime.timedelta(hours=6 * hi)
@@ -713,11 +715,11 @@ for ind_job in range(number_of_jobs) :
                     allFNLfilesExist = all(
                         [os.path.exists(FNLfile) for FNLfile in FNLfiles]
                     )
-                    if allFNLfilesExist :
+                    if allFNLfilesExist:
                         print(
                             "\t\tAll FNL files were found - do not repeat the download"
                         )
-                    else :
+                    else:
                         ## otherwise get it all
                         FNLfiles = download_gdas_fnl_data(
                             orcid=wrf_config.orcid,
@@ -727,12 +729,12 @@ for ind_job in range(number_of_jobs) :
                         )
                     linkGribCmds = ["./link_grib.csh"] + FNLfiles
                     ## optionally take a regional subset
-                    if wrf_config.regional_subset_of_grib_data :
+                    if wrf_config.regional_subset_of_grib_data:
                         geoFile = "geo_em.d01.nc"
                         ## find the geographical region, and add a few degrees on either side
                         geoStrs = {}
                         nc = netCDF4.Dataset(geoFile)
-                        for varname in ["XLAT_M", "XLONG_M"] :
+                        for varname in ["XLAT_M", "XLONG_M"]:
                             coords = nc.variables[varname][:]
                             coords = [coords.min(), coords.max()]
                             coords = [
@@ -743,7 +745,7 @@ for ind_job in range(number_of_jobs) :
                             geoStrs[varname] = coordStr
                         nc.close()
                         ## use wgrib2 that
-                        for FNLfile in FNLfiles :
+                        for FNLfile in FNLfiles:
                             tmpfile = os.path.join("/tmp", os.path.basename(FNLfile))
                             print("\t\tSubset the grib file", os.path.basename(FNLfile))
                             stdout, stderr = subprocess.Popen(
@@ -758,7 +760,7 @@ for ind_job in range(number_of_jobs) :
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,
                             ).communicate()
-                            if len(stderr) > 0 :
+                            if len(stderr) > 0:
                                 print(stderr)
                                 raise RuntimeError(
                                     "Errors found when running wgrib2..."
@@ -769,17 +771,17 @@ for ind_job in range(number_of_jobs) :
 
                 ## EDIT: the following are the substitutions used for the WPS namelist
                 WPSnml["share"]["start_date"] = [
-                                                    job_start.strftime("%Y-%m-%d_%H:%M:%S")
-                                                ] * nDom
+                    job_start.strftime("%Y-%m-%d_%H:%M:%S")
+                ] * nDom
                 WPSnml["share"]["end_date"] = [
-                                                  job_end.strftime("%Y-%m-%d_%H:%M:%S")
-                                              ] * nDom
+                    job_end.strftime("%Y-%m-%d_%H:%M:%S")
+                ] * nDom
                 WPSnml["ungrib"]["prefix"] = "ERA"
                 WPSnml["share"]["interval_seconds"] = 6 * 60 * 60
                 ## end edit section #####################################################
 
                 ## write out the namelist
-                if os.path.exists("namelist.wps") :
+                if os.path.exists("namelist.wps"):
                     os.remove("namelist.wps")
                 WPSnml.write("namelist.wps")
                 ##
@@ -810,7 +812,7 @@ for ind_job in range(number_of_jobs) :
                     for f in os.listdir(run_dir_with_date)
                     if re.search("GRIBFILE", f) is not None
                 ]
-                if len(gribmatches) == 0 :
+                if len(gribmatches) == 0:
                     raise RuntimeError("Gribfiles not linked successfully...")
 
                 ###################
@@ -821,7 +823,7 @@ for ind_job in range(number_of_jobs) :
                 src = wrf_config.analysis_vtable
                 assert os.path.exists(src), "Analysis Vtable expected at {}".format(src)
                 dst = os.path.join(run_dir_with_date, "Vtable")
-                if os.path.exists(dst) :
+                if os.path.exists(dst):
                     os.remove(dst)
                 os.symlink(src, dst)
 
@@ -849,13 +851,13 @@ for ind_job in range(number_of_jobs) :
 
                 ## FIXME: check that it worked
                 matches = grep_lines("Successful completion of ungrib", stdout)
-                if len(matches) == 0 :
+                if len(matches) == 0:
                     print(stdout)
                     raise RuntimeError("Success message not found in ungrib logfile...")
 
                 ## if we are using the FNL analyses, delete the downloaded FNL files
-                if wrf_config.analysis_source == "FNL" :
-                    for FNLfile in FNLfiles :
+                if wrf_config.analysis_source == "FNL":
+                    for FNLfile in FNLfiles:
                         os.remove(FNLfile)
 
                 #############
@@ -870,7 +872,7 @@ for ind_job in range(number_of_jobs) :
                 os.makedirs(metgriddir, exist_ok=True)
 
                 WPSnml["metgrid"]["fg_name"] = ["ERA"]
-                if wrf_config.use_high_res_sst_data :
+                if wrf_config.use_high_res_sst_data:
                     WPSnml["metgrid"]["fg_name"].append("SST")
                 ##
                 ## link to the relevant METGRID.TBL
@@ -879,7 +881,7 @@ for ind_job in range(number_of_jobs) :
                     src
                 )
                 dst = os.path.join(metgriddir, "METGRID.TBL")
-                if not os.path.exists(dst) :
+                if not os.path.exists(dst):
                     os.symlink(src, dst)
                 ## link to metgrid.exe
                 src = wrf_config.metgrid_exe
@@ -887,7 +889,7 @@ for ind_job in range(number_of_jobs) :
                     src
                 )
                 dst = os.path.join(run_dir_with_date, "metgrid.exe")
-                if not os.path.exists(dst) :
+                if not os.path.exists(dst):
                     os.symlink(src, dst)
                 ##
                 ## logfile = 'metgrid_stderr_stdout.log'
@@ -908,13 +910,13 @@ for ind_job in range(number_of_jobs) :
                 f.close()
 
                 matches = grep_lines("Successful completion of metgrid", stdout)
-                if len(matches) == 0 :
+                if len(matches) == 0:
                     raise RuntimeError(
                         "Success message not found in metgrid logfile..."
                     )
 
                 purge(run_dir_with_date, "ERA:*")
-                if wrf_config.use_high_res_sst_data :
+                if wrf_config.use_high_res_sst_data:
                     purge(run_dir_with_date, "SST:*")
                 purge(run_dir_with_date, "FILE:*")
                 purge(run_dir_with_date, "PFILE:*")
@@ -931,10 +933,10 @@ for ind_job in range(number_of_jobs) :
             ## link to the met_em files
             os.chdir(run_dir_with_date)
             print("\t\tlink to the met_em files")
-            for hour in range(0, run_length_total_hours + 1, 6) :
+            for hour in range(0, run_length_total_hours + 1, 6):
                 metem_time = job_start + datetime.timedelta(seconds=hour * 3600)
                 metem_time_str = metem_time.strftime("%Y-%m-%d_%H:%M:%S")
-                for iDom in range(nDom) :
+                for iDom in range(nDom):
                     dom = "d0{}".format(iDom + 1)
                     metem_file = "met_em.{}.{}.nc".format(dom, metem_time_str)
                     src = os.path.join(wrf_config.metem_dir, metem_file)
@@ -942,10 +944,10 @@ for ind_job in range(number_of_jobs) :
                         src
                     ), "Cannot find met_em file at {} ...".format(src)
                     dst = os.path.join(run_dir_with_date, metem_file)
-                    if not os.path.exists(dst) :
+                    if not os.path.exists(dst):
                         os.symlink(src, dst)
 
-    if (not wrf_config.only_edit_namelists) and (not wrfInitFilesExist) :
+    if (not wrf_config.only_edit_namelists) and (not wrfInitFilesExist):
         ## find a met_em file and read the number of atmospheric and soil levels
         metempattern = os.path.join(wrf_config.metem_dir, "met_em.d*.nc")
         ##
@@ -956,11 +958,11 @@ for ind_job in range(number_of_jobs) :
         nz_metem = len(nc.dimensions["num_metgrid_levels"])
         nz_soil = len(nc.dimensions["num_st_layers"])
         nc.close()
-    else :
-        if wrf_config.analysis_source == "ERAI" :
+    else:
+        if wrf_config.analysis_source == "ERAI":
             nz_metem = 38
             nz_soil = 4
-        elif wrf_config.analysis_source == "FNL" :
+        elif wrf_config.analysis_source == "FNL":
             nz_metem = 27
             nz_soil = 4
 
@@ -988,7 +990,7 @@ for ind_job in range(number_of_jobs) :
     WRFnml["domains"]["num_metgrid_soil_levels"] = nz_soil
     ##
     nmlfile = "namelist.input"
-    if os.path.exists(nmlfile) :
+    if os.path.exists(nmlfile):
         os.remove(nmlfile)
     WRFnml.write(nmlfile)
     ##
@@ -996,14 +998,14 @@ for ind_job in range(number_of_jobs) :
     src = wrf_config.real_exe
     assert os.path.exists(src), "Cannot find real.exe at {} ...".format(src)
     dst = os.path.join(run_dir_with_date, "real.exe")
-    if os.path.exists(dst) :
+    if os.path.exists(dst):
         os.remove(dst)
     os.symlink(src, dst)
     ##
     src = wrf_config.wrf_exe
     assert os.path.exists(src), "Cannot find wrf.exe at {} ...".format(src)
     dst = os.path.join(run_dir_with_date, "wrf.exe")
-    if os.path.exists(dst) :
+    if os.path.exists(dst):
         os.remove(dst)
     os.symlink(src, dst)
 
@@ -1013,7 +1015,7 @@ for ind_job in range(number_of_jobs) :
         src
     )
     dst = os.path.join(run_dir_with_date, "checkWrfoutInBackground.py")
-    if os.path.exists(dst) :
+    if os.path.exists(dst):
         os.remove(dst)
     os.symlink(src, dst)
 
@@ -1026,16 +1028,15 @@ for ind_job in range(number_of_jobs) :
 
     # link to scripts from the namelist and target directories
     for input_directory, scripts_to_copy in (
-            (wrf_config.target_dir, wrf_config.scripts_to_copy_from_target_dir),
-            (wrf_config.nml_dir, wrf_config.scripts_to_copy_from_nml_dir),
-    ) :
-
+        (wrf_config.target_dir, wrf_config.scripts_to_copy_from_target_dir),
+        (wrf_config.nml_dir, wrf_config.scripts_to_copy_from_nml_dir),
+    ):
         scripts_to_copy = scripts_to_copy.split(",")
 
-        for script_to_copy in scripts_to_copy :
+        for script_to_copy in scripts_to_copy:
             symlink_file(input_directory, run_dir_with_date, script_to_copy)
 
-    if (not wrf_config.only_edit_namelists) and (not wrfInitFilesExist) :
+    if (not wrf_config.only_edit_namelists) and (not wrfInitFilesExist):
         ##
         logfile = "real_stderr_stdout.log"
 
@@ -1063,24 +1064,24 @@ for ind_job in range(number_of_jobs) :
 
         rsloutfile = "rsl.out.0000"
         matches = grep_file("SUCCESS COMPLETE REAL_EM INIT", rsloutfile)
-        if len(matches) == 0 :
+        if len(matches) == 0:
             raise RuntimeError(
                 "Success message not found in real.exe logfile (rsl.out.0000)..."
             )
         ##
-        if os.path.exists("link_grib.csh") :
+        if os.path.exists("link_grib.csh"):
             os.remove("link_grib.csh")
-        if os.path.exists("Vtable") :
+        if os.path.exists("Vtable"):
             os.remove("Vtable")
-        if os.path.exists("metgrid") :
+        if os.path.exists("metgrid"):
             shutil.rmtree("metgrid")
-        if os.path.exists("metgrid.exe") :
+        if os.path.exists("metgrid.exe"):
             os.remove("metgrid.exe")
-        if os.path.exists("ungrib.exe") :
+        if os.path.exists("ungrib.exe"):
             os.remove("ungrib.exe")
 
         ## optionally delete the met_em files once they have been used
-        if wrf_config.delete_metem_files :
+        if wrf_config.delete_metem_files:
             purge(wrf_config.metem_dir, "met_em*")
 
     ## clean up the links to the met_em files regardless, as they are no longer needed
@@ -1091,18 +1092,18 @@ for ind_job in range(number_of_jobs) :
 
     ########## EDIT: the following are the substitutions used for the per-run cleanup and run scripts
     substitutions = {
-        "RUN_DIR" : run_dir_with_date,
-        "RUNSHORT" : wrf_config.run_name[:8],
-        "STARTDATE" : job_start_usable.strftime("%Y%m%d"),
-        "firstTimeToKeep" : job_start_usable.strftime("%Y-%m-%dT%H%M"),
+        "RUN_DIR": run_dir_with_date,
+        "RUNSHORT": wrf_config.run_name[:8],
+        "STARTDATE": job_start_usable.strftime("%Y%m%d"),
+        "firstTimeToKeep": job_start_usable.strftime("%Y-%m-%dT%H%M"),
     }
     ########## end edit section #####################################################
 
     ## write out the run and cleanup script
-    for dailyScriptName in dailyScriptNames :
+    for dailyScriptName in dailyScriptNames:
         ## do the substitutions
         thisScript = copy.copy(scripts[dailyScriptName])
-        for avail_key in list(substitutions.keys()) :
+        for avail_key in list(substitutions.keys()):
             key = "${%s}" % avail_key
             value = substitutions[avail_key]
             thisScript = [item.replace(key, value) for item in thisScript]
