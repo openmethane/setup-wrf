@@ -1,3 +1,5 @@
+import datetime
+
 from attrs import define, field
 import os
 from setup_runs.config_read_functions import (
@@ -20,9 +22,9 @@ class WRFConfig:
     """Project name """
     target: str
     """Target environment for running tasks"""
-    start_date: str = field(converter=process_date_string)
+    start_date: datetime.datetime = field(converter=process_date_string)
     """start first simulation, "%Y-%m-%d %H:%M:%S %Z" or just "%Y-%m-%d %H:%M:%S" for UTC"""
-    end_date: str = field(converter=process_date_string)
+    end_date: datetime.datetime = field(converter=process_date_string)
     """The end time of the last simulation (same format as above)"""
 
     @end_date.validator
