@@ -10,8 +10,8 @@ import pytz
 
 def boolean_converter(
     value: str,
-    truevals: list[str] = ("True", "true", "1", "t", "y", "yes"),
-    falsevals: list[str] = ("False", "false", "0", "f", "n", "no"),
+    true_vals: list[str] = ("True", "true", "1", "t", "y", "yes"),
+    false_vals: list[str] = ("False", "false", "0", "f", "n", "no"),
 ):
     """
     Convert a string value to a boolean based on predefined true and false values.
@@ -20,9 +20,9 @@ def boolean_converter(
     ----------
     value
         The string value to be converted.
-    truevals
+    true_vals
         List of strings considered as True values.
-    falsevals
+    false_vals
         List of strings considered as False values.
 
     Returns
@@ -31,11 +31,11 @@ def boolean_converter(
 
     """
 
-    boolvals = truevals + falsevals
+    boolvals = true_vals + false_vals
 
     assert value.lower() in boolvals, f"Key {value} not a recognised boolean value"
 
-    return value.lower() in truevals
+    return value.lower() in true_vals
 
 
 def read_config_file(configFile: str) -> str:
@@ -155,30 +155,28 @@ def substitute_variables(config: dict) -> dict[str, str | bool | int]:
     return config
 
 
-def process_date_string(datestring):
+def process_date_string(date_str: str) -> datetime.datetime:
     """
     Process a date string to a datetime object with the appropriate timezone.
 
     Parameters
     ----------
-    datestring
+    date_str
         The input date string to be processed.
 
     Returns
     -------
         The processed datetime object with the correct timezone
     """
-    datestring = datestring.strip().rstrip()
+    date_str = date_str.strip().rstrip()
 
     ## get the timezone
-    if len(datestring) <= 19:
+    if len(date_str) <= 19:
         tz = pytz.UTC
-        date = datetime.datetime.strptime(datestring, "%Y-%m-%d %H:%M:%S")
+        dt = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S")
     else:
-        tzstr = datestring[20:]
+        tzstr = date_str[20:]
         tz = pytz.timezone(tzstr)
-        date = datetime.datetime.strptime(datestring, "%Y-%m-%d %H:%M:%S %Z")
+        dt = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %Z")
 
-    date = tz.localize(date)
-
-    return date
+    return tz.localize(dt)

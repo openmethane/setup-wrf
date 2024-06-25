@@ -70,10 +70,8 @@ COPY --from=builder /opt/venv /opt/venv
 # Copy in WRF and CMAQ binaries
 # https://github.com/climate-resource/docker-wrf
 # https://github.com/openmethane/docker-cmaq
-# TODO: temporarily pinned staging builds until this is verified to work
-# Otherwise the CI will be broken for main
-COPY --from=ghcr.io/climate-resource/wrf:pr-1 /opt/wrf /opt/wrf
-COPY --from=ghcr.io/openmethane/cmaq:pr-4 /opt/cmaq /opt/cmaq
+COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
+COPY --from=ghcr.io/openmethane/cmaq:5.0.2 /opt/cmaq /opt/cmaq
 
 # Install the local package in editable mode
 # Requires scaffolding the src directories

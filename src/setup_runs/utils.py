@@ -89,7 +89,7 @@ def compressNCfile(filename, ppc=None):
         print("File {} not found...".format(filename))
 
 
-def loadScripts(Scripts):
+def loadScripts(scripts):
     """Read the contents (i.e. the lines of text) of a set of scripts into a dictionary
 
     Args:
@@ -98,7 +98,7 @@ def loadScripts(Scripts):
     Returns:
         scripts: A dictionary of dictionaries, with the inner level containing the keys 'path' and 'lines' (giving their file path and lines of text, respectively)
     """
-    scripts = copy.copy(Scripts)
+    scripts = copy.copy(scripts)
     ## for each of the scripts, read in the contents
     for k in list(scripts.keys()):
         ## check that the script is found
