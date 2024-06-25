@@ -13,18 +13,28 @@ import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.wrf.read_config_wrf import load_wrf_config
+import click
 
-## get command line arguments
-parser = argparse.ArgumentParser()
-
-parser.add_argument(
-    "-c",
-    "--configFile",
+@click.command()
+@click.option("-c",
+    "--configfile",
     help="Path to configuration file",
-    default="config/wrf/config.nci.json",
-)
-args = parser.parse_args()
-configFile = args.configFile
+    default="config/wrf/config.nci.json",)
+def get_config_file_path(configfile):
+    return configfile
+
+configFile = get_config_file_path()
+# ## get command line arguments
+# parser = argparse.ArgumentParser()
+#
+# parser.add_argument(
+#     "-c",
+#     "--configFile",
+#     help="Path to configuration file",
+#     default="config/wrf/config.nci.json",
+# )
+# args = parser.parse_args()
+# configFile = args.configFile
 
 # load config file and create WRFConfig object
 wrf_config = load_wrf_config(configFile)
