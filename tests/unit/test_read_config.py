@@ -227,17 +227,25 @@ def test_010_WRF_NCI_config_object(config_path_wrf_docker):
     assert config == asdict(wrf_config)
 
 
-def test_0115_WRF_NCI_config_object(config_path_wrf_nci):
-    assert False
+def test_011_WRF_NCI_config_object(config_path_wrf_nci, data_regression):
+    wrf_config = load_wrf_config(config_path_wrf_nci)
+    data = asdict(wrf_config)
+    data_regression.check(data)
 
-def test_011_valid_CMAQ_NCI_config_file(config_path_cmaq_nci):
-    setup_cmaq = load_cmaq_config(config_path_cmaq_nci)
-    assert setup_cmaq
+def test_012_WRF_docker_config_object(config_path_wrf_docker, data_regression):
+    wrf_config = load_wrf_config(config_path_wrf_docker)
+    data = asdict(wrf_config)
+    data_regression.check(data)
 
+def test_013_valid_CMAQ_NCI_config_file(config_path_cmaq_nci, data_regression):
+    cmaq_config = load_cmaq_config(config_path_cmaq_nci)
+    data = asdict(cmaq_config)
+    data_regression.check(data)
 
-def test_012_valid_CMAQ_Docker_config_file(config_path_cmaq_docker):
-    setup_cmaq = load_cmaq_config(config_path_cmaq_docker)
-    assert setup_cmaq
+def test_014_valid_CMAQ_Docker_config_file(data_regression , config_path_cmaq_docker):
+    cmaq_config = load_cmaq_config(config_path_cmaq_docker)
+    data = asdict(cmaq_config)
+    data_regression.check(data)
 
 
 @pytest.fixture
@@ -300,7 +308,7 @@ def cmaq_config_dict():
     ],
     ids=lambda test_id: test_id,
 )
-def test_010_mechCMAQ_validator(value, expected_exception, test_id, cmaq_config_dict):
+def test_015_mechCMAQ_validator(value, expected_exception, test_id, cmaq_config_dict):
     cmaq_config_dict["mechCMAQ"] = value
 
     if expected_exception:
@@ -339,7 +347,7 @@ def test_010_mechCMAQ_validator(value, expected_exception, test_id, cmaq_config_
         ),
     ],
 )
-def test_011_validators_more_than_16_characters(
+def test_016_validators_more_than_16_characters(
     attribute, value, error_string, cmaq_config_dict
 ):
     cmaq_config_dict[attribute] = value
@@ -376,7 +384,7 @@ def test_011_validators_more_than_16_characters(
     ],
     ids=lambda test_id: test_id,
 )
-def test_012_scripts_validator(input_value, test_id, cmaq_config_dict):
+def test_017_scripts_validator(input_value, test_id, cmaq_config_dict):
     cmaq_config_dict["scripts"] = input_value
 
     try:
@@ -417,7 +425,7 @@ def test_012_scripts_validator(input_value, test_id, cmaq_config_dict):
     ],
     ids=lambda test_id: test_id,
 )
-def test_013_scripts_validator_error_cases(
+def test_018_scripts_validator_error_cases(
     input_value, expected_exception_message, test_id, cmaq_config_dict
 ):
     cmaq_config_dict["scripts"] = input_value
@@ -442,7 +450,7 @@ def test_013_scripts_validator_error_cases(
         ),
     ],
 )
-def test_014_read_cmaq_json_config(test_input, expected, tmp_path):
+def test_019_read_cmaq_json_config(test_input, expected, tmp_path):
     # Create a temporary directory and write the test data to a file
     test_file = tmp_path / test_input
     with open(test_file, "w") as f:
@@ -463,7 +471,7 @@ def test_014_read_cmaq_json_config(test_input, expected, tmp_path):
     ],
     ids=lambda test_id: test_id,
 )
-def test_015_validator_endDate_after_startDate(
+def test_020_validator_endDate_after_startDate(
     startDate, endDate, test_id, cmaq_config_dict
 ):
     cmaq_config_dict["startDate"] = startDate
@@ -498,7 +506,7 @@ def test_015_validator_endDate_after_startDate(
     ],
     ids=lambda test_id: test_id,
 )
-def test_016_validator_endDate_after_startDate_errors(
+def test_021_validator_endDate_after_startDate_errors(
     startDate, endDate, test_id, cmaq_config_dict
 ):
     cmaq_config_dict["startDate"] = startDate
