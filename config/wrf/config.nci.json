@@ -21,7 +21,7 @@
     "use_high_res_sst_data" : "true",
     "wps_dir" : "${project_root}/wrf/coecms/WPS",
     "wrf_dir" : "${project_root}/wrf/coecms/WRF",
-    "nml_dir" : "${setup_root}/templates/${run_name}",
+    "nml_dir" : "${setup_root}/domains/${run_name}",
     "target_dir" : "${setup_root}/targets/${target}",
     "scripts_to_copy_from_nml_dir":"add_remove_var.txt",
     "scripts_to_copy_from_target_dir":"nccopy_compress_output.sh,load_wrf_env.sh",
