@@ -1,8 +1,11 @@
 import datetime
 
 from attrs import define, field
-import json
-from setup_runs.config_read_functions import boolean_converter, process_date_string
+from setup_runs.config_read_functions import (
+    boolean_converter,
+    process_date_string,
+    load_json,
+)
 
 
 def boolean_tuple(x):
@@ -153,25 +156,6 @@ class CMAQConfig:
     CAMSToCmaqBiasCorrect: float
     """Pre-set is (1.838 - 1.771)"""
     # TODO: Add description for CAMSToCmaqBiasCorrect?
-
-
-def load_json(filepath: str) -> dict[str, str | int | float]:
-    """
-    Loads and parses JSON data from a file.
-
-    Parameters
-    ----------
-    filepath
-        The path to the JSON file to load.
-
-    Returns
-    -------
-        The parsed JSON data.
-    """
-
-    with open(filepath) as f:
-        config = json.load(f)
-    return config
 
 
 def create_cmaq_config_object(config: dict[str, str | int | float]) -> CMAQConfig:

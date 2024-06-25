@@ -1,7 +1,4 @@
-import os
-import sys
 import json
-import re
 import datetime
 from typing import Mapping
 
@@ -38,59 +35,6 @@ def boolean_converter(
     return value.lower() in true_vals
 
 
-def read_config_file(configFile: str) -> str:
-    """
-    Read and return the content of a configuration file.
-
-    Parameters
-    ----------
-    configFile
-        The path to the configuration file.
-
-    Returns
-    -------
-        The content of the configuration file.
-
-    """
-
-    assert os.path.exists(
-        configFile
-    ), f"No configuration file was found at {configFile}"
-
-    try:
-        with open(configFile, "rt") as f:
-            input_str = f.read()
-        return input_str
-    except Exception as e:
-        print("Problem reading in configuration file")
-        print(e)
-        sys.exit()
-
-
-def parse_config(input_str: str) -> dict[str, str | bool | int]:
-    """
-    Parse the input string  and remove comments.
-
-    Parameters
-    ----------
-    input_str
-        The input string containing configuration data.
-
-    Returns
-    -------
-        The parsed configuration data.
-    """
-
-    try:
-        # strip out the comments
-        input_str = re.sub(r"#.*\n", "\n", input_str)
-        return json.loads(input_str)
-    except Exception as e:
-        print("Problem parsing in configuration file")
-        print(e)
-        sys.exit()
-
-
 def add_environment_variables(
     config: dict[str, str | bool | int], environment_variables: Mapping[str, str]
 ) -> dict[str, str | bool | int]:
@@ -117,7 +61,9 @@ def add_environment_variables(
     return config
 
 
-def substitute_variables(config: dict) -> dict[str, str | bool | int]:
+def substitute_variables(
+    config: dict[str, str | bool | int],
+) -> dict[str, str | bool | int]:
     """
     Perform variable substitutions in the configuration dictionary.
 
@@ -181,4 +127,26 @@ def process_date_string(date_str: str) -> datetime.datetime:
         tz = pytz.timezone(tzstr)
         dt = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %Z")
 
+
     return tz.localize(dt)
+
+
+def load_json(filepath: str) -> dict[str, str | int | float]:
+    """
+    Loads and parses JSON data from a file.
+
+    Parameters
+    ----------
+    filepath
+        The path to the JSON file to load.
+
+    Returns
+    -------
+        The parsed JSON data.
+    """
+
+    with open(filepath) as f:
+        config = json.load(f)
+
+    return config
+

@@ -2,8 +2,6 @@ import pytest
 import os
 from pathlib import Path
 from setup_runs.config_read_functions import (
-    read_config_file,
-    parse_config,
     add_environment_variables,
     substitute_variables,
     boolean_converter,
@@ -11,10 +9,10 @@ from setup_runs.config_read_functions import (
 )
 from setup_runs.wrf.read_config_wrf import load_wrf_config
 from setup_runs.cmaq.read_config_cmaq import (
-    load_json,
     create_cmaq_config_object,
     load_cmaq_config,
 )
+from setup_runs.config_read_functions import load_json
 from attrs import asdict
 import json
 
@@ -30,18 +28,8 @@ def config_path_wrf_nci(root_dir):
 
 
 @pytest.fixture
-def input_str_wrf_nci(config_path_wrf_nci):
-    return read_config_file(config_path_wrf_nci)
-
-
-@pytest.fixture
 def config_path_wrf_docker(root_dir):
     return os.path.join(root_dir, "config/wrf/config.docker.json")
-
-
-@pytest.fixture
-def input_str_wrf_docker(config_path_wrf_docker):
-    return read_config_file(config_path_wrf_docker)
 
 
 @pytest.fixture
@@ -61,76 +49,6 @@ def temp_config_file(tmp_path, request):
     temp_file = tmp_path / "temp_config.json"
     temp_file.write_text(content)
     return str(temp_file)
-
-
-@pytest.mark.parametrize(
-    "temp_config_file, expected_content",
-    [
-        pytest.param(
-            "This is a test configuration.",
-            "This is a test configuration.",
-            id="simple_content",
-        ),
-        pytest.param("", "", id="empty_file"),
-    ],
-    indirect=["temp_config_file"],
-)
-def test_001_read_config_file_happy_path(temp_config_file, expected_content):
-    content = read_config_file(temp_config_file)
-
-    assert (
-        content == expected_content
-    ), "The content read from the file does not match the expected content."
-
-
-def test_002_read_config_file_error_cases():
-    config_path = "path/to/non/existent/config.json"
-    expected_exception = AssertionError
-    expected_message = (
-        "No configuration file was found at path/to/non/existent/config.json"
-    )
-    with pytest.raises(expected_exception) as exc_info:
-        read_config_file(config_path)
-    assert expected_message == str(exc_info.value)
-
-
-@pytest.mark.parametrize(
-    "sample_string, expected",
-    [
-        pytest.param('{"key": "value"}', {"key": "value"}, id="simple_json"),
-        pytest.param('{"number": 1234}', {"number": 1234}, id="json_with_number"),
-        pytest.param(
-            '# This is a comment\n{"key": "value"}',
-            {"key": "value"},
-            id="json_with_comment",
-        ),
-        pytest.param(
-            '{"nested": {"key": "value"}}',
-            {"nested": {"key": "value"}},
-            id="json_with_nested_object",
-        ),
-    ],
-)
-def test_003_parse_config_happy_path(sample_string, expected):
-    result = parse_config(sample_string)
-
-    assert result == expected, "The parsed JSON does not match the expected output."
-
-
-@pytest.mark.parametrize(
-    "sample_string, expected",
-    [
-        pytest.param('{"missing": "bracket"', None, id="error_missing_bracket"),
-        pytest.param('{unquoted_key: "value"}', None, id="error_unquoted_key"),
-        pytest.param("not a json", None, id="error_not_json"),
-    ],
-)
-def test_004_parse_config_error_cases(sample_string, expected, capsys):
-    with pytest.raises(SystemExit):
-        parse_config(sample_string)
-
-    captured = capsys.readouterr()
-    assert "Problem parsing in configuration file" in captured.out
 
 
 def test_005_add_environment_variable():
@@ -237,8 +155,8 @@ def test_008_process_date_string(datestring, expected):
 
 
 # TODO: The following two tests can probably be parametrised
-def test_009_WRF_NCI_config_object(input_str_wrf_nci, config_path_wrf_nci):
-    config = parse_config(input_str_wrf_nci)
+def test_009_WRF_NCI_config_object(config_path_wrf_nci):
+    config = load_json(config_path_wrf_nci)
 
     for value_to_boolean in [
         "restart",
@@ -273,8 +191,8 @@ def test_009_WRF_NCI_config_object(input_str_wrf_nci, config_path_wrf_nci):
     assert config == asdict(wrf_config)
 
 
-def test_010_WRF_NCI_config_object(input_str_wrf_docker, config_path_wrf_docker):
-    config = parse_config(input_str_wrf_docker)
+def test_010_WRF_NCI_config_object(config_path_wrf_docker):
+    config = load_json(config_path_wrf_docker)
 
     for value_to_boolean in [
         "restart",
