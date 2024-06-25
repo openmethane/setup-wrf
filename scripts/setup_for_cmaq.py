@@ -29,8 +29,8 @@ from setup_runs.cmaq.mcip_preparation import (
 from setup_runs.cmaq.cams import interpolateFromCAMSToCmaqGrid
 from setup_runs.cmaq.read_config_cmaq import load_cmaq_config, CMAQConfig
 
-
 def main(setup_cmaq: CMAQConfig):
+
     # define date range
     ndates = (setup_cmaq.endDate - setup_cmaq.startDate).days + 1
     dates = [setup_cmaq.startDate + datetime.timedelta(days=d) for d in range(ndates)]
