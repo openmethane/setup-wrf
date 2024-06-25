@@ -1,3 +1,5 @@
+import datetime
+
 from attrs import define, field
 from setup_runs.config_read_functions import (
     boolean_converter,
@@ -40,10 +42,10 @@ class CMAQConfig:
     run: str
     # TODO: Clarify what is meant by *short* - longer!
     """name of the simulation, appears in some filenames (keep this *short* - longer)"""
-    startDate: str = field(converter=process_date_string)
+    startDate: datetime.datetime = field(converter=process_date_string)
     """this is the START of the FIRST day, use the format 
     2022-07-01 00:00:00 UTC (time zone optional)"""
-    endDate: str = field(converter=process_date_string)
+    endDate: datetime.datetime = field(converter=process_date_string)
     """this is the START of the LAST day, use the format 
     2022-07-01 00:00:00 UTC (time zone optional)"""
 

@@ -26,6 +26,8 @@ ruff = "^0.4.8"
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^8.2.1"
+pytest-regressions = "^2.5.0"
+xarray = "^2024.6.0"
 
 [build-system]
 requires = ["poetry-core"]
