@@ -30,7 +30,6 @@ data/geog: scripts/download-geog.sh ## Download static geography data
 
 .PHONY: clean
 clean: ## Remove any previous local runs
-	find templates -name "*.d??.nc" -delete
 	find data/runs ! -path '*/metem/*' -delete  # exclude the pre downloaded met data
 	rm -rf data/cmaq
 	rm -rf data/mcip
