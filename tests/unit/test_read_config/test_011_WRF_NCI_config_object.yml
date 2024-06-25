@@ -9,7 +9,6 @@ num_hours_per_run: 24
 num_hours_spin_up: 12
 only_edit_namelists: false
 orcid: ***REMOVED***
-project_root: /Users/danielbusch/openmethane-beta
 rda_ucar_edu_api_token: ***REMOVED***
 regional_subset_of_grib_data: true
 restart: false
@@ -18,7 +17,6 @@ run_dir: /scratch/q90/pjr563/openmethane-beta/wrf/aust-test
 run_name: aust-test
 scripts_to_copy_from_nml_dir: add_remove_var.txt
 scripts_to_copy_from_target_dir: nccopy_compress_output.sh,load_wrf_env.sh
-setup_root: /Users/danielbusch/openmethane-beta/setup-wrf
 sst_daily_dir: /g/data/ua8/NCEP_Polar/sst/rtg_high_res
 sst_daily_pattern: rtg_sst_grb_hr_0.083.%Y%m%d
 sst_monthly_dir: /g/data/ua8/NCEP_Polar/sst/rtg_high_res
@@ -28,6 +26,4 @@ submit_wps_component: false
 submit_wrf_now: false
 target: nci
 use_high_res_sst_data: true
-wps_dir: /Users/danielbusch/openmethane-beta/wrf/coecms/WPS
-wrf_dir: /Users/danielbusch/openmethane-beta/wrf/coecms/WRF
 wrf_run_tables_pattern: (DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)

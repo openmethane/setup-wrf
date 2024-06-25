@@ -228,7 +228,35 @@ def test_010_WRF_NCI_config_object(config_path_wrf_docker):
 
 
 @pytest.fixture
-def dynamic_wrf_values():
+def dynamic_wrf_nci_values():
+    return [
+        "run_script_template",
+        "cleanup_script_template",
+        "main_script_template",
+        "check_wrfout_in_background_script",
+        "nml_dir",
+        "target_dir",
+        "metem_dir",
+        "namelist_wps",
+        "namelist_wrf",
+        "geogrid_tbl",
+        "geogrid_exe",
+        "ungrib_exe",
+        "metgrid_tbl",
+        "metgrid_exe",
+        "linkgrib_script",
+        "wrf_exe",
+        "real_exe",
+        "sst_vtable",
+        "analysis_vtable",
+        "wrf_run_dir",
+        "setup_root",
+        "wps_dir",
+        "wrf_dir",
+        "project_root"
+    ]
+@pytest.fixture
+def dynamic_wrf_docker_values():
     return [
         "run_script_template",
         "cleanup_script_template",
@@ -254,24 +282,24 @@ def dynamic_wrf_values():
 
 
 def test_011_WRF_NCI_config_object(
-    config_path_wrf_nci, data_regression, dynamic_wrf_values
+    config_path_wrf_nci, data_regression, dynamic_wrf_nci_values
 ):
     wrf_config = load_wrf_config(config_path_wrf_nci)
     data = asdict(wrf_config)
 
-    for val in dynamic_wrf_values:
+    for val in dynamic_wrf_nci_values:
         data.pop(val)
 
     data_regression.check(data)
 
 
 def test_012_WRF_docker_config_object(
-    config_path_wrf_docker, data_regression, dynamic_wrf_values
+    config_path_wrf_docker, data_regression, dynamic_wrf_docker_values
 ):
     wrf_config = load_wrf_config(config_path_wrf_docker)
     data = asdict(wrf_config)
 
-    for val in dynamic_wrf_values:
+    for val in dynamic_wrf_docker_values:
         data.pop(val)
 
     data_regression.check(data)
