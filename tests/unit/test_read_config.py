@@ -227,6 +227,9 @@ def test_010_WRF_NCI_config_object(config_path_wrf_docker):
     assert config == asdict(wrf_config)
 
 
+def test_0115_WRF_NCI_config_object(config_path_wrf_nci):
+    assert False
+
 def test_011_valid_CMAQ_NCI_config_file(config_path_cmaq_nci):
     setup_cmaq = load_cmaq_config(config_path_cmaq_nci)
     assert setup_cmaq
