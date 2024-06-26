@@ -656,57 +656,56 @@ def run_setup_for_wrf(configfile: str) -> None:
                         if not os.path.exists(analysisDir):
                             os.makedirs(analysisDir, exist_ok=True)
 
-                        for pattern in [
-                            wrf_config.analysis_pattern_surface,
-                            wrf_config.analysis_pattern_upper,
-                        ]:
-
-                            files = set([])
-                            for iDayWps in range(nDaysWps):
-                                wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
-                                patternWithDates = wpsDate.strftime(pattern)
-                                files = files.union(set(glob.glob(patternWithDates)))
-                            ##
-                            files = list(files)
-                            files.sort()
-                            if pattern == "analysis_pattern_upper":
-                                ## for the upper-level files, be selective and use only those that contain the relevant range of dates
-                                for ifile, filename in enumerate(files):
-                                    basepieces = os.path.basename(filename).split("_")
-                                    fileStartDateStr = os.path.basename(filename).split(
-                                        "_"
-                                    )[-2]
-                                    fileEndDateStr = os.path.basename(filename).split("_")[
-                                        -1
-                                    ]
-                                    fileStartDate = datetime.datetime.strptime(
-                                        fileStartDateStr, "%Y%m%d"
-                                    ).date()
-                                    fileEndDate = datetime.datetime.strptime(
-                                        fileEndDateStr, "%Y%m%d"
-                                    ).date()
-                                    ##
-                                    if (
-                                        fileStartDate <= wpsStrDate
-                                        and wpsStrDate <= fileEndDate
-                                    ):
-                                        ifileStart = ifile
-                                    ##
-                                    if (
-                                        fileStartDate <= wpsEndDate
-                                        and wpsEndDate <= fileEndDate
-                                    ):
-                                        ifileEnd = ifile
-                            else:
-                                ## for the surface files use all those that match
-                                ifileStart = 0
-                                ifileEnd = len(files) - 1
-                            ##
-                            for ifile in range(ifileStart, ifileEnd + 1):
-                                src = files[ifile]
-                                dst = os.path.join(analysisDir, os.path.basename(src))
-                                if not os.path.exists(dst):
-                                    os.symlink(src, dst)
+                    for pattern in [
+                        wrf_config.analysis_pattern_surface,
+                        wrf_config.analysis_pattern_upper,
+                    ]:
+                        files = set([])
+                        for iDayWps in range(nDaysWps):
+                            wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
+                            patternWithDates = wpsDate.strftime(pattern)
+                            files = files.union(set(glob.glob(patternWithDates)))
+                        ##
+                        files = list(files)
+                        files.sort()
+                        if pattern == "analysis_pattern_upper":
+                            ## for the upper-level files, be selective and use only those that contain the relevant range of dates
+                            for ifile, filename in enumerate(files):
+                                basepieces = os.path.basename(filename).split("_")
+                                fileStartDateStr = os.path.basename(filename).split(
+                                    "_"
+                                )[-2]
+                                fileEndDateStr = os.path.basename(filename).split("_")[
+                                    -1
+                                ]
+                                fileStartDate = datetime.datetime.strptime(
+                                    fileStartDateStr, "%Y%m%d"
+                                ).date()
+                                fileEndDate = datetime.datetime.strptime(
+                                    fileEndDateStr, "%Y%m%d"
+                                ).date()
+                                ##
+                                if (
+                                    fileStartDate <= wpsStrDate
+                                    and wpsStrDate <= fileEndDate
+                                ):
+                                    ifileStart = ifile
+                                ##
+                                if (
+                                    fileStartDate <= wpsEndDate
+                                    and wpsEndDate <= fileEndDate
+                                ):
+                                    ifileEnd = ifile
+                        else:
+                            ## for the surface files use all those that match
+                            ifileStart = 0
+                            ifileEnd = len(files) - 1
+                        ##
+                        for ifile in range(ifileStart, ifileEnd + 1):
+                            src = files[ifile]
+                            dst = os.path.join(analysisDir, os.path.basename(src))
+                            if not os.path.exists(dst):
+                                os.symlink(src, dst)
 
                             ## prepare to run link_grib.csh
                             linkGribCmds = [
