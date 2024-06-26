@@ -20,7 +20,16 @@ import click
     "--configfile",
     help="Path to configuration file",
     default="config/wrf/config.nci.json",)
-def run_setup_for_wrf(configfile):
+def run_setup_for_wrf(configfile: str) -> None:
+    """
+    Run the setup for WRF script.
+
+    Parameters
+    ----------
+    configfile
+        The path to the configuration file to be used.
+
+    """
 
     # ## get command line arguments
     # parser = argparse.ArgumentParser()
