@@ -1,7 +1,6 @@
 import datetime
 import re
 import os
-import argparse
 import math
 import f90nml
 import shutil
@@ -15,11 +14,15 @@ from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.wrf.read_config_wrf import load_wrf_config
 import click
 
+
 @click.command()
-@click.option("-c",
+@click.option(
+    "-c",
     "--configfile",
     help="Path to configuration file",
-    default="config/wrf/config.nci.json",)
+    default="config/wrf/config.nci.json",
+    type=click.Path(file_okay=True, dir_okay=False, readable=True, exists=True),
+)
 def run_setup_for_wrf(configfile: str) -> None:
     """
     Run the setup for WRF script.
@@ -30,20 +33,6 @@ def run_setup_for_wrf(configfile: str) -> None:
         The path to the configuration file to be used.
 
     """
-
-    # ## get command line arguments
-    # parser = argparse.ArgumentParser()
-    #
-    # parser.add_argument(
-    #     "-c",
-    #     "--configFile",
-    #     help="Path to configuration file",
-    #     default="config/wrf/config.nci.json",
-    # )
-    # args = parser.parse_args()
-    # configFile = args.configFile
-
-    # load config file and create WRFConfig object
     wrf_config = load_wrf_config(configfile)
 
     scripts = {}
@@ -56,7 +45,9 @@ def run_setup_for_wrf(configfile: str) -> None:
     ]
     for script_name, script_path in zip(script_names, script_paths):
         ## read the template run script
-        assert os.path.exists(script_path), f"No template script was found at {script_path}"
+        assert os.path.exists(
+            script_path
+        ), f"No template script was found at {script_path}"
         try:
             f = open(script_path, "rt")
             scripts[script_name] = f.readlines()
@@ -65,12 +56,10 @@ def run_setup_for_wrf(configfile: str) -> None:
             print("Problem reading in template {} script".format(script_name))
             print(str(e))
 
-
     def decode_bytes(x):
         if isinstance(x, bytes):
             x = x.decode("utf-8")
         return x
-
 
     def purge(dir, pattern):
         for f in os.listdir(dir):
@@ -78,12 +67,10 @@ def run_setup_for_wrf(configfile: str) -> None:
                 print("deleting:", pattern, "- file:", f)
                 os.remove(os.path.join(dir, f))
 
-
     def move_pattern_to_dir(sourceDir, pattern, destDir):
         for f in os.listdir(sourceDir):
             if re.search(pattern, f) is not None:
                 os.rename(os.path.join(sourceDir, f), os.path.join(destDir, f))
-
 
     def link_pattern_to_dir(sourceDir, pattern, destDir):
         for f in os.listdir(sourceDir):
@@ -93,7 +80,6 @@ def run_setup_for_wrf(configfile: str) -> None:
                 if not os.path.exists(dst):
                     os.symlink(src, dst)
 
-
     def grep_file(regex, inFile):
         fl = open(inFile, "r")
         lines = fl.readlines()
@@ -101,13 +87,11 @@ def run_setup_for_wrf(configfile: str) -> None:
         out = [line for line in lines if line.find(regex) >= 0]
         return out
 
-
     def grep_lines(regex, lines):
         if isinstance(lines, str):
             lines = lines.split("\n")
         out = [line for line in lines if line.find(regex) >= 0]
         return out
-
 
     def symlink_file(input_directory, output_directory, filename):
         src = os.path.join(input_directory, filename)
@@ -115,7 +99,6 @@ def run_setup_for_wrf(configfile: str) -> None:
         dst = os.path.join(output_directory, filename)
         if not os.path.exists(dst):
             os.symlink(src, dst)
-
 
     def compressNCfile(filename, ppc=None):
         """Compress a netCDF3 file to netCDF4 using ncks
@@ -142,7 +125,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     raise RuntimeError("Argument ppc should be between 1 and 6...")
                 else:
                     ppcText = "--ppc default={}".format(ppc)
-                    commandList = [commandList[0]] + ppcText.split(" ") + commandList[1:]
+                    commandList = (
+                        [commandList[0]] + ppcText.split(" ") + commandList[1:]
+                    )
             ##
             ##
             p = subprocess.Popen(
@@ -158,12 +143,13 @@ def run_setup_for_wrf(configfile: str) -> None:
         else:
             print("File {} not found...".format(filename))
 
-
     ## calculate the number of jobs
     run_length_hours = (
         wrf_config.end_date - wrf_config.start_date
     ).total_seconds() / 3600.0
-    number_of_jobs = int(math.ceil(run_length_hours / float(wrf_config.num_hours_per_run)))
+    number_of_jobs = int(
+        math.ceil(run_length_hours / float(wrf_config.num_hours_per_run))
+    )
 
     ## check that namelist template files are present
     WPSnmlPath = wrf_config.namelist_wps
@@ -230,11 +216,23 @@ def run_setup_for_wrf(configfile: str) -> None:
             "wps_var": "e_sn",
             "wps_group": "geogrid",
         },
-        {"wrf_var": "dx", "wrf_group": "domains", "wps_var": "dx", "wps_group": "geogrid"},
-        {"wrf_var": "dy", "wrf_group": "domains", "wps_var": "dy", "wps_group": "geogrid"},
+        {
+            "wrf_var": "dx",
+            "wrf_group": "domains",
+            "wps_var": "dx",
+            "wps_group": "geogrid",
+        },
+        {
+            "wrf_var": "dy",
+            "wrf_group": "domains",
+            "wps_var": "dy",
+            "wps_group": "geogrid",
+        },
     ]
 
-    print("\t\tCheck for consistency between key parameters of the WRF and WPS namelists")
+    print(
+        "\t\tCheck for consistency between key parameters of the WRF and WPS namelists"
+    )
     for paramDict in namelistParamsThatShouldAgree:
         WRFval = WRFnml[paramDict["wrf_group"]][paramDict["wrf_var"]]
         WPSval = WPSnml[paramDict["wps_group"]][paramDict["wps_var"]]
@@ -275,8 +273,8 @@ def run_setup_for_wrf(configfile: str) -> None:
                     paramDict["wrf_var"]
                 )
         else:
-            assert type(WRFval) == type(
-                WPSval
+            assert (
+                type(WRFval) == type(WPSval)
             ), "Mismatched type for variable {} between the WRF and WPS namelists".format(
                 paramDict["wrf_var"]
             )
@@ -342,7 +340,9 @@ def run_setup_for_wrf(configfile: str) -> None:
     for ind_job in range(number_of_jobs):
         job_start = (
             wrf_config.start_date
-            + datetime.timedelta(seconds=3600 * ind_job * int(wrf_config.num_hours_per_run))
+            + datetime.timedelta(
+                seconds=3600 * ind_job * int(wrf_config.num_hours_per_run)
+            )
             - datetime.timedelta(seconds=3600 * int(wrf_config.num_hours_spin_up))
         )
 
@@ -354,7 +354,9 @@ def run_setup_for_wrf(configfile: str) -> None:
             seconds=3600 * (ind_job + 1) * int(wrf_config.num_hours_per_run)
         )
 
-        print("Start preparation for the run beginning {}".format(job_start_usable.date()))
+        print(
+            "Start preparation for the run beginning {}".format(job_start_usable.date())
+        )
         ##
         yyyymmddhh_start = job_start_usable.strftime("%Y%m%d%H")
         run_dir_with_date: str = os.path.join(wrf_config.run_dir, yyyymmddhh_start)
@@ -400,9 +402,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     WPSnml.write(dst)
                     ## copy the geogrid table
                     src = wrf_config.geogrid_tbl
-                    assert os.path.exists(src), "Cannot find GEOGRID.TBL at {} ...".format(
+                    assert os.path.exists(
                         src
-                    )
+                    ), "Cannot find GEOGRID.TBL at {} ...".format(src)
 
                     geogridFolder = os.path.join(run_dir_with_date, "geogrid")
                     os.makedirs(geogridFolder, exist_ok=True)
@@ -414,9 +416,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     os.symlink(src, dst)
                     ## link to the geogrid.exe program
                     src = wrf_config.geogrid_exe
-                    assert os.path.exists(src), "Cannot find geogrid.exe at {} ...".format(
+                    assert os.path.exists(
                         src
-                    )
+                    ), "Cannot find geogrid.exe at {} ...".format(src)
                     dst = os.path.join(run_dir_with_date, "geogrid.exe")
                     if not os.path.exists(dst):
                         os.symlink(src, dst)
@@ -428,7 +430,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                         )
                     )
                     p = subprocess.Popen(
-                        ["./geogrid.exe"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                        ["./geogrid.exe"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
                     )
                     stdout, stderr = p.communicate()
                     stdout = decode_bytes(stdout)
@@ -488,7 +492,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                                 wrf_config.metem_dir,
                                 "met_em.{}.{}.nc".format(dom, metem_time_str),
                             )
-                            metemFilesExist = metemFilesExist and os.path.exists(metem_file)
+                            metemFilesExist = metemFilesExist and os.path.exists(
+                                metem_file
+                            )
                 ##
                 if not metemFilesExist:
                     print("\t\tThe met_em files did not exist - create them")
@@ -507,9 +513,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     os.symlink(src, dst)
                     ## link the ungrib executabble
                     src = wrf_config.ungrib_exe
-                    assert os.path.exists(src), "Cannot find ungrib.exe at {} ...".format(
+                    assert os.path.exists(
                         src
-                    )
+                    ), "Cannot find ungrib.exe at {} ...".format(src)
                     dst = os.path.join(run_dir_with_date, "ungrib.exe")
                     if not os.path.exists(dst):
                         os.symlink(src, dst)
@@ -531,9 +537,13 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     "%Y-%m-%d_%H:%M:%S"
                                 )
                             ] * nDom
-                            WPSnml["share"]["interval_seconds"] = 6 * 60 * 60  ## 24*60*60
+                            WPSnml["share"]["interval_seconds"] = (
+                                6 * 60 * 60
+                            )  ## 24*60*60
                             WPSnml["ungrib"]["prefix"] = "SST"
-                            WPSnml["geogrid"]["geog_data_path"] = wrf_config.geog_data_path
+                            WPSnml["geogrid"]["geog_data_path"] = (
+                                wrf_config.geog_data_path
+                            )
                             ## end edit section #####################################################
                             ## write out the namelist
                             if os.path.exists("namelist.wps"):
@@ -561,7 +571,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     if not os.path.exists(monthlyFileDst):
                                         os.symlink(monthlyFileSrc, monthlyFileDst)
                                 ## check for the daily file
-                                dailyFile = wpsDate.strftime(wrf_config.sst_daily_pattern)
+                                dailyFile = wpsDate.strftime(
+                                    wrf_config.sst_daily_pattern
+                                )
                                 dailyFileSrc = os.path.join(
                                     wrf_config.sst_daily_dir, dailyFile
                                 )
@@ -578,7 +590,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                             purge(run_dir_with_date, "GRIBFILE*")
                             print(
                                 "\t\tRun link_grib for the SST data at {}".format(
-                                    datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                                    datetime.datetime.utcnow().strftime(
+                                        "%Y-%m-%d %H:%M:%S"
+                                    )
                                 )
                             )
                             p = subprocess.Popen(
@@ -605,12 +619,14 @@ def run_setup_for_wrf(configfile: str) -> None:
                                 if re.search("GRIBFILE", f) is not None
                             ]
                             if len(gribmatches) == 0:
-                                raise RuntimeError("Gribfiles not linked successfully...")
+                                raise RuntimeError(
+                                    "Gribfiles not linked successfully..."
+                                )
                             ## link to the SST Vtable
                             src = wrf_config.sst_vtable
-                            assert os.path.exists(src), "SST Vtable expected at {}".format(
+                            assert os.path.exists(
                                 src
-                            )
+                            ), "SST Vtable expected at {}".format(src)
                             dst = "Vtable"
                             if os.path.exists(dst):
                                 os.remove(dst)
@@ -620,7 +636,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                             ## run ungrib on the SST files
                             print(
                                 "\t\tRun ungrib for the SST data at {}".format(
-                                    datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+                                    datetime.datetime.utcnow().strftime(
+                                        "%Y-%m-%d %H:%M:%S"
+                                    )
                                 )
                             )
                             p = subprocess.Popen(
@@ -642,7 +660,9 @@ def run_setup_for_wrf(configfile: str) -> None:
 
                             ## check that it ran
                             ## matches = grep_file('Successful completion of ungrib', logfile)
-                            matches = grep_lines("Successful completion of ungrib", stdout)
+                            matches = grep_lines(
+                                "Successful completion of ungrib", stdout
+                            )
                             if len(matches) == 0:
                                 raise RuntimeError(
                                     "Success message not found in ungrib logfile..."
@@ -716,7 +736,11 @@ def run_setup_for_wrf(configfile: str) -> None:
                     else:
                         ## consider the case that we are using the FNL datax
                         nIntervals = (
-                            int(round((job_end - job_start).total_seconds() / 3600.0 / 6.0))
+                            int(
+                                round(
+                                    (job_end - job_start).total_seconds() / 3600.0 / 6.0
+                                )
+                            )
                             + 1
                         )
                         FNLtimes = [
@@ -762,8 +786,13 @@ def run_setup_for_wrf(configfile: str) -> None:
                             nc.close()
                             ## use wgrib2 that
                             for FNLfile in FNLfiles:
-                                tmpfile = os.path.join("/tmp", os.path.basename(FNLfile))
-                                print("\t\tSubset the grib file", os.path.basename(FNLfile))
+                                tmpfile = os.path.join(
+                                    "/tmp", os.path.basename(FNLfile)
+                                )
+                                print(
+                                    "\t\tSubset the grib file",
+                                    os.path.basename(FNLfile),
+                                )
                                 stdout, stderr = subprocess.Popen(
                                     [
                                         "wgrib2",
@@ -837,7 +866,9 @@ def run_setup_for_wrf(configfile: str) -> None:
 
                     ## link to the relevant Vtable
                     src = wrf_config.analysis_vtable
-                    assert os.path.exists(src), "Analysis Vtable expected at {}".format(src)
+                    assert os.path.exists(src), "Analysis Vtable expected at {}".format(
+                        src
+                    )
                     dst = os.path.join(run_dir_with_date, "Vtable")
                     if os.path.exists(dst):
                         os.remove(dst)
@@ -869,7 +900,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     matches = grep_lines("Successful completion of ungrib", stdout)
                     if len(matches) == 0:
                         print(stdout)
-                        raise RuntimeError("Success message not found in ungrib logfile...")
+                        raise RuntimeError(
+                            "Success message not found in ungrib logfile..."
+                        )
 
                     ## if we are using the FNL analyses, delete the downloaded FNL files
                     if wrf_config.analysis_source == "FNL":
@@ -893,17 +926,17 @@ def run_setup_for_wrf(configfile: str) -> None:
                     ##
                     ## link to the relevant METGRID.TBL
                     src = wrf_config.metgrid_tbl
-                    assert os.path.exists(src), "Cannot find METGRID.TBL at {} ...".format(
+                    assert os.path.exists(
                         src
-                    )
+                    ), "Cannot find METGRID.TBL at {} ...".format(src)
                     dst = os.path.join(metgriddir, "METGRID.TBL")
                     if not os.path.exists(dst):
                         os.symlink(src, dst)
                     ## link to metgrid.exe
                     src = wrf_config.metgrid_exe
-                    assert os.path.exists(src), "Cannot find metgrid.exe at {} ...".format(
+                    assert os.path.exists(
                         src
-                    )
+                    ), "Cannot find metgrid.exe at {} ...".format(src)
                     dst = os.path.join(run_dir_with_date, "metgrid.exe")
                     if not os.path.exists(dst):
                         os.symlink(src, dst)
@@ -911,7 +944,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                     ## logfile = 'metgrid_stderr_stdout.log'
                     ## with open(logfile, 'w') as output_f:
                     p = subprocess.Popen(
-                        ["./metgrid.exe"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                        ["./metgrid.exe"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
                     )
                     stdout, stderr = p.communicate()
                     stdout = decode_bytes(stdout)
@@ -1027,9 +1062,9 @@ def run_setup_for_wrf(configfile: str) -> None:
 
         # get background checking script to initiate averaging
         src = wrf_config.check_wrfout_in_background_script
-        assert os.path.exists(src), "Cannot find wrfout checking  script at {} ...".format(
+        assert os.path.exists(
             src
-        )
+        ), "Cannot find wrfout checking  script at {} ...".format(src)
         dst = os.path.join(run_dir_with_date, "checkWrfoutInBackground.py")
         if os.path.exists(dst):
             os.remove(dst)
@@ -1131,6 +1166,7 @@ def run_setup_for_wrf(configfile: str) -> None:
             f.close()
             ## make executable
             os.chmod(scriptPath, os.stat(scriptPath).st_mode | stat.S_IEXEC)
+
 
 if __name__ == "__main__":
     run_setup_for_wrf()
