@@ -1,0 +1,29 @@
+analysis_pattern_surface: /g/data/ub4/erai/grib/oper_an_sfc/fullres/ei_oper_an_sfc_075x075_90N0E90S35925E_%Y%m*
+analysis_pattern_upper: /g/data/ub4/erai/grib/oper_an_pl/fullres/%Y/ei_oper_an_pl_075x075_90N0E90S35925E_%Y%m*
+analysis_source: FNL
+delete_metem_files: false
+end_date: 2022-07-23 00:00:00+00:00
+environment_variables_for_substitutions: HOME
+geog_data_path: /g/data/sx70/data/WPS_GEOG_20190418
+num_hours_per_run: 24
+num_hours_spin_up: 12
+only_edit_namelists: false
+orcid: ***REMOVED***
+rda_ucar_edu_api_token: ***REMOVED***
+regional_subset_of_grib_data: true
+restart: false
+run_as_one_job: true
+run_dir: /scratch/q90/pjr563/openmethane-beta/wrf/aust-test
+run_name: aust-test
+scripts_to_copy_from_nml_dir: add_remove_var.txt
+scripts_to_copy_from_target_dir: nccopy_compress_output.sh,load_wrf_env.sh
+sst_daily_dir: /g/data/ua8/NCEP_Polar/sst/rtg_high_res
+sst_daily_pattern: rtg_sst_grb_hr_0.083.%Y%m%d
+sst_monthly_dir: /g/data/ua8/NCEP_Polar/sst/rtg_high_res
+sst_monthly_pattern: rtg_sst_grb_hr_0.083.%Y%m
+start_date: 2022-07-22 00:00:00+00:00
+submit_wps_component: false
+submit_wrf_now: false
+target: nci
+use_high_res_sst_data: true
+wrf_run_tables_pattern: (DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)

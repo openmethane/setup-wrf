@@ -101,8 +101,6 @@ def substitute_variables(
     return config
 
 
-
-
 def process_date_string(date_str: str) -> datetime.datetime:
     """
     Process a date string to a datetime object with the appropriate timezone.
@@ -127,7 +125,6 @@ def process_date_string(date_str: str) -> datetime.datetime:
         tz = pytz.timezone(tzstr)
         dt = datetime.datetime.strptime(date_str, "%Y-%m-%d %H:%M:%S %Z")
 
-
     return tz.localize(dt)
 
 
@@ -149,4 +146,3 @@ def load_json(filepath: str) -> dict[str, str | int | float]:
         config = json.load(f)
 
     return config
-

@@ -643,7 +643,6 @@ for ind_job in range(number_of_jobs):
                         wrf_config.analysis_pattern_surface,
                         wrf_config.analysis_pattern_upper,
                     ]:
-
                         files = set([])
                         for iDayWps in range(nDaysWps):
                             wpsDate = wpsStrDate + datetime.timedelta(days=iDayWps)
