@@ -1,4 +1,7 @@
-# Build the reqired depencies
+# Secret management
+FROM segment/chamber:2 AS chamber
+
+# Build the reqired dependecies
 FROM continuumio/miniconda3 as builder
 
 # Install and package up the conda environment
@@ -63,6 +66,9 @@ WORKDIR /opt/project
 RUN apt-get update && \
     apt-get install -y csh bc file make wget && \
     rm -rf /var/lib/apt/lists/*
+
+# Secret management
+COPY --from=chamber /chamber /bin/chamber
 
 # Copy across the virtual environment
 COPY --from=builder /opt/venv /opt/venv
