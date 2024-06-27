@@ -9,5 +9,5 @@ dependencies:
   - gfortran=10.4
   - jasper=1.900.1
   - wgrib2
-  - nco
+  - nco=5.2.4
   - python=3.11
