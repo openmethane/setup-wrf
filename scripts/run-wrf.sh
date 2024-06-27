@@ -12,10 +12,6 @@ set -Eeuo pipefail
 
 CONFIG_FILE=${CONFIG_FILE:-config/wrf/config.docker.json}
 
-# Setup the prerequisites
-# These may come from different places in future
-./scripts/download-geog.sh --low-res
-
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
 /opt/project/data/runs/aust-test/main.sh
