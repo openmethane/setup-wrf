@@ -5,8 +5,8 @@
 echo Start date is ${STARTDATE}
 echo Run directory is ${RUN_DIR}
 
-[ ! -e ${RUN_DIR}/${STARTDATE}/ ] && echo "directory ${RUN_DIR}/${STARTDATE} not found - exiting" && exit
-cd ${RUN_DIR}/${STARTDATE}/
+[ ! -e ${RUN_DIR}/${STARTDATE}/ ] && echo "directory ${RUN_DIR}/${STARTDATE} not found - exiting" && exit 1
+cd ${RUN_DIR}/${STARTDATE}/ || exit 1
 
 chmod u+x run.sh
 ./run.sh
@@ -25,7 +25,7 @@ while [ $n -lt ${njobs} ]; do
   echo $startdate
  
   # Go into the next directory
-  cd ${RUN_DIR}/$startdate/
+  cd ${RUN_DIR}/$startdate/ || exit 1
 
   # Submit run
   ./run.sh
@@ -33,4 +33,4 @@ while [ $n -lt ${njobs} ]; do
   let n=n+1
 done
 
-cd ${RUN_DIR}
+cd ${RUN_DIR}|| exit 1

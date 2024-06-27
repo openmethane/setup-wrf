@@ -147,7 +147,7 @@ jobs:
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data
-          sed -i "s/geog_data_res.*/geog_data_res = 'usgs_10m+lowres',/g" templates/aust-test/namelist.wps
+          sed -i "s/geog_data_res.*/geog_data_res = 'usgs_10m+lowres',/g" domains/aust-test/namelist.wps
           # Run setup_for_wrf.py
           docker run --rm \
             -v ${{ github.workspace }}:/opt/project \

@@ -2,7 +2,7 @@
 
 ulimit -s unlimited
 
-cd ${RUN_DIR}
+cd ${RUN_DIR} || exit 1
 
 du -hc .
 
