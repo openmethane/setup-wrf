@@ -2,7 +2,6 @@
 
 export NCPUS=${NCPUS:-1}
 
-ulimit -s unlimited
 cd ${RUN_DIR} || exit 1
 
 python3 checkWrfoutInBackground.py --verify-steps --watch > wrf-background.log 2>&1 &
