@@ -47,3 +47,7 @@ run: build  ## Run the required steps for the test domain
 .PHONY: test
 test:  ## Run the tests
 	$(PYTHON_CMD) -m pytest -r a -v $(TEST_DIRS)
+
+.PHONY: test-regen
+test-regen:  ## Regenerate the regression data for tests
+	$(PYTHON_CMD) -m pytest -r a -v $(TEST_DIRS) --regen-all
