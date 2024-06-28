@@ -9,6 +9,9 @@
 # - Handle config files from the cmdline
 
 set -Eeuo pipefail
+set -x
+
+env
 
 CONFIG_FILE=${CONFIG_FILE:-config/wrf/config.docker.json}
 DOMAIN=${DOMAIN:-aust-test}
