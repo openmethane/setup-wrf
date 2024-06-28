@@ -265,10 +265,6 @@ jobs:
             type=ref,event=pr
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main'}}
       - name: Tag and push docker image to Amazon ECR
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: setup-wrf
-          IMAGE_TAG: ${{ github.sha }}
         run: |
           echo "${{ steps.meta.outputs.tags }}"
           
