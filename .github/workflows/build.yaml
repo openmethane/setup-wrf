@@ -312,3 +312,4 @@ jobs:
           for $IMAGE_TAG in "${{ steps.meta.outputs.tags }}"; do
             docker tag "${{ env.GHCR_IMAGE_ID }}" "${{ env.ECR_IMAGE }}:$IMAGE_TAG"
             docker push "${{ env.ECR_IMAGE }}:$IMAGE_TAG"
+          done
