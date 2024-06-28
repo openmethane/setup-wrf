@@ -224,7 +224,7 @@ jobs:
   # Push the image to ECR as well
   push-ecr:
     runs-on: ubuntu-latest
-    needs: [ test-integration , test-unit ]
+    needs: [ test-integration , test-unit, build ]
     permissions:  # Tag the latest image if running on the main branch
       contents: read
       packages: read
