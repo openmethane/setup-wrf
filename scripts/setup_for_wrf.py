@@ -13,7 +13,7 @@ import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.wrf.read_config_wrf import load_wrf_config
-from setup_runs.utils import compressNCfile
+from setup_runs.utils import compress_nc_file
 
 ## get command line arguments
 parser = argparse.ArgumentParser()
@@ -398,7 +398,7 @@ for ind_job in range(number_of_jobs):
                 for iDom in range(nDom):
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
-                    compressNCfile(geoFile)
+                    compress_nc_file(geoFile)
                     ## move the file to the namelist directory
                     src = os.path.join(run_dir_with_date, geoFile)
                     dst = os.path.join(wrf_config.nml_dir, geoFile)
