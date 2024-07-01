@@ -6,10 +6,10 @@ import pytz
 
 
 def boolean_converter(
-    value: str,
-    true_vals: list[str] = ("True", "true", "1", "t", "y", "yes"),
-    false_vals: list[str] = ("False", "false", "0", "f", "n", "no"),
-):
+    value: str | bool,
+    true_vals: tuple[str] = ("True", "true", "1", "t", "y", "yes"),
+    false_vals: tuple[str] = ("False", "false", "0", "f", "n", "no"),
+) -> bool:
     """
     Convert a string value to a boolean based on predefined true and false values.
 
@@ -55,10 +55,10 @@ def add_environment_variables(
         The updated configuration dictionary with added environment variables.
 
     """
-    envVarsToInclude = config["environment_variables_for_substitutions"].split(",")
+    env_vars_to_include = config["environment_variables_for_substitutions"].split(",")
 
-    for envVarToInclude in envVarsToInclude:
-        config[envVarToInclude] = environment_variables[envVarToInclude]
+    for env_var in env_vars_to_include:
+        config[env_var] = environment_variables[env_var]
 
     return config
 
@@ -79,8 +79,8 @@ def substitute_variables(
         The updated configuration dictionary after variable substitutions.
     """
     avail_keys = list(config.keys())
-    iterationCount = 0
-    while iterationCount < 10:
+    iteration_count = 0
+    while iteration_count < 10:
         ## check if any entries in the config dictionary need populating
         foundToken = False
         for value in config.values():
@@ -95,10 +95,10 @@ def substitute_variables(
                 if isinstance(config[k], str) and config[k].find(key) >= 0:
                     config[k] = config[k].replace(key, value)
 
-        iterationCount += 1
+        iteration_count += 1
 
     # Iteration count for filling variables
-    assert iterationCount < 10, "Config key substitution exceeded iteration limit."
+    assert iteration_count < 10, "Config key substitution exceeded iteration limit."
 
     return config
 
