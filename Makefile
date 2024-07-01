@@ -31,8 +31,6 @@ data/geog: scripts/download-geog.sh ## Download static geography data
 .PHONY: clean
 clean: ## Remove any previous local runs
 	find data/runs ! -path '*/metem/*' -delete  # exclude the pre downloaded met data
-	rm -rf data/cmaq
-	rm -rf data/mcip
 
 .PHONY: build
 build:  ## Build the docker container locally
@@ -42,7 +40,6 @@ build:  ## Build the docker container locally
 run: build  ## Run the required steps for the test domain
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf python scripts/setup_for_wrf.py -c config/wrf/config.docker.json
 	docker run --rm -it -v $(PWD):/opt/project setup_wrf /opt/project/data/runs/aust-test/main.sh
-	docker run --rm -it -v $(PWD):/opt/project setup_wrf python scripts/setup_for_cmaq.py
 
 .PHONY: test
 test:  ## Run the tests

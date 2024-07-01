@@ -28,7 +28,6 @@ jobs:
       packages: write
 
     outputs:
-      imageid: ${{ steps.build.outputs.imageid }}
       digest: ${{ steps.build.outputs.digest }}
 
     # Builds and pushes the image
@@ -126,24 +125,6 @@ jobs:
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
           ./scripts/download-geog.sh --low-res
-      - name: Cache CAMS data
-        id: cache-cams
-        uses: actions/cache@v4
-        with:
-          path: data/inputs
-          key: cams
-      - name: Download CAMS input data
-        if: steps.cache-cams.outputs.cache-hit != 'true'
-        run: |
-          # This can take a few minutes as the CAMS data is stored on tape
-          docker run --rm \
-            -v ${{ github.workspace }}:/opt/project \
-            -e CDSAPI_KEY=${{ secrets.CDSAPI_ADS_KEY }} \
-            ${{ env.IMAGE_ID }} \
-            python scripts/download_cams_input.py \
-            -s 2022-07-01 \
-            -e 2022-07-01 \
-            data/inputs/cams_eac4_methane.nc
       - name: Run test
         run: |
           # Update the namelist.wps file to use the low resolution data
@@ -158,11 +139,6 @@ jobs:
             -v ${{ github.workspace }}:/opt/project \
             ${{ env.IMAGE_ID }} \
             data/runs/aust-test/main.sh
-          # Prepare CMAQ
-          docker run --rm \
-            -v ${{ github.workspace }}:/opt/project \
-            ${{ env.IMAGE_ID }} \
-            python scripts/setup_for_cmaq.py
       - name: Run pytest integration tests
         run: |
           # Run the integration tests which rely on WRF output already being available
