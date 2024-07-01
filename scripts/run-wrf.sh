@@ -10,7 +10,7 @@
 
 set -Eeuo pipefail
 
-CONFIG_FILE=${CONFIG_FILE:-config/wrf/config.docker.json}
+CONFIG_FILE=${CONFIG_FILE:-config/config.docker.json}
 
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
