@@ -30,9 +30,11 @@ def boolean_converter(
 
     boolvals = true_vals + false_vals
 
-    assert value.lower() in boolvals, f"Key {value} not a recognised boolean value"
+    str_value = str(value).lower()
 
-    return value.lower() in true_vals
+    assert str_value in boolvals, f"Key {value} not a recognised boolean value"
+
+    return str_value in true_vals
 
 
 def add_environment_variables(

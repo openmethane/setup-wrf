@@ -11,7 +11,6 @@ from setup_runs.config_read_functions import load_json
 from attrs import asdict
 
 
-
 @pytest.fixture
 def config_path_wrf_nci(root_dir):
     return os.path.join(root_dir, "config/config.nci.json")
@@ -125,9 +124,20 @@ def test_process_date_string(datestring, expected):
     assert str(out) == expected
 
 
-# TODO: The following two tests can probably be parametrised
-def test_WRF_NCI_config_object(config_path_wrf_nci):
-    config = load_json(config_path_wrf_nci)
+targets = pytest.mark.parametrize("target", ["nci", "docker"])
+
+
+@targets
+def test_config_values(target, config_path_wrf_nci, config_path_wrf_docker):
+    if target == "nci":
+        config = load_json(config_path_wrf_nci)
+        # load config object (performs all of the above steps)
+        wrf_config = load_wrf_config(config_path_wrf_nci)
+    elif target == "docker":
+        config = load_json(config_path_wrf_docker)
+        wrf_config = load_wrf_config(config_path_wrf_docker)
+    else:
+        raise ValueError("Unknown target")
 
     for value_to_boolean in [
         "restart",
@@ -155,45 +165,6 @@ def test_WRF_NCI_config_object(config_path_wrf_nci):
     # parse the dates
     config["end_date"] = process_date_string(config["end_date"])
     config["start_date"] = process_date_string(config["start_date"])
-
-    # load config object (performs all of the above steps)
-    wrf_config = load_wrf_config(config_path_wrf_nci)
-
-    assert config == asdict(wrf_config)
-
-
-def test_WRF_NCI_config_object(config_path_wrf_docker):
-    config = load_json(config_path_wrf_docker)
-
-    for value_to_boolean in [
-        "restart",
-        "run_as_one_job",
-        "submit_wrf_now",
-        "submit_wps_component",
-        "only_edit_namelists",
-        "use_high_res_sst_data",
-        "delete_metem_files",
-        "regional_subset_of_grib_data",
-    ]:
-        config[value_to_boolean] = boolean_converter(config[value_to_boolean])
-
-    # fill variables in the values with environment variables - e.g. '${HOME}' to '/Users/danielbusch'
-    config = add_environment_variables(config=config, environment_variables=os.environ)
-
-    # fill variables that depend on environment variables - e.g. "${HOME}/openmethane-beta" to "/Users/danielbusch/openmethane-beta"
-    config = substitute_variables(config)
-
-    # remove environment variables that were previously added
-    for env_var in config["environment_variables_for_substitutions"].split(","):
-        if env_var in config.keys():
-            config.pop(env_var)
-
-    # parse the dates
-    config["end_date"] = process_date_string(config["end_date"])
-    config["start_date"] = process_date_string(config["start_date"])
-
-    # load config object (performs all of the above steps)
-    wrf_config = load_wrf_config(config_path_wrf_docker)
 
     assert config == asdict(wrf_config)
 
@@ -224,8 +195,9 @@ def dynamic_wrf_nci_values():
         "setup_root",
         "wps_dir",
         "wrf_dir",
-        "project_root"
+        "project_root",
     ]
+
 
 @pytest.fixture
 def dynamic_wrf_docker_values():
@@ -253,7 +225,7 @@ def dynamic_wrf_docker_values():
     ]
 
 
-def test_WRF_NCI_config_object(
+def test_nci_config_regression(
     config_path_wrf_nci, data_regression, dynamic_wrf_nci_values
 ):
     wrf_config = load_wrf_config(config_path_wrf_nci)
@@ -265,7 +237,7 @@ def test_WRF_NCI_config_object(
     data_regression.check(data)
 
 
-def test_WRF_docker_config_object(
+def test_docker_config_regression(
     config_path_wrf_docker, data_regression, dynamic_wrf_docker_values
 ):
     wrf_config = load_wrf_config(config_path_wrf_docker)
@@ -281,8 +253,9 @@ def test_WRF_docker_config_object(
 def wrf_config_dict(config_path_wrf_docker):
     return asdict(load_wrf_config(config_path_wrf_docker))
 
+
 @pytest.mark.parametrize(
-    "startDate, endDate, test_id",
+    "start_date, end_date, test_id",
     [
         ("2022-07-01 00:00:00 UTC", "2022-07-01 00:00:00 UTC", "test_same_day"),
         ("2022-07-01 00:00:00 UTC", "2022-07-02 00:00:00 UTC", "test_next_day"),
@@ -290,21 +263,21 @@ def wrf_config_dict(config_path_wrf_docker):
     ],
     ids=lambda test_id: test_id,
 )
-def test_validator_endDate_after_startDate(
-    startDate, endDate, test_id, wrf_config_dict
+def test_validator_end_date_after_start_date(
+    start_date, end_date, test_id, wrf_config_dict
 ):
-    wrf_config_dict["startDate"] = startDate
-    wrf_config_dict["endDate"] = endDate
+    wrf_config_dict["start_date"] = start_date
+    wrf_config_dict["end_date"] = end_date
 
     wrf_config = WRFConfig(**wrf_config_dict)
 
-    assert wrf_config.startDate
-    assert wrf_config.endDate
+    assert wrf_config.start_date
+    assert wrf_config.end_date
 
 
 # Error cases
 @pytest.mark.parametrize(
-    "startDate, endDate, test_id",
+    "start_date, end_date, test_id",
     [
         (
             "2022-07-02 00:00:00 UTC",
@@ -324,11 +297,11 @@ def test_validator_endDate_after_startDate(
     ],
     ids=lambda test_id: test_id,
 )
-def test_validator_endDate_after_startDate_errors(
-    startDate, endDate, test_id, wrf_config_dict
+def test_validator_end_date_after_start_date_errors(
+    start_date, end_date, test_id, wrf_config_dict
 ):
-    wrf_config_dict["startDate"] = startDate
-    wrf_config_dict["endDate"] = endDate
+    wrf_config_dict["start_date"] = start_date
+    wrf_config_dict["end_date"] = end_date
 
     with pytest.raises(ValueError, match="End date must be after start date."):
         WRFConfig(**wrf_config_dict)
