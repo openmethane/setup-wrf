@@ -253,8 +253,10 @@ def dynamic_wrf_nci_values():
         "setup_root",
         "wps_dir",
         "wrf_dir",
-        "project_root"
+        "project_root",
     ]
+
+
 @pytest.fixture
 def dynamic_wrf_docker_values():
     return [
