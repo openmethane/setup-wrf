@@ -1,5 +1,5 @@
 """
-Coordination scripts for running CMAQ and WRF
+Coordination scripts for running WRF
 """
 
 import importlib.metadata

@@ -73,11 +73,9 @@ COPY --from=chamber /chamber /bin/chamber
 # Copy across the virtual environment
 COPY --from=builder /opt/venv /opt/venv
 
-# Copy in WRF and CMAQ binaries
+# Copy in the WRF binaries
 # https://github.com/climate-resource/docker-wrf
-# https://github.com/openmethane/docker-cmaq
 COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
-COPY --from=ghcr.io/openmethane/cmaq:5.0.2 /opt/cmaq /opt/cmaq
 
 # Install the local package in editable mode
 # Requires scaffolding the src directories
