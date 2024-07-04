@@ -9,11 +9,15 @@
 # - Handle config files from the cmdline
 
 set -Eeuo pipefail
+set -x
+
+env
 
 CONFIG_FILE=${CONFIG_FILE:-config/wrf/config.docker.json}
+DOMAIN=${DOMAIN:-aust-test}
 
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
-/opt/project/data/runs/aust-test/main.sh
+/opt/project/data/runs/${DOMAIN}/main.sh
 
 echo "Finished"
