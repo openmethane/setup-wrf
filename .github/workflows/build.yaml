@@ -95,21 +95,21 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
-      - name: Change directory
-        run: |
-          cd /opt/project
       - name: Cache Geog data
         id: cache-geog
         uses: actions/cache@v4
         with:
-          path: data/geog
+          path: /opt/project/data/geog
           key: geog-data-${{ hashFiles('scripts/download-geog.sh') }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
+          cd /opt/project
           ./scripts/download-geog.sh --low-res
       - name: Run WRF
         run: |
+          cd /opt/project
+          
           # Update the namelist.wps file to use the low resolution data
           sed -i "s/geog_data_res.*/geog_data_res = 'usgs_10m+lowres',/g" domains/aust-test/namelist.wps
           
@@ -118,13 +118,15 @@ jobs:
           bash data/runs/aust-test/main.sh
       - name: Run pytest integration tests
         run: |
+          cd /opt/project
+          
           # Run the integration tests which rely on WRF output already being available
           python -m pytest -v tests/integration
       # The WRF directory contains filenames with : in them, which are not supported by upload-artifact
       - name: Zip WRF artifacts
         if: ${{ always() }}
         run: |
-          tar -cvzf results.tar.gz --exclude data/geog data
+          tar -cvzf results.tar.gz --exclude /opt/project/data/geog /opt/project/data
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
