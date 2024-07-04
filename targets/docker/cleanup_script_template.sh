@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ulimit -s unlimited
-
 cd ${RUN_DIR} || exit 1
 
 du -hc .
