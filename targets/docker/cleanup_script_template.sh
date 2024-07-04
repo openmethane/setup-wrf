@@ -37,7 +37,7 @@ for file in wrfout_*; do
 
   if [ -e $file ] ; then
     echo "Could not process $file. Exiting."
-    exit
+    exit 1
   fi
 done
 

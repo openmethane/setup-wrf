@@ -4,5 +4,3 @@ venv
 
 # Ignore the generated runs
 data
-
-CMAQv5.0.2-data*

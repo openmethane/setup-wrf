@@ -1,6 +1,6 @@
-# WRF/CMAQ coordination scripts
+# WRF coordination scripts
 
-This repository contains the code used to generate the scripts needed to run WRF and CMAQ
+This repository contains the code used to generate the scripts needed to run WRF
 according to a set of configuration.
 
 
@@ -15,7 +15,7 @@ See [Input files](#input-files) for more information about how the configuration
 
 `config/wrf/config.nci.json` will be used as the default configuration file,
 but this can be overriden using the `-c` command line argument.
-An example config file `config/wrf/config.docker.json` that targets running WRF using docker.
+An example config file `config/config.docker.json` that targets running WRF using docker.
 
 The `setup_for_wrf.py` script does the following:
 * Reads the configuration file
@@ -35,37 +35,6 @@ The `setup_for_wrf.py` script does the following:
 After the `setup_for_wrf.py` script has been run successfully, 
 the `main.sh` script in the runs output directory can be used to run all the WRF jobs sequentially.
 For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and domain.
-
-## CMAQ runs
-
-The `scripts/setup_for_cmaq.py` script generates the required configuration and data to run CMAQ for a given domain and time.
-
-# TODO: DB update docs about how to configure the CMAQ scripts
-Currently, the configuration for CMAQ is not as flexible as for WRF
-and is specified directly in `setup_for_cmaq`.
-
-Before runnning this script, the WRF model must be run to generate the meteorological data and the CAMS data must be downloaded
-(`scripts/download_cams_input.py`) for the period of interest.
-[CAMS](https://www.copernicus.eu/en/access-data/copernicus-services-catalogue/cams-global-reanalysis-eac4) 
-is a global atmospheric reanalysis data set that can be used to provide boundary conditions for CMAQ.
-
-The `setup_for_cmaq.py` script does the following:
-* Checks if the required input files are available (WRF output files from the above section)
-* Run MCIP to extract the meteorological data from the WRF output files and interpolate onto the CMAQ grid
-* Prepares the initial and boundary conditions for CMAQ (using ICON and BCON respectively)
-* Interpolate CAMS data to the CMAQ grid
-* Generate the run script for CMAQ for each job
-
-TODO: Expand on the CMAQ run process
-
-Depending on the configuration of the script, 
-multiple CMAQ jobs may be generated.
-
-After the `setup_for_cmaq.py` script has been run successfully,
-there should be results in the `data/mcip` and `data/cmaq` directory.
-The `data/cmaq/runCMAQ.sh` script in the runs output directory can be used to run CMAQ for all jobs sequentially.
-
-TODO: Document how to run CMAQ (including fetching the CMAQ data files)
 
 ## Getting started
 
@@ -134,7 +103,7 @@ Inside the container, the wrf setup process can be run using the following comma
 (this might take some time):
 
 ```
-python scripts/setup_for_wrf.py -c config/wrf/config.docker.json
+python scripts/setup_for_wrf.py -c config/config.docker.json
 ```
 
 This command will generate all the required configuration

@@ -12,6 +12,7 @@ import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.wrf.read_config_wrf import load_wrf_config
+from setup_runs.utils import compress_nc_file
 import click
 
 
@@ -100,56 +101,11 @@ def run_setup_for_wrf(configfile: str) -> None:
         if not os.path.exists(dst):
             os.symlink(src, dst)
 
-    def compressNCfile(filename, ppc=None):
-        """Compress a netCDF3 file to netCDF4 using ncks
-
-        Args:
-            filename: Path to the netCDF3 file to commpress
-            ppc: number of significant digits to retain (default is to retain all)
-
-        Returns:
-            Nothing
-        """
-
-        if os.path.exists(filename):
-            print("Compress file {} with ncks".format(filename))
-            command = "ncks -4 -L4 -O {} {}".format(filename, filename)
-            print("\t" + command)
-            commandList = command.split(" ")
-            if ppc is None:
-                ppcText = ""
-            else:
-                if not isinstance(ppc, int):
-                    raise RuntimeError("Argument ppc should be an integer...")
-                elif ppc < 1 or ppc > 6:
-                    raise RuntimeError("Argument ppc should be between 1 and 6...")
-                else:
-                    ppcText = "--ppc default={}".format(ppc)
-                    commandList = (
-                        [commandList[0]] + ppcText.split(" ") + commandList[1:]
-                    )
-            ##
-            ##
-            p = subprocess.Popen(
-                commandList, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            stdout, stderr = p.communicate()
-            stdout = decode_bytes(stdout)
-            stderr = decode_bytes(stderr)
-            if len(stderr) > 0 or len(stdout) > 0:
-                print("stdout = " + stdout)
-                print("stderr = " + stderr)
-                raise RuntimeError("Error from ncks...")
-        else:
-            print("File {} not found...".format(filename))
-
     ## calculate the number of jobs
     run_length_hours = (
         wrf_config.end_date - wrf_config.start_date
     ).total_seconds() / 3600.0
-    number_of_jobs = int(
-        math.ceil(run_length_hours / float(wrf_config.num_hours_per_run))
-    )
+    number_of_jobs = int(math.ceil(run_length_hours / float(wrf_config.num_hours_per_run)))
 
     ## check that namelist template files are present
     WPSnmlPath = wrf_config.namelist_wps
@@ -460,7 +416,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                     for iDom in range(nDom):
                         dom = "d0{}".format(iDom + 1)
                         geoFile = "geo_em.{}.nc".format(dom)
-                        compressNCfile(geoFile)
+                        compress_nc_file(geoFile)
                         ## move the file to the namelist directory
                         src = os.path.join(run_dir_with_date, geoFile)
                         dst = os.path.join(wrf_config.nml_dir, geoFile)
