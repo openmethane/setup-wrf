@@ -38,6 +38,9 @@ For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and dom
 
 ## Getting started
 
+The `ORCID` and `RDA_TOKEN` environment variables must be set in the shell environment before running the scripts.
+These can be added to a `.env` file which is read by `setup_for_wrf.py`.
+
 This repository supports two target environments to run.
 
 ### NCI 

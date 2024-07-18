@@ -8,8 +8,6 @@ geog_data_path: /g/data/sx70/data/WPS_GEOG_20190418
 num_hours_per_run: 24
 num_hours_spin_up: 12
 only_edit_namelists: false
-orcid: 0000-0001-7707-6298
-rda_ucar_edu_api_token: 89a8563d5150b91b543d3a734626
 regional_subset_of_grib_data: true
 restart: false
 run_as_one_job: true

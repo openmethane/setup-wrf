@@ -7,3 +7,5 @@
 
 # Ignore the generated outputs
 data
+
+.env
