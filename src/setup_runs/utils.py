@@ -1,14 +1,15 @@
 """Utility functions used by a number of different functions"""
+
 import pathlib
 import subprocess
 import os
 import re
 
 
-def run_command(command_list: list[str], log_prefix: str | None=None, verbose: bool = False) -> tuple[str, str]:
-    p = subprocess.Popen(
-        command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
+def run_command(
+    command_list: list[str], log_prefix: str | None = None, verbose: bool = False
+) -> tuple[str, str]:
+    p = subprocess.Popen(command_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     stdout = stdout.decode()
     stderr = stderr.decode()
@@ -25,6 +26,7 @@ def run_command(command_list: list[str], log_prefix: str | None=None, verbose: b
         print(f"stderr: {stderr}")
 
     return stdout, stderr
+
 
 def compress_nc_file(filename: str, ppc: int | None = None) -> None:
     """Compress a netCDF3 file to netCDF4 using ncks
@@ -58,6 +60,7 @@ def compress_nc_file(filename: str, ppc: int | None = None) -> None:
             raise RuntimeError("Error from ncks...")
     else:
         print("File {} not found...".format(filename))
+
 
 def purge(directory: str | pathlib.Path, pattern: str):
     for f in os.listdir(directory):
