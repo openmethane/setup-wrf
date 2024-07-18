@@ -4,17 +4,44 @@ import os
 import math
 import f90nml
 import shutil
-import subprocess
 import glob
-import pdb
 import copy
 import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
-from setup_runs.wrf.read_config_wrf import load_wrf_config
-from setup_runs.utils import compress_nc_file
+from setup_runs.wrf.namelists import validate_wrf_namelists
+from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
+from setup_runs.utils import compress_nc_file, run_command, purge
 import click
 
+
+def move_pattern_to_dir(sourceDir, pattern, destDir):
+    for f in os.listdir(sourceDir):
+        if re.search(pattern, f) is not None:
+            os.rename(os.path.join(sourceDir, f), os.path.join(destDir, f))
+
+
+def link_pattern_to_dir(sourceDir, pattern, destDir):
+    for f in os.listdir(sourceDir):
+        if re.search(pattern, f) is not None:
+            src = os.path.join(sourceDir, f)
+            dst = os.path.join(destDir, f)
+            if not os.path.exists(dst):
+                os.symlink(src, dst)
+
+def grep_lines(regex, lines):
+    if isinstance(lines, str):
+        lines = lines.split("\n")
+    out = [line for line in lines if line.find(regex) >= 0]
+    return out
+
+
+def symlink_file(input_directory, output_directory, filename):
+    src = os.path.join(input_directory, filename)
+    assert os.path.exists(src), "Cannot find script {} ...".format(filename)
+    dst = os.path.join(output_directory, filename)
+    if not os.path.exists(dst):
+        os.symlink(src, dst)
 
 @click.command()
 @click.option(
@@ -57,50 +84,6 @@ def run_setup_for_wrf(configfile: str) -> None:
             print("Problem reading in template {} script".format(script_name))
             print(str(e))
 
-    def decode_bytes(x):
-        if isinstance(x, bytes):
-            x = x.decode("utf-8")
-        return x
-
-    def purge(dir, pattern):
-        for f in os.listdir(dir):
-            if re.search(pattern, f) is not None:
-                print("deleting:", pattern, "- file:", f)
-                os.remove(os.path.join(dir, f))
-
-    def move_pattern_to_dir(sourceDir, pattern, destDir):
-        for f in os.listdir(sourceDir):
-            if re.search(pattern, f) is not None:
-                os.rename(os.path.join(sourceDir, f), os.path.join(destDir, f))
-
-    def link_pattern_to_dir(sourceDir, pattern, destDir):
-        for f in os.listdir(sourceDir):
-            if re.search(pattern, f) is not None:
-                src = os.path.join(sourceDir, f)
-                dst = os.path.join(destDir, f)
-                if not os.path.exists(dst):
-                    os.symlink(src, dst)
-
-    def grep_file(regex, inFile):
-        fl = open(inFile, "r")
-        lines = fl.readlines()
-        fl.close()
-        out = [line for line in lines if line.find(regex) >= 0]
-        return out
-
-    def grep_lines(regex, lines):
-        if isinstance(lines, str):
-            lines = lines.split("\n")
-        out = [line for line in lines if line.find(regex) >= 0]
-        return out
-
-    def symlink_file(input_directory, output_directory, filename):
-        src = os.path.join(input_directory, filename)
-        assert os.path.exists(src), "Cannot find script {} ...".format(filename)
-        dst = os.path.join(output_directory, filename)
-        if not os.path.exists(dst):
-            os.symlink(src, dst)
-
     ## calculate the number of jobs
     run_length_hours = (
         wrf_config.end_date - wrf_config.start_date
@@ -121,136 +104,7 @@ def run_setup_for_wrf(configfile: str) -> None:
     WPSnml = f90nml.read(WPSnmlPath)
     WRFnml = f90nml.read(WRFnmlPath)
 
-    ## check that the parameters do agree between the WRF and WPS namelists
-    ## parameters that should agree for the WRF and WPS namelists
-    namelistParamsThatShouldAgree = [
-        {
-            "wrf_var": "max_dom",
-            "wrf_group": "domains",
-            "wps_var": "max_dom",
-            "wps_group": "share",
-        },
-        {
-            "wrf_var": "interval_seconds",
-            "wrf_group": "time_control",
-            "wps_var": "interval_seconds",
-            "wps_group": "share",
-        },
-        {
-            "wrf_var": "parent_id",
-            "wrf_group": "domains",
-            "wps_var": "parent_id",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "parent_grid_ratio",
-            "wrf_group": "domains",
-            "wps_var": "parent_grid_ratio",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "i_parent_start",
-            "wrf_group": "domains",
-            "wps_var": "i_parent_start",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "j_parent_start",
-            "wrf_group": "domains",
-            "wps_var": "j_parent_start",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "e_we",
-            "wrf_group": "domains",
-            "wps_var": "e_we",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "e_sn",
-            "wrf_group": "domains",
-            "wps_var": "e_sn",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "dx",
-            "wrf_group": "domains",
-            "wps_var": "dx",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "dy",
-            "wrf_group": "domains",
-            "wps_var": "dy",
-            "wps_group": "geogrid",
-        },
-    ]
-
-    print(
-        "\t\tCheck for consistency between key parameters of the WRF and WPS namelists"
-    )
-    for paramDict in namelistParamsThatShouldAgree:
-        WRFval = WRFnml[paramDict["wrf_group"]][paramDict["wrf_var"]]
-        WPSval = WPSnml[paramDict["wps_group"]][paramDict["wps_var"]]
-        ## the dx,dy variables need special treatment - they are handled differently in the two namelists
-        if paramDict["wrf_var"] in ["dx", "dy"]:
-            if WPSnml["share"]["max_dom"] == 1:
-                if isinstance(WRFval, list):
-                    assert (
-                        WRFval[0] == WPSval
-                    ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
-                        paramDict["wrf_var"]
-                    )
-                else:
-                    assert (
-                        WRFval == WPSval
-                    ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
-                        paramDict["wrf_var"]
-                    )
-            else:
-                expectedVal = [float(WPSnml["geogrid"][paramDict["wps_var"]])]
-                for idom in range(1, WPSnml["share"]["max_dom"]):
-                    try:
-                        expectedVal.append(
-                            expectedVal[-1]
-                            / float(WPSnml["geogrid"]["parent_grid_ratio"][idom])
-                        )
-                    except Exception:
-                        pdb.set_trace()
-                ##
-                assert (
-                    len(WRFval) == len(expectedVal)
-                ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
-                    paramDict["wrf_var"]
-                )
-                assert all(
-                    [a == b for a, b in zip(WRFval, expectedVal)]
-                ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
-                    paramDict["wrf_var"]
-                )
-        else:
-            assert (
-                type(WRFval) == type(WPSval)
-            ), "Mismatched type for variable {} between the WRF and WPS namelists".format(
-                paramDict["wrf_var"]
-            )
-            if isinstance(WRFval, list):
-                assert (
-                    len(WRFval) == len(WPSval)
-                ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
-                    paramDict["wrf_var"]
-                )
-                assert all(
-                    [a == b for a, b in zip(WRFval, WPSval)]
-                ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
-                    paramDict["wrf_var"]
-                )
-            else:
-                assert (
-                    WRFval == WPSval
-                ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
-                    paramDict["wrf_var"]
-                )
+    validate_wrf_namelists(WPSnml, WRFnml)
 
     ## get the number of domains
     nDom = WPSnml["share"]["max_dom"]
@@ -385,22 +239,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                             datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         )
                     )
-                    p = subprocess.Popen(
-                        ["./geogrid.exe"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                    )
-                    stdout, stderr = p.communicate()
-                    stdout = decode_bytes(stdout)
-                    stderr = decode_bytes(stderr)
-                    ##
-                    f = open("geogrid.log.stdout", "w")
-                    f.writelines(stdout)
-                    f.close()
-                    ##
-                    f = open("geogrid.log.stderr", "w")
-                    f.writelines(stderr)
-                    f.close()
+
+                    run_command(["./geogrid.exe"], log_prefix="geogrid.log")
+
                     ## check that it ran
                     dom = "d0{}".format(nDom)
                     geoFile = "geo_em.{}.nc".format(dom)
@@ -551,22 +392,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     )
                                 )
                             )
-                            p = subprocess.Popen(
-                                ["./link_grib.csh", os.path.join(sstDir, "*")],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                            )
-                            stdout, stderr = p.communicate()
-                            stdout = decode_bytes(stdout)
-                            stderr = decode_bytes(stderr)
-                            ##
-                            f = open("link_grib_sst.log.stdout", "w")
-                            f.writelines(stdout)
-                            f.close()
-                            ##
-                            f = open("link_grib_sst.log.stderr", "w")
-                            f.writelines(stderr)
-                            f.close()
+
+                            run_command(["./link_grib.csh", os.path.join(sstDir, "*")], log_prefix="link_grib_sst.log")
+
                             ## check that it ran
                             ## time.sleep(0.2)
                             gribmatches = [
@@ -597,22 +425,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     )
                                 )
                             )
-                            p = subprocess.Popen(
-                                ["./ungrib.exe"],
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,
-                            )
-                            stdout, stderr = p.communicate()
-                            stdout = decode_bytes(stdout)
-                            stderr = decode_bytes(stderr)
-                            ##
-                            f = open("ungrib_sst.log.stdout", "w")
-                            f.writelines(stdout)
-                            f.close()
-                            ##
-                            f = open("ungrib_sst.log.stderr", "w")
-                            f.writelines(stderr)
-                            f.close()
+                            stdout, _ = run_command(["./ungrib.exe"], log_prefix="ungrib_sst.log")
 
                             ## check that it ran
                             ## matches = grep_file('Successful completion of ungrib', logfile)
@@ -749,18 +562,14 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     "\t\tSubset the grib file",
                                     os.path.basename(FNLfile),
                                 )
-                                stdout, stderr = subprocess.Popen(
-                                    [
+                                _, stderr = run_command([
                                         "wgrib2",
                                         FNLfile,
                                         "-small_grib",
                                         geoStrs["XLONG_M"],
                                         geoStrs["XLAT_M"],
                                         tmpfile,
-                                    ],
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.PIPE,
-                                ).communicate()
+                                    ])
                                 if len(stderr) > 0:
                                     print(stderr)
                                     raise RuntimeError(
@@ -792,20 +601,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                             datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         )
                     )
-                    p = subprocess.Popen(
-                        linkGribCmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                    )
-                    stdout, stderr = p.communicate()
-                    stdout = decode_bytes(stdout)
-                    stderr = decode_bytes(stderr)
-                    ##
-                    f = open("link_grib_fnl.log.stdout", "w")
-                    f.writelines(stdout)
-                    f.close()
-                    ##
-                    f = open("link_grib_fnl.log.stderr", "w")
-                    f.writelines(stderr)
-                    f.close()
+                    run_command(linkGribCmds, log_prefix="link_grib_fnl.log")
 
                     ## check that it ran
                     gribmatches = [
@@ -837,20 +633,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                             datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         )
                     )
-                    p = subprocess.Popen(
-                        ["./ungrib.exe"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                    )
-                    stdout, stderr = p.communicate()
-                    stdout = decode_bytes(stdout)
-                    stderr = decode_bytes(stderr)
-                    ##
-                    f = open("ungrib_era.log.stdout", "w")
-                    f.writelines(stdout)
-                    f.close()
-                    ##
-                    f = open("ungrib_era.log.stderr", "w")
-                    f.writelines(stderr)
-                    f.close()
+                    stdout, _ = run_command(["./ungrib.exe"], log_prefix="ungrib_era.log")
 
                     ## FIXME: check that it worked
                     matches = grep_lines("Successful completion of ungrib", stdout)
@@ -899,22 +682,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                     ##
                     ## logfile = 'metgrid_stderr_stdout.log'
                     ## with open(logfile, 'w') as output_f:
-                    p = subprocess.Popen(
-                        ["./metgrid.exe"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                    )
-                    stdout, stderr = p.communicate()
-                    stdout = decode_bytes(stdout)
-                    stderr = decode_bytes(stderr)
-                    ##
-                    f = open("metgrid.log.stdout", "w")
-                    f.writelines(stdout)
-                    f.close()
-                    ##
-                    f = open("metgrid.log.stderr", "w")
-                    f.writelines(stderr)
-                    f.close()
+                    stdout, _ = run_command(["./metgrid.exe"], log_prefix="metgrid.log")
 
                     matches = grep_lines("Successful completion of metgrid", stdout)
                     if len(matches) == 0:
@@ -1044,52 +812,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                 symlink_file(input_directory, run_dir_with_date, script_to_copy)
 
         if (not wrf_config.only_edit_namelists) and (not wrfInitFilesExist):
-            ##
-            logfile = "real_stderr_stdout.log"
-
-            print(
-                "\t\tRun real.exe at {}".format(
-                    datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-                )
-            )
-            p = subprocess.Popen(
-                ["mpirun", "-np", "1", "./real.exe"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            stdout, stderr = p.communicate()
-            stdout = decode_bytes(stdout)
-            stderr = decode_bytes(stderr)
-            ##
-            f = open("real.log.stdout", "w")
-            f.writelines(stdout)
-            f.close()
-            ##
-            f = open("real.log.stderr", "w")
-            f.writelines(stderr)
-            f.close()
-
-            rsloutfile = "rsl.out.0000"
-            matches = grep_file("SUCCESS COMPLETE REAL_EM INIT", rsloutfile)
-            if len(matches) == 0:
-                raise RuntimeError(
-                    "Success message not found in real.exe logfile (rsl.out.0000)..."
-                )
-            ##
-            if os.path.exists("link_grib.csh"):
-                os.remove("link_grib.csh")
-            if os.path.exists("Vtable"):
-                os.remove("Vtable")
-            if os.path.exists("metgrid"):
-                shutil.rmtree("metgrid")
-            if os.path.exists("metgrid.exe"):
-                os.remove("metgrid.exe")
-            if os.path.exists("ungrib.exe"):
-                os.remove("ungrib.exe")
-
-            ## optionally delete the met_em files once they have been used
-            if wrf_config.delete_metem_files:
-                purge(wrf_config.metem_dir, "met_em*")
+            run_wrf(wrf_config)
 
         ## clean up the links to the met_em files regardless, as they are no longer needed
         purge(run_dir_with_date, "met_em*")
@@ -1122,6 +845,40 @@ def run_setup_for_wrf(configfile: str) -> None:
             f.close()
             ## make executable
             os.chmod(scriptPath, os.stat(scriptPath).st_mode | stat.S_IEXEC)
+
+
+def run_wrf(wrf_config: WRFConfig):
+    print(
+        "\t\tRun real.exe at {}".format(
+            datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        )
+    )
+    run_command(["mpirun", "-np", "1", "./real.exe"], log_prefix="real.log")
+    rsloutfile = "rsl.out.0000"
+
+    complete_message="SUCCESS COMPLETE REAL_EM INIT"
+    with open(rsloutfile) as fh:
+        lines = fh.readlines()
+
+    matches = [line for line in lines if line.find(complete_message) >= 0]
+    if len(matches) == 0:
+        raise RuntimeError(
+            "Success message not found in real.exe logfile (rsl.out.0000)..."
+        )
+    # Clean up symlinks
+    if os.path.exists("link_grib.csh"):
+        os.remove("link_grib.csh")
+    if os.path.exists("Vtable"):
+        os.remove("Vtable")
+    if os.path.exists("metgrid"):
+        shutil.rmtree("metgrid")
+    if os.path.exists("metgrid.exe"):
+        os.remove("metgrid.exe")
+    if os.path.exists("ungrib.exe"):
+        os.remove("ungrib.exe")
+    ## optionally delete the met_em files once they have been used
+    if wrf_config.delete_metem_files:
+        purge(wrf_config.metem_dir, "met_em*")
 
 
 if __name__ == "__main__":
