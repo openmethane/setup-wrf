@@ -6,7 +6,7 @@ du -hc .
 
 echo "Remove temporary files"
 rm -f met_em*
-rm -f geo_em*
+#rm -f geo_em*
 rm -f link_grib.csh
 rm -f Vtable
 rm -r -f metgrid
