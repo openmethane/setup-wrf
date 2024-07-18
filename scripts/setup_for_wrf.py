@@ -13,6 +13,7 @@ from setup_runs.wrf.namelists import validate_wrf_namelists
 from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
 from setup_runs.utils import compress_nc_file, run_command, purge
 import click
+import dotenv
 
 
 def move_pattern_to_dir(sourceDir, pattern, destDir):
@@ -29,6 +30,7 @@ def link_pattern_to_dir(sourceDir, pattern, destDir):
             if not os.path.exists(dst):
                 os.symlink(src, dst)
 
+
 def grep_lines(regex, lines):
     if isinstance(lines, str):
         lines = lines.split("\n")
@@ -42,6 +44,7 @@ def symlink_file(input_directory, output_directory, filename):
     dst = os.path.join(output_directory, filename)
     if not os.path.exists(dst):
         os.symlink(src, dst)
+
 
 @click.command()
 @click.option(
@@ -88,7 +91,9 @@ def run_setup_for_wrf(configfile: str) -> None:
     run_length_hours = (
         wrf_config.end_date - wrf_config.start_date
     ).total_seconds() / 3600.0
-    number_of_jobs = int(math.ceil(run_length_hours / float(wrf_config.num_hours_per_run)))
+    number_of_jobs = int(
+        math.ceil(run_length_hours / float(wrf_config.num_hours_per_run))
+    )
 
     ## check that namelist template files are present
     WPSnmlPath = wrf_config.namelist_wps
@@ -381,9 +386,6 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     if not os.path.exists(dailyFileDst):
                                         os.symlink(dailyFileSrc, dailyFileDst)
                             ##
-                            wpsStrDateStr = wpsStrDate.strftime("%Y-%m-%d_%H:%M:%S")
-                            wpsEndDateEnd = wpsEndDate.strftime("%Y-%m-%d_%H:%M:%S")
-                            ##
                             purge(run_dir_with_date, "GRIBFILE*")
                             print(
                                 "\t\tRun link_grib for the SST data at {}".format(
@@ -393,7 +395,10 @@ def run_setup_for_wrf(configfile: str) -> None:
                                 )
                             )
 
-                            run_command(["./link_grib.csh", os.path.join(sstDir, "*")], log_prefix="link_grib_sst.log")
+                            run_command(
+                                ["./link_grib.csh", os.path.join(sstDir, "*")],
+                                log_prefix="link_grib_sst.log",
+                            )
 
                             ## check that it ran
                             ## time.sleep(0.2)
@@ -425,7 +430,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     )
                                 )
                             )
-                            stdout, _ = run_command(["./ungrib.exe"], log_prefix="ungrib_sst.log")
+                            stdout, _ = run_command(
+                                ["./ungrib.exe"], log_prefix="ungrib_sst.log"
+                            )
 
                             ## check that it ran
                             ## matches = grep_file('Successful completion of ungrib', logfile)
@@ -460,7 +467,6 @@ def run_setup_for_wrf(configfile: str) -> None:
                         if pattern == "analysis_pattern_upper":
                             ## for the upper-level files, be selective and use only those that contain the relevant range of dates
                             for ifile, filename in enumerate(files):
-                                basepieces = os.path.basename(filename).split("_")
                                 fileStartDateStr = os.path.basename(filename).split(
                                     "_"
                                 )[-2]
@@ -534,7 +540,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                                 orcid = os.environ["ORCID"]
                                 api_token = os.environ["RDA_TOKEN"]
                             except KeyError:
-                                raise ValueError("ORCID and RDA_TOKEN environment variables must be set")
+                                raise ValueError(
+                                    "ORCID and RDA_TOKEN environment variables must be set"
+                                )
 
                             FNLfiles = download_gdas_fnl_data(
                                 orcid=orcid,
@@ -568,14 +576,16 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     "\t\tSubset the grib file",
                                     os.path.basename(FNLfile),
                                 )
-                                _, stderr = run_command([
+                                _, stderr = run_command(
+                                    [
                                         "wgrib2",
                                         FNLfile,
                                         "-small_grib",
                                         geoStrs["XLONG_M"],
                                         geoStrs["XLAT_M"],
                                         tmpfile,
-                                    ])
+                                    ]
+                                )
                                 if len(stderr) > 0:
                                     print(stderr)
                                     raise RuntimeError(
@@ -639,7 +649,9 @@ def run_setup_for_wrf(configfile: str) -> None:
                             datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
                         )
                     )
-                    stdout, _ = run_command(["./ungrib.exe"], log_prefix="ungrib_era.log")
+                    stdout, _ = run_command(
+                        ["./ungrib.exe"], log_prefix="ungrib_era.log"
+                    )
 
                     ## FIXME: check that it worked
                     matches = grep_lines("Successful completion of ungrib", stdout)
@@ -862,7 +874,7 @@ def run_wrf(wrf_config: WRFConfig):
     run_command(["mpirun", "-np", "1", "./real.exe"], log_prefix="real.log")
     rsloutfile = "rsl.out.0000"
 
-    complete_message="SUCCESS COMPLETE REAL_EM INIT"
+    complete_message = "SUCCESS COMPLETE REAL_EM INIT"
     with open(rsloutfile) as fh:
         lines = fh.readlines()
 
@@ -888,4 +900,6 @@ def run_wrf(wrf_config: WRFConfig):
 
 
 if __name__ == "__main__":
+    dotenv.load_dotenv(dotenv.find_dotenv())
+
     run_setup_for_wrf()

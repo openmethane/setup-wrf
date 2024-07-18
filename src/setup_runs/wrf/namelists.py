@@ -1,67 +1,68 @@
 import pdb
 
 NAMELIST_PARAMS_TO_MATCH = [
-        {
-            "wrf_var": "max_dom",
-            "wrf_group": "domains",
-            "wps_var": "max_dom",
-            "wps_group": "share",
-        },
-        {
-            "wrf_var": "interval_seconds",
-            "wrf_group": "time_control",
-            "wps_var": "interval_seconds",
-            "wps_group": "share",
-        },
-        {
-            "wrf_var": "parent_id",
-            "wrf_group": "domains",
-            "wps_var": "parent_id",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "parent_grid_ratio",
-            "wrf_group": "domains",
-            "wps_var": "parent_grid_ratio",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "i_parent_start",
-            "wrf_group": "domains",
-            "wps_var": "i_parent_start",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "j_parent_start",
-            "wrf_group": "domains",
-            "wps_var": "j_parent_start",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "e_we",
-            "wrf_group": "domains",
-            "wps_var": "e_we",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "e_sn",
-            "wrf_group": "domains",
-            "wps_var": "e_sn",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "dx",
-            "wrf_group": "domains",
-            "wps_var": "dx",
-            "wps_group": "geogrid",
-        },
-        {
-            "wrf_var": "dy",
-            "wrf_group": "domains",
-            "wps_var": "dy",
-            "wps_group": "geogrid",
-        },
-    ]
+    {
+        "wrf_var": "max_dom",
+        "wrf_group": "domains",
+        "wps_var": "max_dom",
+        "wps_group": "share",
+    },
+    {
+        "wrf_var": "interval_seconds",
+        "wrf_group": "time_control",
+        "wps_var": "interval_seconds",
+        "wps_group": "share",
+    },
+    {
+        "wrf_var": "parent_id",
+        "wrf_group": "domains",
+        "wps_var": "parent_id",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "parent_grid_ratio",
+        "wrf_group": "domains",
+        "wps_var": "parent_grid_ratio",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "i_parent_start",
+        "wrf_group": "domains",
+        "wps_var": "i_parent_start",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "j_parent_start",
+        "wrf_group": "domains",
+        "wps_var": "j_parent_start",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "e_we",
+        "wrf_group": "domains",
+        "wps_var": "e_we",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "e_sn",
+        "wrf_group": "domains",
+        "wps_var": "e_sn",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "dx",
+        "wrf_group": "domains",
+        "wps_var": "dx",
+        "wps_group": "geogrid",
+    },
+    {
+        "wrf_var": "dy",
+        "wrf_group": "domains",
+        "wps_var": "dy",
+        "wps_group": "geogrid",
+    },
+]
+
 
 def validate_wrf_namelists(namelist_wps, namelist_wrf):
     ## check that the parameters do agree between the WRF and WPS namelists
@@ -78,13 +79,13 @@ def validate_wrf_namelists(namelist_wps, namelist_wrf):
             if namelist_wps["share"]["max_dom"] == 1:
                 if isinstance(value_wrf, list):
                     assert (
-                            value_wrf[0] == value_wps
+                        value_wrf[0] == value_wps
                     ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                         param_dict["wrf_var"]
                     )
                 else:
                     assert (
-                            value_wrf == value_wps
+                        value_wrf == value_wps
                     ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                         param_dict["wrf_var"]
                     )
@@ -100,7 +101,7 @@ def validate_wrf_namelists(namelist_wps, namelist_wrf):
                         pdb.set_trace()
                 ##
                 assert (
-                        len(value_wrf) == len(expectedVal)
+                    len(value_wrf) == len(expectedVal)
                 ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
                     param_dict["wrf_var"]
                 )
@@ -111,13 +112,13 @@ def validate_wrf_namelists(namelist_wps, namelist_wrf):
                 )
         else:
             assert (
-                    type(value_wrf) == type(value_wps)
+                type(value_wrf) == type(value_wps)
             ), "Mismatched type for variable {} between the WRF and WPS namelists".format(
                 param_dict["wrf_var"]
             )
             if isinstance(value_wrf, list):
                 assert (
-                        len(value_wrf) == len(value_wps)
+                    len(value_wrf) == len(value_wps)
                 ), "Mismatched length for variable {} between the WRF and WPS namelists".format(
                     param_dict["wrf_var"]
                 )
@@ -128,7 +129,7 @@ def validate_wrf_namelists(namelist_wps, namelist_wrf):
                 )
             else:
                 assert (
-                        value_wrf == value_wps
+                    value_wrf == value_wps
                 ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                     param_dict["wrf_var"]
                 )
