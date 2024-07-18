@@ -8,9 +8,7 @@ geog_data_path: /opt/project/data/geog/WPS_GEOG
 num_hours_per_run: 24
 num_hours_spin_up: 12
 only_edit_namelists: false
-orcid: ***REMOVED***
 project_root: /opt/project
-rda_ucar_edu_api_token: ***REMOVED***
 regional_subset_of_grib_data: true
 restart: false
 run_as_one_job: true

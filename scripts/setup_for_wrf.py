@@ -530,9 +530,15 @@ def run_setup_for_wrf(configfile: str) -> None:
                             )
                         else:
                             ## otherwise get it all
+                            try:
+                                orcid = os.environ["ORCID"]
+                                api_token = os.environ["RDA_TOKEN"]
+                            except KeyError:
+                                raise ValueError("ORCID and RDA_TOKEN environment variables must be set")
+
                             FNLfiles = download_gdas_fnl_data(
-                                orcid=wrf_config.orcid,
-                                api_token=wrf_config.rda_ucar_edu_api_token,
+                                orcid=orcid,
+                                api_token=api_token,
                                 target_dir=run_dir_with_date,
                                 download_dts=FNLtimes,
                             )

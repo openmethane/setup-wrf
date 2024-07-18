@@ -39,8 +39,6 @@
     "real_exe" : "${wrf_dir}/main/real.exe",
     "delete_metem_files" : "false",
     "analysis_source" : "FNL",
-    "orcid" : "***REMOVED***",
-    "rda_ucar_edu_api_token" : "***REMOVED***",
     "regional_subset_of_grib_data" : "true",
     "sst_monthly_dir" : "/g/data/ua8/NCEP_Polar/sst/rtg_high_res",
     "sst_daily_dir" : "/g/data/ua8/NCEP_Polar/sst/rtg_high_res",
