@@ -1,6 +1,6 @@
 # WRF coordination scripts
 
-This repository contains the code used to generate the scripts needed to run WRF
+This repository contains the code used to generate the scripts needed to run the [Weather Research & Forecasting Model (WRF)](https://www.mmm.ucar.edu/models/wrf)
 according to a set of configuration.
 
 
@@ -16,14 +16,13 @@ See [Input files](#input-files) for more information about how the configuration
 `config/wrf/config.nci.json` will be used as the default configuration file,
 but this can be overriden using the `-c` command line argument.
 An example config file `config/config.docker.json` that targets running WRF using docker.
-The `config.docker.full.json` is..
 
 The `setup_for_wrf.py` script does the following:
 * Reads the configuration file
 * Performs substitutions of the config file. For example, if used, the shell environment variable `${HOME}` will be replaced by its value when interpreting the script. The variable `wps_dir` is defined within the config file, and if the token `${wps_dir}` appears within the configuration entries, such tokens will be replaced by the value of this variable.
 * Configure the main coordination script
 * Loop over the required WRF jobs, performing the following:
-  * Check if the WRF input files for this run are available (`wrfinput_d0?`). If not, perform the following:
+  * Check if the WRF input files for this run are available (`wrfinput_d01`). If not, perform the following:
     * Check that the geogrid files are available (copies should be found in the directory given by the config variable `nml_dir`). If not available, configure the WPS namelist and run `geogrid.exe` to produce them.
     * Check if the `met_em` files for this run are available. If not, perform the following:
       * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the high-resolution SST files (RTG) - this is optional
@@ -32,6 +31,7 @@ The `setup_for_wrf.py` script does the following:
       * Run `metgrid.exe` to produce the `met_em` files, moves these to a directory (`METEM`)
     * Link to the `met_em` files (in the `METEM` directory), configure the WRF namelist, run `real.exe`
   * Configure the daily "run" and "cleanup" scripts
+
 
 After the `setup_for_wrf.py` script has been run successfully, 
 the `main.sh` script in the runs output directory can be used to run all the WRF jobs sequentially.
