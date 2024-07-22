@@ -16,6 +16,7 @@ See [Input files](#input-files) for more information about how the configuration
 `config/wrf/config.nci.json` will be used as the default configuration file,
 but this can be overriden using the `-c` command line argument.
 An example config file `config/config.docker.json` that targets running WRF using docker.
+The `config.docker.full.json` is..
 
 The `setup_for_wrf.py` script does the following:
 * Reads the configuration file
@@ -35,6 +36,8 @@ The `setup_for_wrf.py` script does the following:
 After the `setup_for_wrf.py` script has been run successfully, 
 the `main.sh` script in the runs output directory can be used to run all the WRF jobs sequentially.
 For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and domain.
+
+The `check_wrfout_in_background.py` script..
 
 ## Getting started
 
