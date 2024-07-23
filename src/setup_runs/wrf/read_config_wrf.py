@@ -67,7 +67,7 @@ class WRFConfig:
     wrf_dir: str
     """the top-level directory containing the WRF executables and data-tables"""
     nml_dir: str
-    """the directory containining the run specific configuration (the directory with template namelists)"""
+    """the directory containing the run specific configuration (the directory with template namelists)"""
     target_dir: str
     """the directory containing the target-specific configuration"""
     scripts_to_copy_from_nml_dir: str

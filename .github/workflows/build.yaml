@@ -110,6 +110,9 @@ jobs:
           cd /opt/project
           ./scripts/download-geog.sh --low-res
       - name: Run WRF
+        env:
+          ORCID: ${{ secrets.ORCID }}
+          RDA_TOKEN: ${{ secrets.RDA_TOKEN }}
         run: |
           cd /opt/project
           
