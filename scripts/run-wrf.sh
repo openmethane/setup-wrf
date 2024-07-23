@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
-# Runs the WRF model with the given configuration
+# Runs the WRF model with the given configuration for a single day
 #
 # The output to archive will be stored in `data/runs` directories.
 #
 # Future work
 # - Cache the WRF geog data
-# - Specify start/end dates
-# - Handle config files from the cmdline
 
 set -Eeuo pipefail
 
-CONFIG_FILE=${CONFIG_FILE:-config/config.docker.json}
 DOMAIN=${DOMAIN:-aust-test}
+CONFIG_FILE=${CONFIG_FILE:-config/config.docker.json}
+START_DATE=${START_DATE:-2022-07-22}
+
+# Default end date is the next day
+# Ignores the existing END_DATE variable if it is provided.
+# setup-wrf uses a different date conventions compared to the rest of the OpenMethane project
+END_DATE=$(date '+%Y-%m-%d' -d "$START_DATE+1 days")
 
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
