@@ -29,7 +29,7 @@ The `setup_for_wrf.py` script does the following:
 * Loop over the required WRF jobs, performing the following:
     * Check if the WRF input files for this run are available (`wrfinput_d01`). If not, perform the following:
         * Check that the geogrid files are available (copies should be found in the directory given by the config
-          variable `nml_dir`). If not available, configure the WPS namelist and run `geogrid.exe` to produce them.
+          variable `nml_dir`). If not available, configure the [WRF Pre-Processing System (WPS)](https://github.com/wrf-model/WPS) namelist and run `geogrid.exe` to produce them.
         * Check if the `met_em` files for this run are available. If not, perform the following:
             * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the high-resolution SST files (
               RTG) - this is optional
