@@ -23,6 +23,7 @@ tqdm = "^4.66.4"
 cdsapi = "^0.7.0"
 click = "^8.1.7"
 ruff = "^0.4.8"
+python-dotenv = "^1.0.1"
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^8.2.1"

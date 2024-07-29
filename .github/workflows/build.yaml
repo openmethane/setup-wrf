@@ -77,6 +77,9 @@ jobs:
         password: ${{ secrets.github_token }}
     steps:
       - name: Run pytest
+        env:
+          ORCID: ${{ secrets.ORCID }}
+          RDA_TOKEN: ${{ secrets.RDA_TOKEN }}
         run: |
           # GHA sets a random work directory, so we need to change to the project directory
           cd /opt/project
@@ -107,6 +110,9 @@ jobs:
           cd /opt/project
           ./scripts/download-geog.sh --low-res
       - name: Run WRF
+        env:
+          ORCID: ${{ secrets.ORCID }}
+          RDA_TOKEN: ${{ secrets.RDA_TOKEN }}
         run: |
           cd /opt/project
           
@@ -117,6 +123,9 @@ jobs:
           python scripts/setup_for_wrf.py -c config/config.docker.json
           bash data/runs/aust-test/main.sh
       - name: Run pytest integration tests
+        env:
+          ORCID: ${{ secrets.ORCID }}
+          RDA_TOKEN: ${{ secrets.RDA_TOKEN }}
         run: |
           cd /opt/project
           
