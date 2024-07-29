@@ -67,7 +67,7 @@ class WRFConfig:
     wrf_dir: str
     """the top-level directory containing the WRF executables and data-tables"""
     nml_dir: str
-    """the directory containining the run specific configuration (the directory with template namelists)"""
+    """the directory containing the run specific configuration (the directory with template namelists)"""
     target_dir: str
     """the directory containing the target-specific configuration"""
     scripts_to_copy_from_nml_dir: str
@@ -108,10 +108,6 @@ class WRFConfig:
         if value not in ["FNL", "ERAI"]:
             raise ValueError("analysis_source must be one of ERAI or FNL")
 
-    orcid: str
-    """if analysis_source is "FNL", you will need a login for CISL/rda.ucar.edu"""
-    rda_ucar_edu_api_token: str
-    """"""
     regional_subset_of_grib_data: str = field(converter=boolean_converter)
     """if analysis_source is "FNL", it's a good idea to take a subset of the grib2 files"""
     sst_monthly_dir: str
