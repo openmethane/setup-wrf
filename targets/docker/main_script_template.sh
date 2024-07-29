@@ -2,6 +2,9 @@
 # Submit WRF for a group of consecutive days. Wait for each job to
 # finish before starting the next one.
 
+# Exit if any errors occur
+set -Eeuo pipefail
+
 echo Start date is ${STARTDATE}
 echo Run directory is ${RUN_DIR}
 
