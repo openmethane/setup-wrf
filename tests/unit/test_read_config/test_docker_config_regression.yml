@@ -4,6 +4,7 @@ analysis_source: FNL
 delete_metem_files: false
 end_date: 2022-07-23 00:00:00+00:00
 environment_variables_for_substitutions: HOME
+geo_em_dir: /opt/project/data/runs/aust-test
 geog_data_path: /opt/project/data/geog/WPS_GEOG
 num_hours_per_run: 24
 num_hours_spin_up: 12

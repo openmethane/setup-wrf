@@ -209,7 +209,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                 for iDom in range(nDom):
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
-                    geoPath = os.path.join(wrf_config.nml_dir, geoFile)
+                    geoPath = os.path.join(wrf_config.geo_em_dir, geoFile)
                     if not os.path.exists(geoPath):
                         geoFilesExist = False
                 ## If not, produce them
