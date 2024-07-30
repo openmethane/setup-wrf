@@ -14,6 +14,9 @@ from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
 from setup_runs.utils import compress_nc_file, run_command, purge
 import click
 import dotenv
+import prettyprinter
+
+prettyprinter.install_extras(["attrs"])
 
 
 def move_pattern_to_dir(sourceDir, pattern, destDir):
@@ -65,6 +68,9 @@ def run_setup_for_wrf(configfile: str) -> None:
 
     """
     wrf_config = load_wrf_config(configfile)
+
+    print("Configuration:")
+    prettyprinter.cpprint(wrf_config)
 
     scripts = {}
     dailyScriptNames = ["run", "cleanup"]
