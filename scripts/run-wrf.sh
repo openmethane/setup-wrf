@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the WRF model with the given configuration for a single day
 #
-# The output to archive will be stored in `data/runs` directories.
+# The output to archive will be stored in `data/wrf` directories by default.
 #
 # Future work
 # - Cache the WRF geog data
@@ -9,6 +9,7 @@
 set -Eeuo pipefail
 
 DOMAIN=${DOMAIN:-aust-test}
+RUN_DIR=${RUN_DIR:-/opt/project/data/wrf}
 CONFIG_FILE=${CONFIG_FILE:-config/config.docker.json}
 START_DATE=${START_DATE:-2022-07-22}
 
