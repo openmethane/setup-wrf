@@ -265,7 +265,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                         compress_nc_file(geoFile)
                         ## move the file to the namelist directory
                         src = os.path.join(run_dir_with_date, geoFile)
-                        dst = os.path.join(wrf_config.nml_dir, geoFile)
+                        dst = os.path.join(wrf_config.geo_em_dir, geoFile)
                         shutil.move(src, dst)
                 ##
                 ## link to the geo files
@@ -273,7 +273,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
                     ## move the file to the namelist directory
-                    src = os.path.join(wrf_config.nml_dir, geoFile)
+                    src = os.path.join(wrf_config.geo_em_dir, geoFile)
                     dst = os.path.join(run_dir_with_date, geoFile)
                     if not os.path.exists(dst):
                         os.symlink(src, dst)
