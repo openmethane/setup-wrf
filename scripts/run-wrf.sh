@@ -9,8 +9,10 @@
 set -Eeuo pipefail
 
 export DOMAIN_NAME=${DOMAIN_NAME:-aust-test}
-export RUN_DIR=${RUN_DIR:-/opt/project/data/wrf}
+# Root directory for storing output (excluding the wrf/${DOMAIN_NAME} directory)
+export STORE_PATH=${RUN_DIR:-/opt/project/data}
 export START_DATE=${START_DATE:-2022-07-22}
+# Note that currently the full docker config is the only one that supports `STORE_PATH`
 CONFIG_FILE=${CONFIG_FILE:-config/config.docker.full.json}
 
 
@@ -21,6 +23,6 @@ export END_DATE=$(date '+%Y-%m-%d' -d "$START_DATE+1 days")
 
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
-/opt/project/data/runs/${DOMAIN_NAME}/main.sh
+${STORE_PATH}/wrf/${DOMAIN_NAME}/main.sh
 
 echo "Finished"
