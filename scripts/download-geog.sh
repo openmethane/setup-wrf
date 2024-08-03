@@ -11,12 +11,14 @@ set -Eeuo pipefail
 parse_params() {
   # default values of variables set from params
   low_res=0
+  force=0
 
   while :; do
     case "${1-}" in
 #    -h | --help) usage ;;
     -v | --verbose) set -x ;;
     -l | --low-res) low_res=1 ;; # Download low res data
+    -f | --force) force=1 ;; # Delete existing data if present
     -?*) die "Unknown option: $1" ;;
     *) break ;;
     esac
@@ -32,7 +34,13 @@ parse_params "$@"
 
 output_dir="data/geog"
 
+if ((force)); then
+  echo "Deleting existing data"
+  rm -rf $output_dir
+fi
+
 mkdir -p $output_dir
+
 
 if ((low_res)); then
   echo "Downloading low resolution data"
@@ -54,6 +62,7 @@ else
 	echo "Extracting data to $output_dir/WPS_GEOG..."
 	echo "  This may take a few minutes"
 	tar -xzf $output_dir/geog_high_res_mandatory.tar.gz -C $output_dir
+	echo "  geog_high_res_mandatory.tar.gz extracted"
 	tar -xzf $output_dir/landuse_30s.tar.bz2 -C $output_dir/WPS_GEOG
 fi
 
