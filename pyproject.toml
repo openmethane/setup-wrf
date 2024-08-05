@@ -24,6 +24,7 @@ cdsapi = "^0.7.0"
 click = "^8.1.7"
 ruff = "^0.4.8"
 python-dotenv = "^1.0.1"
+prettyprinter = "^0.18.0"
 
 [tool.poetry.group.tests.dependencies]
 pytest = "^8.2.1"
