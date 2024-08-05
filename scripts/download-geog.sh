@@ -71,7 +71,8 @@ else
 	echo "  This may take a few minutes"
 	tar ${tar_args} -xzf $output_dir/geog_high_res_mandatory.tar.gz -C $output_dir
 	echo "  geog_high_res_mandatory.tar.gz extracted"
-	tar ${tar_args} -xzf $output_dir/landuse_30s.tar.bz2 -C $output_dir/WPS_GEOG
+	bunzip2 $output_dir/landuse_30s.tar.bz2
+	tar ${tar_args} -xzf $output_dir/landuse_30s.tar -C $output_dir/WPS_GEOG
 fi
 
 echo "Completed downloading and extracting WRF geog data."
