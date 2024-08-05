@@ -169,82 +169,22 @@ def test_config_values(target, config_path_wrf_nci, config_path_wrf_docker):
     assert config == asdict(wrf_config)
 
 
-@pytest.fixture
-def dynamic_wrf_nci_values():
-    return [
-        "run_script_template",
-        "cleanup_script_template",
-        "main_script_template",
-        "check_wrfout_in_background_script",
-        "nml_dir",
-        "target_dir",
-        "metem_dir",
-        "namelist_wps",
-        "namelist_wrf",
-        "geogrid_tbl",
-        "geogrid_exe",
-        "ungrib_exe",
-        "metgrid_tbl",
-        "metgrid_exe",
-        "linkgrib_script",
-        "wrf_exe",
-        "real_exe",
-        "sst_vtable",
-        "analysis_vtable",
-        "wrf_run_dir",
-        "setup_root",
-        "wps_dir",
-        "wrf_dir",
-        "project_root",
-    ]
-
-
-@pytest.fixture
-def dynamic_wrf_docker_values():
-    return [
-        "run_script_template",
-        "cleanup_script_template",
-        "main_script_template",
-        "check_wrfout_in_background_script",
-        "nml_dir",
-        "target_dir",
-        "metem_dir",
-        "namelist_wps",
-        "namelist_wrf",
-        "geogrid_tbl",
-        "geogrid_exe",
-        "ungrib_exe",
-        "metgrid_tbl",
-        "metgrid_exe",
-        "linkgrib_script",
-        "wrf_exe",
-        "real_exe",
-        "sst_vtable",
-        "analysis_vtable",
-        "wrf_run_dir",
-    ]
-
-
 def test_nci_config_regression(
-    config_path_wrf_nci, data_regression, dynamic_wrf_nci_values
+    config_path_wrf_nci, data_regression, monkeypatch
 ):
+    monkeypatch.setenv("HOME", "{HOME}")
     wrf_config = load_wrf_config(config_path_wrf_nci)
-    data = asdict(wrf_config)
 
-    for val in dynamic_wrf_nci_values:
-        data.pop(val)
+    data = asdict(wrf_config)
 
     data_regression.check(data)
 
 
 def test_docker_config_regression(
-    config_path_wrf_docker, data_regression, dynamic_wrf_docker_values
+    config_path_wrf_docker, data_regression
 ):
     wrf_config = load_wrf_config(config_path_wrf_docker)
     data = asdict(wrf_config)
-
-    for val in dynamic_wrf_docker_values:
-        data.pop(val)
 
     data_regression.check(data)
 

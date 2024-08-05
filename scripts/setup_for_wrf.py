@@ -14,6 +14,9 @@ from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
 from setup_runs.utils import compress_nc_file, run_command, purge
 import click
 import dotenv
+import prettyprinter
+
+prettyprinter.install_extras(["attrs"])
 
 
 def move_pattern_to_dir(sourceDir, pattern, destDir):
@@ -65,6 +68,9 @@ def run_setup_for_wrf(configfile: str) -> None:
 
     """
     wrf_config = load_wrf_config(configfile)
+
+    print("Configuration:")
+    prettyprinter.cpprint(wrf_config)
 
     scripts = {}
     dailyScriptNames = ["run", "cleanup"]
@@ -203,7 +209,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                 for iDom in range(nDom):
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
-                    geoPath = os.path.join(wrf_config.nml_dir, geoFile)
+                    geoPath = os.path.join(wrf_config.geo_em_dir, geoFile)
                     if not os.path.exists(geoPath):
                         geoFilesExist = False
                 ## If not, produce them
@@ -265,7 +271,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                         compress_nc_file(geoFile)
                         ## move the file to the namelist directory
                         src = os.path.join(run_dir_with_date, geoFile)
-                        dst = os.path.join(wrf_config.nml_dir, geoFile)
+                        dst = os.path.join(wrf_config.geo_em_dir, geoFile)
                         shutil.move(src, dst)
                 ##
                 ## link to the geo files
@@ -273,7 +279,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                     dom = "d0{}".format(iDom + 1)
                     geoFile = "geo_em.{}.nc".format(dom)
                     ## move the file to the namelist directory
-                    src = os.path.join(wrf_config.nml_dir, geoFile)
+                    src = os.path.join(wrf_config.geo_em_dir, geoFile)
                     dst = os.path.join(run_dir_with_date, geoFile)
                     if not os.path.exists(dst):
                         os.symlink(src, dst)

@@ -68,6 +68,12 @@ class WRFConfig:
     """the top-level directory containing the WRF executables and data-tables"""
     nml_dir: str
     """the directory containing the run specific configuration (the directory with template namelists)"""
+    geo_em_dir: str
+    """
+    Directory that contains the geo_em.d01.nc file. 
+    
+    This file is used by the WPS program to generate the met_em files.
+    """
     target_dir: str
     """the directory containing the target-specific configuration"""
     scripts_to_copy_from_nml_dir: str

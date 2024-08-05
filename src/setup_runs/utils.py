@@ -20,8 +20,9 @@ def run_command(
         with open(f"{log_prefix}.stderr", "w") as f:
             f.write(stderr)
 
-    if verbose:
+    if verbose or p.returncode != 0:
         print(f"Log from command: {command_list}")
+        print(f"Exit Code: {p.returncode}")
         print(f"stdout: {stdout}")
         print(f"stderr: {stderr}")
 
