@@ -2,55 +2,22 @@
 
 [[package]]
 name = "attrs"
-version = "23.2.0"
+version = "24.2.0"
 description = "Classes Without Boilerplate"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "attrs-23.2.0-py3-none-any.whl", hash = "sha256:99b87a485a5820b23b879f04c2305b44b951b502fd64be915879d77a7e8fc6f1"},
-    {file = "attrs-23.2.0.tar.gz", hash = "sha256:935dc3b529c262f6cf76e50877d35a4bd3c1de194fd41f47a2b7ae8f19971f30"},
+    {file = "attrs-24.2.0-py3-none-any.whl", hash = "sha256:81921eb96de3191c8258c199618104dd27ac608d9366f5e35d011eae1867ede2"},
+    {file = "attrs-24.2.0.tar.gz", hash = "sha256:5cfb1b9148b5b086569baec03f20d7b6bf3bcacc9a42bebf87ffaaca362f6346"},
 ]
 
 [package.extras]
-cov = ["attrs[tests]", "coverage[toml] (>=5.3)"]
-dev = ["attrs[tests]", "pre-commit"]
-docs = ["furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier", "zope-interface"]
-tests = ["attrs[tests-no-zope]", "zope-interface"]
-tests-mypy = ["mypy (>=1.6)", "pytest-mypy-plugins"]
-tests-no-zope = ["attrs[tests-mypy]", "cloudpickle", "hypothesis", "pympler", "pytest (>=4.3.0)", "pytest-xdist[psutil]"]
-
-[[package]]
-name = "cads-api-client"
-version = "1.0.3"
-description = "CADS API Python client"
-optional = false
-python-versions = "*"
-files = [
-    {file = "cads_api_client-1.0.3-py3-none-any.whl", hash = "sha256:fff4e4501692ff25a1ef15896f93630ec444fd338473f710def87708a1cf0adf"},
-    {file = "cads_api_client-1.0.3.tar.gz", hash = "sha256:5b10f08ea559237e49ae1c742fea9aef48280cb786f346f6cacda224b9c204e0"},
-]
-
-[package.dependencies]
-attrs = "*"
-multiurl = "*"
-requests = "*"
-typing-extensions = "*"
-
-[[package]]
-name = "cdsapi"
-version = "0.7.0"
-description = "Climate Data Store API"
-optional = false
-python-versions = "*"
-files = [
-    {file = "cdsapi-0.7.0-py2.py3-none-any.whl", hash = "sha256:b78d871c13862095476986904e7d7224c2480a6670e1bfd46718e095eaaf9b19"},
-    {file = "cdsapi-0.7.0.tar.gz", hash = "sha256:293ba622f25a15c29c435763d0bbeff4c44d1ee71bc7df965e9d191160d39d59"},
-]
-
-[package.dependencies]
-cads-api-client = ">=0.9.2"
-requests = ">=2.5.0"
-tqdm = "*"
+benchmark = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-codspeed", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+cov = ["cloudpickle", "coverage[toml] (>=5.3)", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+dev = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pre-commit", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
+tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
+tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
 
 [[package]]
 name = "certifi"
@@ -303,22 +270,6 @@ files = [
     {file = "joblib-1.4.2-py3-none-any.whl", hash = "sha256:06d478d5674cbc267e7496a410ee875abd68e4340feff4490bcb7afb88060ae6"},
     {file = "joblib-1.4.2.tar.gz", hash = "sha256:2382c5816b2636fbd20a09e0f4e9dad4736765fdfb7dca582943b9c1366b3f0e"},
 ]
-
-[[package]]
-name = "multiurl"
-version = "0.3.1"
-description = "A package to download several URL as one, as well as supporting multi-part URLs"
-optional = false
-python-versions = "*"
-files = [
-    {file = "multiurl-0.3.1.tar.gz", hash = "sha256:c7001437b59d56d4c310d725c3dcfff98c97c4b652893d88989853827465d442"},
-]
-
-[package.dependencies]
-python-dateutil = "*"
-pytz = "*"
-requests = "*"
-tqdm = "*"
 
 [[package]]
 name = "netcdf4"
@@ -789,17 +740,6 @@ slack = ["slack-sdk"]
 telegram = ["requests"]
 
 [[package]]
-name = "typing-extensions"
-version = "4.12.2"
-description = "Backported and Experimental Type Hints for Python 3.8+"
-optional = false
-python-versions = ">=3.8"
-files = [
-    {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
-    {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
-]
-
-[[package]]
 name = "tzdata"
 version = "2024.1"
 description = "Provider of IANA time zone data"
@@ -854,4 +794,4 @@ viz = ["matplotlib", "nc-time-axis", "seaborn"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10,<3.12"
-content-hash = "28800589b6f8a8f984eed49c8314ac9255a497c74e26e327a600407b7f850e2b"
+content-hash = "8cfa1832bd0f23a994b596163d21d03af775d12c7cf358e134cec45b9b4cc8de"
