@@ -23,6 +23,7 @@ from urllib3.util import Retry
 N_JOBS = 8
 LOGIN_URL = "https://rda.ucar.edu/cgi-bin/login"
 DATASET_URL = "https://data.rda.ucar.edu/ds083.3/"
+FNL_START_DATE = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
 
 def create_session() -> requests.Session:
@@ -55,29 +56,6 @@ def create_session() -> requests.Session:
     session.mount("https://", adapter)
 
     return session
-
-
-def authenticate(session: requests.Session, orcid: str, api_token: str):
-    """
-    Authenticate with the RDA API
-
-    This will set some cookies on the session to allow for downloading data
-
-    Args:
-        session:
-            Session to authenticate
-        orcid:
-            ORCID for the user
-        api_token:
-            API token for the user
-    """
-
-    values = {"orcid_id": orcid, "api_token": api_token, "action": "tokenlogin"}
-    ret = session.post(LOGIN_URL, data=values)
-    if ret.status_code != 200:
-        print("Bad Authentication")
-        print(ret.text)
-        raise RuntimeError("Invalid RDA credentials")
 
 
 def download_file(session: requests.Session, target_dir: str, url: str) -> str:
@@ -114,7 +92,7 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
 
 
 def download_gdas_fnl_data(
-    orcid: str, api_token: str, target_dir: str, download_dts: list[datetime.datetime]
+    target_dir: str, download_dts: list[datetime.datetime]
 ) -> list[str]:
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3
@@ -125,11 +103,10 @@ def download_gdas_fnl_data(
     an exception will be raised and any other downloads will be aborted.
     If that occurs, any files being downloaded may be incomplete and should be deleted.
 
+    We are downloading raw grib files without any subsetting.
+    This operation does not require any RDA credentials.
+
     Args:
-        orcid:
-            orcid for which you have an account on rda.ucar.edu / CISL
-        api_token:
-            api_token for rda.ucar.edu / CISL
         target_dir:
             Directory where the data should be downloaded
         download_dts:
@@ -147,19 +124,15 @@ def download_gdas_fnl_data(
         target_dir
     ), "Target directory {} not found...".format(target_dir)
 
-    # Create a new session and authenticate
-    print("authenticate credentials")
+    # Create a new session with a retry strategy
     session = create_session()
-    authenticate(session, orcid, api_token)
-
-    FNLstartDate = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
     file_list = []
     for time in download_dts:
         assert (
             (time.hour % 6) == 0 and time.minute == 0 and time.second == 0
         ), "Analysis time should be staggered at 00Z, 06Z, 12Z, 18Z intervals"
-        assert time > FNLstartDate, "Analysis times should not be before 2015-07-08"
+        assert time > FNL_START_DATE, "Analysis times should not be before 2015-07-08"
         file_path = time.strftime("%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2")
         file_list.append(file_path)
 
