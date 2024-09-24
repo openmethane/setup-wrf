@@ -214,3 +214,11 @@ The scripts have been developed with the following principles:
   minimal (generally just that paths exist, not whether the contents are appropriate).
 * The data footprint should be kept to a minimum.
 * Progress is reported as the script progresses.
+
+# Acknowledgement
+
+The scripts and ideas found in `setup-wrf` were originally authored by
+[Jeremy Silver](https://github.com/JeremySilver) to assist researchers who
+wanted to run WRF on Australia's National Computational Infrastructure (NCI).
+Jeremy has graciously agreed to allow us to modify and open source his work
+which is now maintained as part of Open Methane.
