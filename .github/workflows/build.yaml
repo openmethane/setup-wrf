@@ -52,6 +52,7 @@ jobs:
             type=schedule
             type=ref,event=branch
             type=ref,event=pr
+            type=pep440,pattern={{version}}
       - name: Build and push image
         uses: docker/build-push-action@v5
         id: build
