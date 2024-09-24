@@ -541,18 +541,8 @@ def run_setup_for_wrf(configfile: str) -> None:
                                 "\t\tAll FNL files were found - do not repeat the download"
                             )
                         else:
-                            ## otherwise get it all
-                            try:
-                                orcid = os.environ["ORCID"]
-                                api_token = os.environ["RDA_TOKEN"]
-                            except KeyError:
-                                raise ValueError(
-                                    "ORCID and RDA_TOKEN environment variables must be set"
-                                )
-
+                            ## otherwise download all the required FNL files
                             FNLfiles = download_gdas_fnl_data(
-                                orcid=orcid,
-                                api_token=api_token,
                                 target_dir=run_dir_with_date,
                                 download_dts=FNLtimes,
                             )
@@ -906,6 +896,8 @@ def run_wrf(wrf_config: WRFConfig):
 
 
 if __name__ == "__main__":
-    dotenv.load_dotenv(dotenv.find_dotenv())
+    # Load a .env file if it exists
+    # This mechanism can be used to override the
+    dotenv.load_dotenv(dotenv.find_dotenv(raise_error_if_not_found=False))
 
     run_setup_for_wrf()

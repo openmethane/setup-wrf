@@ -46,9 +46,6 @@ For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and dom
 
 ## Getting started
 
-The `ORCID` and `RDA_TOKEN` environment variables must be set in the shell environment before running the scripts.
-These can be added to a `.env` file which is read by `setup_for_wrf.py`.
-
 This repository supports two target environments to run.
 
 ### NCI (National Computational Infrastructure Australia)
@@ -178,9 +175,7 @@ It is assumed that you have compiled with MPI (i.e. 'distributed memory').
 ## Analysis inputs
 
 This script will either use the ERA Interim reanalyses available on NCI or download NCEP FNL 0.25 analyses. This is set
-in `config/wrf/config.*.json`. If using the FNL analyses, you need to create an account on
-the [UCAR CISL](https://rda.ucar.edu) portal, and enter the credentials in `config.*.json` - this is not terribly
-secure, so make up a **fresh password** for this site. If switching between the FNL and ERA Interim reanalyses, you will
+in `config/wrf/config.*.json`. If switching between the FNL and ERA Interim reanalyses, you will
 need to change the Vtable file used (set in `config.*.json`), and also the number of vertical levels (set
 in `namelist.wrf` file). Also the merger of the RTG SSTs is only done for the ERA Interim analysis, and this step is
 optional (set in `config.*.json`).
