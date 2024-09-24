@@ -18,3 +18,7 @@ of rst and use slightly different categories.
 -->
 
 <!-- towncrier release notes start -->
+
+## setup-wrf v0.1.1 (2024-09-24)
+
+No significant changes.
