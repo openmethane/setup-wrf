@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "setup_runs"
-version = "0.1.2"
+version = "0.1.3a0"
 description = "Scripts for running WRF "
 authors = [
     "Peter Rayner <peter.rayner@superpowerinstitute.com.au>",
