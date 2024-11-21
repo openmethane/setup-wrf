@@ -19,6 +19,15 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.1.2 (2024-11-21)
+
+### Improvements
+
+- Adopt common release process from openmethane/openmethane
+
+  Adopt common docker build workflow from openmethane/openmethane ([#52](https://github.com/openmethane/setup-wrf/pulls/52))
+
+
 ## setup-wrf v0.1.1 (2024-09-24)
 
 No significant changes.
