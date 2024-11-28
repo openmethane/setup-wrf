@@ -45,7 +45,19 @@ RUN --mount=type=cache,target=$POETRY_CACHE_DIR \
 # This isn't a hyper optimised container but it's a good starting point
 FROM debian:bookworm
 
-MAINTAINER Jared Lewis <jared.lewis@climate-resource.com>
+# These will be overwritten in GHA due to https://github.com/docker/metadata-action/issues/295
+# These must be duplicated in .github/workflows/build_docker.yaml
+LABEL org.opencontainers.image.title="Setup WRF"
+LABEL org.opencontainers.image.description="Generate the scripts needed to run WRF according to configuration"
+LABEL org.opencontainers.image.authors="Jared Lewis <jared.lewis@climate-resource.com>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
+LABEL org.opencontainers.image.vendor="The Superpower Institute"
+
+# SETUP_WRF_VERSION will be overridden in release builds with semver vX.Y.Z
+ARG SETUP_WRF_VERSION=development
+# Make the $SETUP_WRF_VERSION available as an env var inside the container
+ENV SETUP_WRF_VERSION=$SETUP_WRF_VERSION
+
+LABEL org.opencontainers.image.version="${SETUP_WRF_VERSION}"
 
 # Configure Python
 ENV PYTHONFAULTHANDLER=1 \

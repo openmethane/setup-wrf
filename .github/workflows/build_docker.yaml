@@ -56,6 +56,13 @@ jobs:
             type=ref,event=branch
             type=ref,event=pr
             type=raw,value=build-${{ github.run_number }}
+          # Duplicated from Dockerfile due to https://github.com/docker/metadata-action/issues/295
+          labels: |
+            org.opencontainers.image.title="Setup WRF"
+            org.opencontainers.image.description="Generate the scripts needed to run WRF according to configuration"
+            org.opencontainers.image.authors="Jared Lewis <jared.lewis@climate-resource.com>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
+            org.opencontainers.image.vendor="The Superpower Institute"
+
       - name: Build and push image
         uses: docker/build-push-action@v5
         id: build
@@ -63,6 +70,8 @@ jobs:
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            SETUP_WRF_VERSION=${{ steps.meta.outputs.version }}
           push: true
           pull: false
           cache-from: type=gha
@@ -84,6 +93,15 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     steps:
+      - name: Check package version
+        if: startsWith(github.event.ref, 'refs/tags/v')
+        run: |
+          TAG_REF="${{ github.event.ref }}"
+          TAG_VERSION=${TAG_REF/"refs\/tags\/"}
+          if [ "$SETUP_WRF_VERSION" != "$TAG_VERSION" ]; then
+            echo "SETUP_WRF_VERSION is $SETUP_WRF_VERSION; expected version is $TAG_VERSION"
+            exit 1
+          fi
       - name: Run pytest
         run: |
           # GHA sets a random work directory, so we need to change to the project directory
