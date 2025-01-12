@@ -45,6 +45,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Extract version from pyproject.toml
+        id: version
+        run: |
+          PACKAGE_VERSION=$(grep -oP '^version = "\K(.+)(?=")' pyproject.toml)
+          echo "version=v$PACKAGE_VERSION" >> $GITHUB_OUTPUT
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
@@ -71,7 +76,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: ${{ steps.meta.outputs.tags }}
           build-args: |
-            SETUP_WRF_VERSION=${{ steps.meta.outputs.version }}
+            SETUP_WRF_VERSION=${{ steps.version.outputs.version }}
           push: true
           pull: false
           cache-from: type=gha
@@ -97,7 +102,7 @@ jobs:
         if: startsWith(github.event.ref, 'refs/tags/v')
         run: |
           TAG_REF="${{ github.event.ref }}"
-          TAG_VERSION=${TAG_REF/"refs\/tags\/"}
+          TAG_VERSION=${TAG_REF#"refs/tags/"}
           if [ "$SETUP_WRF_VERSION" != "$TAG_VERSION" ]; then
             echo "SETUP_WRF_VERSION is $SETUP_WRF_VERSION; expected version is $TAG_VERSION"
             exit 1
