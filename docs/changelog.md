@@ -19,6 +19,17 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.2.0 (2025-01-12)
+
+### Improvements
+
+- Make SETUP_WRF_VERSION environment variable available inside the container ([#53](https://github.com/openmethane/setup-wrf/pulls/53))
+
+### Bug Fixes
+
+- Fix actions incorrectly populating container image version ([#54](https://github.com/openmethane/setup-wrf/pulls/54))
+
+
 ## setup-wrf v0.1.2 (2024-11-21)
 
 ### Improvements
