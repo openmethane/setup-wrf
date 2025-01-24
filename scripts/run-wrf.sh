@@ -22,6 +22,30 @@ CONFIG_FILE=${CONFIG_FILE:-config/config.docker.full.json}
 # setup-wrf uses a different date conventions compared to the rest of the OpenMethane project
 export END_DATE=$(date '+%Y-%m-%d' -d "$START_DATE+1 days")
 
+# Check for the existence of mcip results already in the working folder.
+# If they exist, setup-wrf has already been run and can exit early unless FORCE_WRF=true
+FORCE_WRF=${FORCE_WRF:-false}
+MCIP_FILES=(
+  "GRIDBDY2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "GRIDCRO2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "GRIDDESC"
+  "GRIDDOT2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "METBDY3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "METCRO2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "METCRO3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+  "METDOT3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
+)
+MCIP_MISSING=false
+# shellcheck disable=SC2068
+for MCIP_FILE in ${MCIP_FILES[@]}; do
+  if [ ! -f "${STORE_PATH}/mcip/${START_DATE}/d01/${MCIP_FILE}" ]; then
+    MCIP_MISSING=true
+  fi
+done
+if [ ! "$MCIP_MISSING" = true ] && [ ! "$FORCE_WRF" = true ]; then
+  echo "MCIP files are present, skipping run-wrf"
+  exit 0;
+fi
 
 # Try fetch the published domain
 # If the domain isn't available it will be created by setup_for_wrf.py
