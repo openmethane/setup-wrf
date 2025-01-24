@@ -19,6 +19,17 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.3.0 (2025-01-24)
+
+### Improvements
+
+- Skip running WRF and MCIP if results already exist, unless FORCE_WRF env variable is "true" ([#55](https://github.com/openmethane/setup-wrf/pulls/55))
+
+### Trivial/Internal Changes
+
+- [#56](https://github.com/openmethane/setup-wrf/pulls/56)
+
+
 ## setup-wrf v0.2.0 (2025-01-12)
 
 ### Improvements
