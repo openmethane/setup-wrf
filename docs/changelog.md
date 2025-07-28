@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.3.1 (2025-07-28)
+
+### Bug Fixes
+
+- Update RDA base URL to fix FNL downloads failing with 404 errors ([#58](https://github.com/openmethane/setup-wrf/pulls/58))
+
+
 ## setup-wrf v0.3.0 (2025-01-24)
 
 ### Improvements
