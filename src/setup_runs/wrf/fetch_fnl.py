@@ -22,7 +22,7 @@ from urllib3.util import Retry
 
 N_JOBS = 8
 LOGIN_URL = "https://rda.ucar.edu/cgi-bin/login"
-DATASET_URL = "https://data.rda.ucar.edu/ds083.3/"
+DATASET_URL = "https://data-osdf.rda.ucar.edu/ncar/rda/d083003/"
 FNL_START_DATE = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
 
