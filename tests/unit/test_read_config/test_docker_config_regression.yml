@@ -7,6 +7,7 @@ cleanup_script_template: /opt/project/targets/docker/cleanup_script_template.sh
 delete_metem_files: false
 end_date: 2022-07-23 00:00:00+00:00
 environment_variables_for_substitutions: HOME
+fnl_cache_path: /opt/project/data/fnl
 geo_em_dir: /opt/project/data/runs/aust-test
 geog_data_path: /opt/project/data/geog/WPS_GEOG
 geogrid_exe: /opt/wrf/WPS/geogrid.exe

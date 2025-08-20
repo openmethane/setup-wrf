@@ -29,6 +29,7 @@
     "metem_dir" : "${run_dir}/metem",
     "namelist_wps" : "${nml_dir}/namelist.wps",
     "namelist_wrf" : "${nml_dir}/namelist.wrf",
+    "fnl_cache_path": null,
     "geog_data_path" : "/g/data/sx70/data/WPS_GEOG_20190418",
     "geogrid_tbl" : "${wps_dir}/geogrid/GEOGRID.TBL",
     "geogrid_exe" : "${wps_dir}/geogrid.exe",

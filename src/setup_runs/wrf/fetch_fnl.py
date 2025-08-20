@@ -10,6 +10,7 @@
 #################################################################
 
 import os
+import shutil
 
 import requests
 import datetime
@@ -92,7 +93,9 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
 
 
 def download_gdas_fnl_data(
-    target_dir: str, download_dts: list[datetime.datetime]
+    target_dir: str,
+    download_dts: list[datetime.datetime],
+    cache_path: str,
 ) -> list[str]:
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3
@@ -136,6 +139,21 @@ def download_gdas_fnl_data(
         file_path = time.strftime("%Y/%Y%m/gdas1.fnl0p25.%Y%m%d%H.f00.grib2")
         file_list.append(file_path)
 
+    cached_files = []
+    if cache_path:
+        if not os.path.exists(cache_path):
+            os.makedirs(cache_path)
+
+        for filename in file_list[:]:
+            file = os.path.basename(filename)
+            cache_filename = os.path.join(cache_path, file)
+            if os.path.exists(cache_filename):
+                print(f"Cache exists for {filename}")
+                target_filename = os.path.join(target_dir, file)
+                shutil.copyfile(cache_filename, target_filename)
+                cached_files.append(target_filename)
+                file_list.remove(filename)
+
     downloaded_files = list(
         tqdm(
             Parallel(return_as="generator", n_jobs=N_JOBS)(
@@ -146,4 +164,10 @@ def download_gdas_fnl_data(
         )
     )
 
-    return downloaded_files
+    if cache_path:
+        for downloaded_file in downloaded_files:
+            cache_file = os.path.join(cache_path, os.path.basename(downloaded_file))
+            print(f"Copying {os.path.basename(downloaded_file)} to cache")
+            shutil.copyfile(downloaded_file, cache_file)
+
+    return [*downloaded_files, *cached_files]

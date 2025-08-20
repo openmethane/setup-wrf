@@ -86,6 +86,8 @@ class WRFConfig:
     """template namelist for WPS"""
     namelist_wrf: str
     """template namelist for WRF"""
+    fnl_cache_path: str | None
+    """path to store cached FNL files"""
     geog_data_path: str
     """path to the geography data files"""
     geogrid_tbl: str

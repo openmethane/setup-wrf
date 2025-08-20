@@ -545,6 +545,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                             FNLfiles = download_gdas_fnl_data(
                                 target_dir=run_dir_with_date,
                                 download_dts=FNLtimes,
+                                cache_path=wrf_config.fnl_cache_path,
                             )
                         linkGribCmds = ["./link_grib.csh"] + FNLfiles
                         ## optionally take a regional subset
