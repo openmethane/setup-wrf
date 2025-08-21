@@ -37,52 +37,52 @@ auxinput4_interval                  = 360,
 debug_level                         = 100,
 /
 
-&domains
+&domains                 
 time_step                = 30,
 time_step_fract_num      = 0,
 time_step_fract_den      = 1,
-max_dom                  = 2,
-s_we                     = 1, 1,
-e_we                     = 467, 23,
-s_sn                     = 1, 1,
-e_sn                     = 443, 23,
-s_vert                   = 1, 1,
-e_vert                   = 33, 33,
-num_metgrid_levels       = 38, 38,
-dx                       = 10000, 10000,
-dy                       = 10000, 10000,
-grid_id                  = 1, 2,
-parent_id                = 0, 1,
-i_parent_start           = 1, 373,
-j_parent_start           = 1, 246,
-parent_grid_ratio        = 1, 1,
-parent_time_step_ratio   = 1, 1,
+max_dom                  = 1,
+s_we                     = 1,
+e_we                     = 15,
+s_sn                     = 1,
+e_sn                     = 15,
+s_vert                   = 1,
+e_vert                   = 33,
+num_metgrid_levels       = 38,
+dx                       = 10000,
+dy                       = 10000,
+grid_id                  = 1,
+parent_id                = 1,
+i_parent_start           = 1,
+j_parent_start           = 1,
+parent_grid_ratio        = 1,
+parent_time_step_ratio   = 1,
 !eta_levels = 1.000, 0.997, 0.994, 0.990, 0.985, 0.980, 0.970, 0.960, 0.950, 0.940, 0.922, 0.894, 0.860, 0.817, 0.766, 0.707, 0.644, 0.576,0.507, 0.444, 0.380, 0.324, 0.273, 0.228,0.188, 0.152, 0.121, 0.093, 0.069, 0.048,0.029, 0.014, 0.000,
 feedback                            = 0,
 smooth_option                       = 1,
 /
 
 &physics                 
-    mp_physics = 10, 10
-    ra_lw_physics = 4, 4
-    ra_sw_physics = 4, 4
-    radt = 30, 30
-    sf_sfclay_physics = 2, 2
-    sf_surface_physics = 2, 2
-    bl_pbl_physics = 2, 2
-    bldt = 0, 0
-    cu_physics = 5, 5
-    cudt = 5, 5
-    cu_diag = 0, 0
+    mp_physics = 10, 
+    ra_lw_physics = 4,
+    ra_sw_physics = 4, 
+    radt = 30, 
+    sf_sfclay_physics = 2, 
+    sf_surface_physics = 2,
+    bl_pbl_physics = 2, 
+    bldt = 0, 
+    cu_physics = 5, 
+    cudt = 5, 
+    cu_diag = 0, 
     isfflx = 1
     ifsnow = 1
     icloud = 1
     surface_input_source = 1
     num_soil_layers = 4
-    sf_urban_physics = 1, 1
+    sf_urban_physics = 1, 
     sst_update = 1
     sst_skin = 1
-    progn = 1, 1
+    progn = 1,
     num_land_cat = 24
 /
 
