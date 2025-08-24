@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.4.0 (2025-08-24)
+
+### Improvements
+
+- Add au-test domain details ([#60](https://github.com/openmethane/setup-wrf/pulls/60))
+
+
 ## setup-wrf v0.3.1 (2025-07-28)
 
 ### Bug Fixes
