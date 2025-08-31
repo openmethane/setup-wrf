@@ -50,7 +50,7 @@ fi
 # Try fetch the published domain
 # If the domain isn't available it will be created by setup_for_wrf.py
 wget -N -nv -P ${STORE_PATH}/wrf/${DOMAIN_NAME} \
-  https://prior.openmethane.org/domains/${DOMAIN_NAME}/${DOMAIN_VERSION}/geo_em.d01.nc \
+  "https://openmethane.s3.amazonaws.com/domains/${DOMAIN_NAME}/${DOMAIN_VERSION}/geo_em.d01.nc" \
   || echo "Domain file not found, will create it"
 
 # Steps of interest
