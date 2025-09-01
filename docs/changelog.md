@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.4.1 (2025-09-01)
+
+### Improvements
+
+- Replace prior.openmethane.org data URL with official public data store in S3 ([#61](https://github.com/openmethane/setup-wrf/pulls/61))
+
+
 ## setup-wrf v0.4.0 (2025-08-24)
 
 ### Improvements
