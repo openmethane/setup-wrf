@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.4.2 (2025-10-15)
+
+### Bug Fixes
+
+- Fix failing GDAS download URLs ([#62](https://github.com/openmethane/setup-wrf/pulls/62))
+
+
 ## setup-wrf v0.4.1 (2025-09-01)
 
 ### Improvements
