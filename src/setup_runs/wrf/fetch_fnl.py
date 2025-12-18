@@ -21,10 +21,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 
 N_JOBS = 8
-
-DATASET_URL = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
+DATASET_URL = "https://osdf-director.osg-htc.org/ncar/gdex/d083003/" # OSDF
 # Backup data source
-# DATASET_URL = "https://osdf-data.gdex.ucar.edu/ncar/gdex/d083003/" # OSDF
+# DATASET_URL = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
 
 FNL_START_DATE = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
