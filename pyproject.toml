@@ -1,43 +1,54 @@
-[tool.poetry]
+[project]
 name = "setup_runs"
 version = "0.4.3a0"
 description = "Scripts for running WRF "
 authors = [
-    "Peter Rayner <peter.rayner@superpowerinstitute.com.au>",
-    "Jeremy Silver",
-    "Jared Lewis <jared.lewis@climate-resource.com>"
+    { name = "Peter Rayner", email = "peter.rayner@superpowerinstitute.com.au" },
+    { name = "Jeremy Silver" },
+    { name = "Jared Lewis", email = "jared.lewis@climate-resource.com" },
 ]
+requires-python = ">=3.10,<4,<3.12"
 readme = "README.md"
-packages = [
-    {include = "setup_runs", from = "src"},
+dependencies = [
+    "pytz",
+    "f90nml",
+    "netCDF4",
+    "requests",
+    "joblib>=1.4.2,<2",
+    "tqdm>=4.66.4,<5",
+    "click>=8.1.7,<9",
+    "ruff>=0.4.8,<0.5",
+    "python-dotenv>=1.0.1,<2",
+    "prettyprinter>=0.18.0,<0.19",
+    "attrs>=24.2.0,<25",
 ]
 
-[tool.poetry.dependencies]
-python = "^3.10,<3.12"
-pytz = "*"
-f90nml = "*"
-netCDF4 = "*"
-requests = "*"
-joblib = "^1.4.2"
-tqdm = "^4.66.4"
-click = "^8.1.7"
-ruff = "^0.4.8"
-python-dotenv = "^1.0.1"
-prettyprinter = "^0.18.0"
-attrs = "^24.2.0"
+[dependency-groups]
+tests = [
+    "pytest>=8.2.1,<9",
+    "pytest-regressions>=2.5.0,<3",
+    "xarray>=2024.6.0,<2025",
+]
+dev = ["towncrier>=24.8.0,<25"]
 
-[tool.poetry.group.tests.dependencies]
-pytest = "^8.2.1"
-pytest-regressions = "^2.5.0"
-xarray = "^2024.6.0"
+[tool.uv]
+default-groups = [
+    "tests",
+    "dev",
+]
 
+[tool.hatch.build.targets.sdist]
+include = ["src/setup_runs"]
 
-[tool.poetry.group.dev.dependencies]
-towncrier = "^24.8.0"
+[tool.hatch.build.targets.wheel]
+include = ["src/setup_runs"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/setup_runs" = "setup_runs"
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.towncrier]
 package = "setup_runs"
