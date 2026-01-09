@@ -29,9 +29,11 @@ ENV UV_PYTHON_DOWNLOADS=0 \
 ENV VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
-# Needed for wgrib2
+# wgrib2 dependency isn't solvable with libraries needed by WRF, but does work
+# with the newer version of libnetcdf.so that is installed in our environment
 RUN ln -s /opt/venv/lib/libnetcdf.so /opt/venv/lib/libnetcdf.so.13
 
+# Install pyproject.toml dependencies into the venv using uv
 WORKDIR /opt/project
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
