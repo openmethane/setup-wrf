@@ -25,12 +25,12 @@ clean: ## Remove any previous local runs
 
 .PHONY: build
 build:  ## Build the docker container locally
-	docker build --platform=linux/amd64 -t setup_wrf .
+	docker build --platform=linux/amd64 -t setup-wrf .
 
 .PHONY: run
 run: build  ## Run the required steps for the test domain
-	docker run --rm -it -v $(PWD):/opt/project setup_wrf python scripts/setup_for_wrf.py -c config/config.docker.json
-	docker run --rm -it -v $(PWD):/opt/project setup_wrf /opt/project/data/runs/aust-test/main.sh
+	docker run --rm -it -v $(PWD):/opt/project setup-wrf python scripts/setup_for_wrf.py -c config/config.docker.json
+	docker run --rm -it -v $(PWD):/opt/project setup-wrf /opt/project/data/runs/aust-test/main.sh
 
 .PHONY: test
 test:  ## Run the tests
