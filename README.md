@@ -86,7 +86,7 @@ including Windows, MacOS, and Linux.
 This container can be built via:
 
 ```
-docker build --platform=linux/amd64 . -t setup_wrf
+docker build --platform=linux/amd64 . -t setup-wrf
 ```
 
 Before running [static geographical data](https://www2.mmm.ucar.edu/wrf/users/download/get_sources_wps_geog.html)
@@ -108,7 +108,7 @@ Once the static geography data has been extracted,
 the docker container containing the project dependencies can be run:
 
 ```
-docker run --rm -it -v $(PWD):/opt/project setup_wrf
+docker run --rm -it -v $(PWD):/opt/project setup-wrf
 ```
 
 The root project directory is also mounted to `/opt/project` in the docker container.
