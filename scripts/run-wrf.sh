@@ -22,38 +22,35 @@ CONFIG_FILE=${CONFIG_FILE:-config/config.docker.full.json}
 # setup-wrf uses a different date conventions compared to the rest of the OpenMethane project
 export END_DATE=$(date '+%Y-%m-%d' -d "$START_DATE+1 days")
 
-# Check for the existence of mcip results already in the working folder.
+RUN_DIR="${STORE_PATH}/wrf/${DOMAIN_NAME}"
+OUTPUT_DIR="${RUN_DIR}/$(date -d ${START_DATE} +%Y%m%d00)"
+
+# Check for the existence of WRFOUT output in the working folder.
 # If they exist, setup-wrf has already been run and can exit early unless FORCE_WRF=true
 FORCE_WRF=${FORCE_WRF:-false}
-MCIP_FILES=(
-  "GRIDBDY2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "GRIDCRO2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "GRIDDESC"
-  "GRIDDOT2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "METBDY3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "METCRO2D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "METCRO3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-  "METDOT3D_${DOMAIN_NAME}_${DOMAIN_VERSION}"
-)
-MCIP_MISSING=false
-# shellcheck disable=SC2068
-for MCIP_FILE in ${MCIP_FILES[@]}; do
-  if [ ! -f "${STORE_PATH}/mcip/${START_DATE}/d01/${MCIP_FILE}" ]; then
-    MCIP_MISSING=true
+FOUND_WRF_OUTPUT=false
+if [ -d "${OUTPUT_DIR}" ] && compgen -G "${OUTPUT_DIR}/WRFOUT_*.nc" > /dev/null; then
+  echo "Found existing WRF output in ${OUTPUT_DIR}"
+
+  if compgen -G "${OUTPUT_DIR}/wrfout_*" > /dev/null; then
+    echo "WRF output is incomplete, reprocessing"
+  else
+    FOUND_WRF_OUTPUT=true
   fi
-done
-if [ ! "$MCIP_MISSING" = true ] && [ ! "$FORCE_WRF" = true ]; then
-  echo "MCIP files are present, skipping run-wrf"
+fi
+
+if [ "$FOUND_WRF_OUTPUT" = true ] && [ ! "$FORCE_WRF" = true ]; then
+  echo "Complete WRF output is present, skipping run-wrf"
   exit 0;
 fi
 
 # Try fetch the published domain
 # If the domain isn't available it will be created by setup_for_wrf.py
-wget -N -nv -P ${STORE_PATH}/wrf/${DOMAIN_NAME} \
+wget -N -nv -P ${RUN_DIR} \
   "https://openmethane.s3.amazonaws.com/domains/${DOMAIN_NAME}/${DOMAIN_VERSION}/geo_em.d01.nc" \
   || echo "Domain file not found, will create it"
 
 # Steps of interest
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
-${STORE_PATH}/wrf/${DOMAIN_NAME}/main.sh
+${RUN_DIR}/main.sh
 echo "Finished"
