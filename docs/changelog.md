@@ -19,6 +19,18 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.5.0 (2026-01-27)
+
+### ⚠️ Breaking Changes  ⚠️
+
+- Replace poetry with uv for tool and dependency management ([#63](https://github.com/openmethane/setup-wrf/pull/63))
+
+### Improvements
+
+- Update and pin dependency versions for conda and uv ([#64](https://github.com/openmethane/setup-wrf/pull/64))
+- Skip WRF processing if completed output already exists in STORE_PATH/wrf ([#67](https://github.com/openmethane/setup-wrf/pull/67))
+
+
 ## setup-wrf v0.4.2 (2025-10-15)
 
 ### Bug Fixes

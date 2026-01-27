@@ -1,6 +1,6 @@
 [project]
 name = "setup_runs"
-version = "0.4.3a0"
+version = "0.5.0"
 description = "Scripts for running WRF "
 authors = [
     { name = "Peter Rayner", email = "peter.rayner@superpowerinstitute.com.au" },
