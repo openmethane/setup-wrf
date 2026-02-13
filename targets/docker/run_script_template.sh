@@ -1,6 +1,13 @@
 #!/bin/bash
 
-export NCPUS=${NCPUS:-1}
+## specify NCPUS_ALL=true to utilise all cores
+NCPUS_DEFAULT=1
+if [ "$NCPUS_ALL" = "true" ]; then
+  NCPUS_DEFAULT=`nproc --all`
+fi
+
+## if NCPUS is specified, it always overrides NCPUS_ALL
+export NCPUS=${NCPUS:-$NCPUS_DEFAULT}
 
 cd ${RUN_DIR} || exit 1
 
