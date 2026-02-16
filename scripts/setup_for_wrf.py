@@ -9,6 +9,7 @@ import copy
 import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
+from setup_runs.wrf.mpi_tasks import safe_mpi_tasks
 from setup_runs.wrf.namelists import validate_wrf_namelists
 from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
 from setup_runs.utils import compress_nc_file, run_command, purge
@@ -834,12 +835,20 @@ def run_setup_for_wrf(configfile: str) -> None:
         ## generate the run and cleanup scripts
         print("\t\tGenerate the run and cleanup script")
 
+        ## number of MPI tasks for WRF to use based on domain size and CPUs
+        mpi_tasks = 1
+        geo_file = os.path.join(run_dir_with_date, f"geo_em.d0{nDom}.nc")
+        with netCDF4.Dataset(geo_file) as geo_nc:
+            dims_y, dims_x = geo_nc.dimensions["south_north"].size, geo_nc.dimensions["west_east"].size
+            mpi_tasks = safe_mpi_tasks((dims_y, dims_x))
+
         ########## EDIT: the following are the substitutions used for the per-run cleanup and run scripts
         substitutions = {
             "RUN_DIR": run_dir_with_date,
             "RUNSHORT": wrf_config.run_name[:8],
             "STARTDATE": job_start_usable.strftime("%Y%m%d"),
             "firstTimeToKeep": job_start_usable.strftime("%Y-%m-%dT%H%M"),
+            "DEFAULT_NCPUS": str(mpi_tasks),
         }
         ########## end edit section #####################################################
 

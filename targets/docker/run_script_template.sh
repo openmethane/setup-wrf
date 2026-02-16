@@ -1,6 +1,8 @@
 #!/bin/bash
 
-export NCPUS=${NCPUS:-1}
+DEFAULT_NCPUS=${DEFAULT_NCPUS}
+## if NCPUS is specified, it always overrides templated DEFAULT_NCPUS
+export NCPUS=${NCPUS:-$DEFAULT_NCPUS}
 
 cd ${RUN_DIR} || exit 1
 
