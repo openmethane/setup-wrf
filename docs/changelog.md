@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.6.0 (2026-02-16)
+
+### Improvements
+
+- When NCPUS is not specified, utilise as many cores as possible based on WRF computation guidance ([#70](https://github.com/openmethane/setup-wrf/pull/70))
+
+
 ## setup-wrf v0.5.0 (2026-01-27)
 
 ### ⚠️ Breaking Changes  ⚠️
