@@ -50,5 +50,6 @@
   "analysis_pattern_surface": "/g/data/ub4/erai/grib/oper_an_sfc/fullres/ei_oper_an_sfc_075x075_90N0E90S35925E_%Y%m*",
   "analysis_vtable": "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
   "wrf_run_dir": "${wrf_dir}/run",
-  "wrf_run_tables_pattern": "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)"
+  "wrf_run_tables_pattern": "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)",
+  "met_source_dir" : ""
 }

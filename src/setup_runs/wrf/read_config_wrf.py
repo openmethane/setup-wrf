@@ -139,6 +139,9 @@ class WRFConfig:
     wrf_run_tables_pattern: str
     """pattern to match to get the WRF input tables and data-files 
     (within the folder ${wrf_run_dir}"""
+    met_source_dir: str = field()
+    """folder where meteorology data should be stored prior to processing. if
+    empty, defaults to the run_dir_with_dates"""
 
 
 def load_wrf_config(filename: str) -> WRFConfig:
