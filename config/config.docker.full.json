@@ -51,5 +51,5 @@
   "analysis_vtable": "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
   "wrf_run_dir": "${wrf_dir}/run",
   "wrf_run_tables_pattern": "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)",
-  "met_source_dir" : ""
+  "met_source_dir" : "/opt/project/data/fnl"
 }
