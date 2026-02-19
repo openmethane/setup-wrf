@@ -8,7 +8,12 @@
 
 set -Eeuo pipefail
 
-trap sync_output SIGTERM SIGINT SIGQUIT SIGHUP ERR
+trap fail SIGTERM SIGINT SIGQUIT SIGHUP ERR
+fail() {
+  echo "Failed to run the command"
+  sync_output
+  exit 1
+}
 
 export DOMAIN_NAME=${DOMAIN_NAME:-au-test}
 export DOMAIN_VERSION=${DOMAIN_VERSION:-v1}
