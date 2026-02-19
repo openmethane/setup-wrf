@@ -84,7 +84,8 @@ apt-get install -qyy \
     file \
     make \
     ca-certificates \
-    wget
+    wget \
+    rsync
 
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
