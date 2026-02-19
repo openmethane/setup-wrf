@@ -23,16 +23,16 @@ CONFIG_FILE=${CONFIG_FILE:-config/config.docker.full.json}
 export END_DATE=$(date '+%Y-%m-%d' -d "$START_DATE+1 days")
 
 RUN_DIR="${STORE_PATH}/wrf/${DOMAIN_NAME}"
-OUTPUT_DIR="${RUN_DIR}/$(date -d ${START_DATE} +%Y%m%d00)"
+RUN_DIR_WITH_DATE="${RUN_DIR}/$(date -d ${START_DATE} +%Y%m%d00)"
 
 # Check for the existence of WRFOUT output in the working folder.
 # If they exist, setup-wrf has already been run and can exit early unless FORCE_WRF=true
 FORCE_WRF=${FORCE_WRF:-false}
 FOUND_WRF_OUTPUT=false
-if [ -d "${OUTPUT_DIR}" ] && compgen -G "${OUTPUT_DIR}/WRFOUT_*.nc" > /dev/null; then
-  echo "Found existing WRF output in ${OUTPUT_DIR}"
+if [ -d "${RUN_DIR_WITH_DATE}" ] && compgen -G "${RUN_DIR_WITH_DATE}/WRFOUT_*.nc" > /dev/null; then
+  echo "Found existing WRF output in ${RUN_DIR_WITH_DATE}"
 
-  if compgen -G "${OUTPUT_DIR}/wrfout_*" > /dev/null; then
+  if compgen -G "${RUN_DIR_WITH_DATE}/wrfout_*" > /dev/null; then
     echo "WRF output is incomplete, reprocessing"
   else
     FOUND_WRF_OUTPUT=true
