@@ -8,12 +8,7 @@
 
 set -Eeuo pipefail
 
-trap fail SIGTERM SIGINT SIGQUIT SIGHUP ERR
-fail() {
-  echo "Failed to run the command"
-  sync_output
-  exit 1
-}
+trap sync_output EXIT
 
 export DOMAIN_NAME=${DOMAIN_NAME:-au-test}
 export DOMAIN_VERSION=${DOMAIN_VERSION:-v1}
@@ -86,6 +81,4 @@ wget -N -nv -P ${RUN_DIR} \
 python scripts/setup_for_wrf.py -c "${CONFIG_FILE}"
 ${RUN_DIR}/main.sh
 
-sync_output
-
-echo "Finished"
+echo "Finished successfully"
