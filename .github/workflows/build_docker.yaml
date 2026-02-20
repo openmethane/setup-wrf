@@ -137,6 +137,11 @@ jobs:
         run: |
           cd /opt/project
           ./scripts/download-geog.sh --low-res
+      - name: Cache FNL data
+        uses: actions/cache@v4
+        with:
+          path: /opt/project/data/fnl
+          key: fnl-data-${{ hashFiles('src/setup_runs/wrf/fetch_fnl.py') }}
       - name: Run WRF
         run: |
           cd /opt/project
