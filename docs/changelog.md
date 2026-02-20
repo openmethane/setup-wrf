@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.7.2 (2026-02-20)
+
+### Bug Fixes
+
+- Fix run-wrf.sh sync_output being called multiple times during script failure ([#74](https://github.com/openmethane/setup-wrf/pull/74))
+
+
 ## setup-wrf v0.7.0 (2026-02-20)
 
 ### Improvements
