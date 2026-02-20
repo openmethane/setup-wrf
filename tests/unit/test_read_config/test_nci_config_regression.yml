@@ -13,6 +13,7 @@ geogrid_exe: '{HOME}/openmethane-beta/wrf/coecms/WPS/geogrid.exe'
 geogrid_tbl: '{HOME}/openmethane-beta/wrf/coecms/WPS/geogrid/GEOGRID.TBL'
 linkgrib_script: '{HOME}/openmethane-beta/wrf/coecms/WPS/link_grib.csh'
 main_script_template: '{HOME}/openmethane-beta/setup-wrf/targets/nci/main_script_template.sh'
+met_source_dir: ''
 metem_dir: /scratch/q90/pjr563/openmethane-beta/wrf/aust-test/metem
 metgrid_exe: '{HOME}/openmethane-beta/wrf/coecms/WPS/metgrid.exe'
 metgrid_tbl: '{HOME}/openmethane-beta/wrf/coecms/WPS/metgrid/METGRID.TBL'

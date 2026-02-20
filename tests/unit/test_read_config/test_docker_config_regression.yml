@@ -13,6 +13,7 @@ geogrid_exe: /opt/wrf/WPS/geogrid.exe
 geogrid_tbl: /opt/wrf/WPS/geogrid/GEOGRID.TBL
 linkgrib_script: /opt/wrf/WPS/link_grib.csh
 main_script_template: /opt/project/targets/docker/main_script_template.sh
+met_source_dir: /opt/project/data/fnl
 metem_dir: /opt/project/data/runs/aust-test/metem
 metgrid_exe: /opt/wrf/WPS/metgrid.exe
 metgrid_tbl: /opt/wrf/WPS/metgrid/METGRID.TBL

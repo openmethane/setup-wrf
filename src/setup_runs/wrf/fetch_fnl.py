@@ -10,7 +10,7 @@
 #################################################################
 
 import os
-
+import pathlib
 import requests
 import datetime
 import pytz
@@ -61,7 +61,11 @@ def create_session() -> requests.Session:
     return session
 
 
-def download_file(session: requests.Session, target_dir: str, url: str) -> str:
+def download_file(
+    session: requests.Session,
+    target_dir: pathlib.Path,
+    url: str,
+) -> pathlib.Path:
     """
     Download a file from a URL
 
@@ -79,7 +83,7 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
     Returns:
         Path to the downloaded file
     """
-    filename = os.path.join(target_dir, os.path.basename(url))
+    filename = target_dir / os.path.basename(url)
 
     try:
         with session.get(url, stream=True) as r:
@@ -95,8 +99,9 @@ def download_file(session: requests.Session, target_dir: str, url: str) -> str:
 
 
 def download_gdas_fnl_data(
-    target_dir: str, download_dts: list[datetime.datetime]
-) -> list[str]:
+    target_dir: pathlib.Path,
+    download_dts: list[datetime.datetime]
+) -> list[pathlib.Path]:
     """
     Download NCEP GDAS/FNL 0.25 Degree Global Tropospheric Analyses and Forecast Grids, ds083.3
 
@@ -122,10 +127,8 @@ def download_gdas_fnl_data(
     """
     print("downloading FNL data")
 
-    # check that the target directory is indeed a directory
-    assert os.path.exists(target_dir) and os.path.isdir(
-        target_dir
-    ), "Target directory {} not found...".format(target_dir)
+    # ensure the target directory exists
+    target_dir.mkdir(parents=True, exist_ok=True)
 
     # Create a new session with a retry strategy
     session = create_session()

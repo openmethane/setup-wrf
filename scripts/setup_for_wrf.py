@@ -1,4 +1,5 @@
 import datetime
+import pathlib
 import re
 import os
 import math
@@ -529,24 +530,30 @@ def run_setup_for_wrf(configfile: str) -> None:
                             job_start + datetime.timedelta(hours=6 * hi)
                             for hi in range(nIntervals)
                         ]
+
+                        # FNL files should be fetched to the met_source_dir
+                        met_source_dir = wrf_config.met_source_dir if wrf_config.met_source_dir != "" else run_dir_with_date
+                        met_path = pathlib.Path(met_source_dir)
                         FNLfiles = [
-                            time.strftime("gdas1.fnl0p25.%Y%m%d%H.f00.grib2")
+                            met_path / time.strftime("gdas1.fnl0p25.%Y%m%d%H.f00.grib2")
                             for time in FNLtimes
                         ]
-                        ## if the FNL data exists, don't bother downloading
-                        allFNLfilesExist = all(
-                            [os.path.exists(FNLfile) for FNLfile in FNLfiles]
-                        )
-                        if allFNLfilesExist:
-                            print(
-                                "\t\tAll FNL files were found - do not repeat the download"
-                            )
+
+                        # some FNL files may already be present, do not refetch them
+                        FNL_times_missing = [
+                            time for time in FNLtimes
+                            if not os.path.exists(met_path / time.strftime("gdas1.fnl0p25.%Y%m%d%H.f00.grib2"))
+                        ]
+
+                        if len(FNL_times_missing) == 0:
+                            print("\t\tAll FNL files were found")
                         else:
                             ## otherwise download all the required FNL files
-                            FNLfiles = download_gdas_fnl_data(
-                                target_dir=run_dir_with_date,
-                                download_dts=FNLtimes,
+                            download_gdas_fnl_data(
+                                target_dir=met_path,
+                                download_dts=FNL_times_missing,
                             )
+
                         linkGribCmds = ["./link_grib.csh"] + FNLfiles
                         ## optionally take a regional subset
                         if wrf_config.regional_subset_of_grib_data:
@@ -566,13 +573,19 @@ def run_setup_for_wrf(configfile: str) -> None:
                             nc.close()
                             ## use wgrib2 that
                             for FNLfile in FNLfiles:
-                                tmpfile = os.path.join(
-                                    "/tmp", os.path.basename(FNLfile)
-                                )
-                                print(
-                                    "\t\tSubset the grib file",
-                                    os.path.basename(FNLfile),
-                                )
+                                subset_file = pathlib.Path(run_dir_with_date) / os.path.basename(FNLfile)
+
+                                # if met files are not stored in a separate path
+                                # from the run_dir, then we need to replace the
+                                # original FNL file with the subsetted file.
+                                # we do this by moving the original to /tmp first
+                                if subset_file == pathlib.Path(FNLfile):
+                                    tmp_file = pathlib.Path("/tmp", os.path.basename(FNLfile))
+                                    print(f"\t\tMoving original FNL file to {tmp_file}")
+                                    shutil.move(FNLfile, tmp_file)
+                                    FNLfile = tmp_file
+
+                                print(f"\t\tSubset the grib file: {os.path.basename(FNLfile)}")
                                 _, stderr = run_command(
                                     [
                                         "wgrib2",
@@ -580,7 +593,7 @@ def run_setup_for_wrf(configfile: str) -> None:
                                         "-small_grib",
                                         geoStrs["XLONG_M"],
                                         geoStrs["XLAT_M"],
-                                        tmpfile,
+                                        subset_file,
                                     ]
                                 )
                                 if len(stderr) > 0:
@@ -588,9 +601,6 @@ def run_setup_for_wrf(configfile: str) -> None:
                                     raise RuntimeError(
                                         "Errors found when running wgrib2..."
                                     )
-                                ## use the subset instead - delete the original and put the subset in its place
-                                os.remove(FNLfile)
-                                shutil.copyfile(tmpfile, FNLfile)
 
                     ## EDIT: the following are the substitutions used for the WPS namelist
                     WPSnml["share"]["start_date"] = [
@@ -657,11 +667,6 @@ def run_setup_for_wrf(configfile: str) -> None:
                         raise RuntimeError(
                             "Success message not found in ungrib logfile..."
                         )
-
-                    ## if we are using the FNL analyses, delete the downloaded FNL files
-                    if wrf_config.analysis_source == "FNL":
-                        for FNLfile in FNLfiles:
-                            os.remove(FNLfile)
 
                     #############
                     # Run metgrid
