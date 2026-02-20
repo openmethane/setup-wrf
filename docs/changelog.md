@@ -19,6 +19,14 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.7.0 (2026-02-20)
+
+### Improvements
+
+- Add met_source_dir config option to source FNL data outside the run dir ([#72](https://github.com/openmethane/setup-wrf/pull/72))
+- Run WRF outside the STORE_PATH if using run-wrf.sh and config.docker.full.json ([#73](https://github.com/openmethane/setup-wrf/pull/73))
+
+
 ## setup-wrf v0.6.0 (2026-02-16)
 
 ### Improvements
