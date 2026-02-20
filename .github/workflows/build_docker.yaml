@@ -131,7 +131,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/project/data/geog
-          key: geog-data-${{ hashFiles('scripts/download-geog.sh') }}
+          key: geog-data-${{ hashFiles('/opt/project/scripts/download-geog.sh') }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
@@ -141,7 +141,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /opt/project/data/fnl
-          key: fnl-data-${{ hashFiles('src/setup_runs/wrf/fetch_fnl.py') }}
+          key: fnl-data-${{ hashFiles('/opt/project/src/setup_runs/wrf/fetch_fnl.py') }}
       - name: Run WRF
         run: |
           cd /opt/project
@@ -162,7 +162,7 @@ jobs:
       - name: Zip WRF artifacts
         if: ${{ always() }}
         run: |
-          tar -cvzf results.tar.gz --exclude /opt/project/data/geog /opt/project/data
+          tar -cvzf results.tar.gz /opt/project/data/runs
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
