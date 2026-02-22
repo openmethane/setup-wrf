@@ -36,8 +36,12 @@ mkdir -p "${RUN_DIR}"
 
 # In the case of failure, ensure partial output is moved to OUTPUT_DIR
 sync_output() {
+  echo "System information"
+  mount
+  df -h
+
   # copy any results from RUN_DIR to OUTPUT_DIR
-  echo "Copying completed output from ${RUN_DIR} to ${OUTPUT_DIR}"
+  echo "Copying output from ${RUN_DIR} to ${OUTPUT_DIR}"
   mkdir -p "${OUTPUT_DIR}"
   rsync -auv "${RUN_DIR}/" "${OUTPUT_DIR}/"
 
