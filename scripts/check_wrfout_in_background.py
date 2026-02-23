@@ -16,6 +16,9 @@ import os
 import time
 import logging
 
+from watchdog.events import FileClosedEvent, PatternMatchingEventHandler
+from watchdog.observers import Observer
+
 from setup_runs.wrf.average_fields import average_fields
 
 
@@ -27,6 +30,40 @@ Derived from the `frames_per_outfile` variable in the WRF namelist
 """
 
 logger = logging.getLogger("check_wrfout_in_background")
+# logging.basicConfig(level=logging.INFO)
+
+class WrfOutputProcessor(PatternMatchingEventHandler):
+    file_pattern: str
+    expected_steps: int
+
+    def __init__(
+        self,
+        file_pattern: str,
+        expected_steps: int,
+    ):
+        self.expected_steps = expected_steps
+        super(WrfOutputProcessor, self).__init__(
+            patterns=[file_pattern],
+            case_sensitive=False,
+        )
+
+    def on_closed(self, event: FileClosedEvent) -> None:
+        """
+        Watch for file close events in the current working directory, and if
+        the file matches the WRF output file pattern in `file_pattern`, start
+        post-processing.
+
+        :param event: File closed event including the filename under src_path.
+        :return:
+        """
+        logger.info(f"file.closed:{event.src_path}")
+        # from observation, WRF produces output files in sequence and closes
+        # each output file only when it is complete. when we see a file close
+        # event on a WRF file, it should be safe to process.
+        process_file(
+            in_file=Path(event.src_path),
+            expected_steps=self.expected_steps,
+        )
 
 
 def generate_out_filename(in_file: str):
@@ -139,10 +176,21 @@ def main(file_pattern: str, watch: bool, timeout: float, verify_steps: bool):
         expected_steps = None
 
     if watch:
-        # Keep checking until the process is killed
-        while True:
-            time.sleep(1)
-            process_files(file_pattern, expected_steps=expected_steps, timeout=timeout)
+        logger.info(f"Watching for completed files matching '{file_pattern}'")
+        event_handler = WrfOutputProcessor(
+            file_pattern=file_pattern,
+            expected_steps=expected_steps,
+        )
+        observer = Observer()
+        observer.schedule(event_handler, '.')
+
+        observer.start()
+        try:
+            while True:
+                time.sleep(1)
+        finally:
+            observer.stop()
+            observer.join()
     else:
         process_files(file_pattern, expected_steps=expected_steps, timeout=timeout)
 
