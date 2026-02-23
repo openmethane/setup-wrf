@@ -21,6 +21,7 @@ dependencies = [
     "python-dotenv>=1.0.1,<2",
     "prettyprinter>=0.18.0,<0.19",
     "attrs>=24.2.0,<25",
+    "watchdog>=6.0.0",
 ]
 
 [dependency-groups]
