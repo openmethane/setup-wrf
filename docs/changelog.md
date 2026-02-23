@@ -19,6 +19,14 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.7.3 (2026-02-23)
+
+### Bug Fixes
+
+- Fix "patch" version bump adding an extra increment during release ([#75](https://github.com/openmethane/setup-wrf/pull/75))
+- Fix WRF output processing not waiting for files to be closed ([#77](https://github.com/openmethane/setup-wrf/pull/77))
+
+
 ## setup-wrf v0.7.2 (2026-02-20)
 
 ### Bug Fixes
