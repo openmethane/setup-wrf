@@ -22,9 +22,12 @@ from urllib3.util import Retry
 
 N_JOBS = 8
 
-DATASET_URL = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
+FNL_DATASET_ROOT = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
+if "FNL_DATASET_ROOT" in os.environ and os.environ["FNL_DATASET_ROOT"] is not None:
+    FNL_DATASET_ROOT = os.environ["FNL_DATASET_ROOT"]
+
 # Backup data source
-# DATASET_URL = "https://osdf-data.gdex.ucar.edu/ncar/gdex/d083003/" # OSDF
+# FNL_DATASET_ROOT = "https://osdf-data.gdex.ucar.edu/ncar/gdex/d083003/" # OSDF
 
 FNL_START_DATE = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
@@ -145,7 +148,7 @@ def download_gdas_fnl_data(
     downloaded_files = list(
         tqdm(
             Parallel(return_as="generator", n_jobs=N_JOBS)(
-                delayed(download_file)(session, target_dir, DATASET_URL + filename)
+                delayed(download_file)(session, target_dir, FNL_DATASET_ROOT + filename)
                 for filename in file_list
             ),
             total=len(file_list),
