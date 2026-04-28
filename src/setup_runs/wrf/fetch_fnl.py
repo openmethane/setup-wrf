@@ -22,12 +22,13 @@ from urllib3.util import Retry
 
 N_JOBS = 8
 
-FNL_DATASET_ROOT = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
+FNL_DATASET_ROOT = "https://data.gdex.ucar.edu/d083003/"
 if "FNL_DATASET_ROOT" in os.environ and os.environ["FNL_DATASET_ROOT"] is not None:
     FNL_DATASET_ROOT = os.environ["FNL_DATASET_ROOT"]
 
 # Backup data source
-# FNL_DATASET_ROOT = "https://osdf-data.gdex.ucar.edu/ncar/gdex/d083003/" # OSDF
+# THREDDS now requires authentication for fileServer access
+# FNL_DATASET_ROOT = "https://tds.gdex.ucar.edu/thredds/fileServer/files/g/d083003/" # THREDDS
 
 FNL_START_DATE = pytz.UTC.localize(datetime.datetime(2015, 7, 8, 0, 0, 0))
 
