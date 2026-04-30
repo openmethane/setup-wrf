@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.7.4 (2026-04-30)
+
+### Improvements
+
+- Allow using an alternate FNL file mirror by setting the `FNL_DATASET_ROOT` env var ([#78](https://github.com/openmethane/setup-wrf/pull/78))
+
+
 ## setup-wrf v0.7.3 (2026-02-23)
 
 ### Bug Fixes
