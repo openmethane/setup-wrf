@@ -65,7 +65,7 @@ jobs:
           labels: |
             org.opencontainers.image.title="Setup WRF"
             org.opencontainers.image.description="Generate the scripts needed to run WRF according to configuration"
-            org.opencontainers.image.authors="Jared Lewis <jared.lewis@climate-resource.com>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
+            org.opencontainers.image.authors="Lindsay Gaines <lindsay.gaines@superpowerinstitute.com.au>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
             org.opencontainers.image.vendor="The Superpower Institute"
 
       - name: Build and push image

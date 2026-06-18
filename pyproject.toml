@@ -3,9 +3,9 @@ name = "setup_runs"
 version = "0.7.5.dev1"
 description = "Scripts for running WRF "
 authors = [
+    { name = "Lindsay Gaines", email = "lindsay.gaines@superpowerinstitute.com.au" },
     { name = "Peter Rayner", email = "peter.rayner@superpowerinstitute.com.au" },
     { name = "Jeremy Silver" },
-    { name = "Jared Lewis", email = "jared.lewis@climate-resource.com" },
 ]
 requires-python = ">=3.10,<4,<3.12"
 readme = "README.md"
