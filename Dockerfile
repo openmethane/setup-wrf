@@ -44,13 +44,13 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --active
 
 # Then, use a final image without uv for our runtime environment
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 # These will be overwritten in GHA due to https://github.com/docker/metadata-action/issues/295
 # These must be duplicated in .github/workflows/build_docker.yaml
 LABEL org.opencontainers.image.title="Setup WRF"
 LABEL org.opencontainers.image.description="Generate the scripts needed to run WRF according to configuration"
-LABEL org.opencontainers.image.authors="Jared Lewis <jared.lewis@climate-resource.com>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
+LABEL org.opencontainers.image.authors="Lindsay Gaines <lindsay.gaines@superpowerinstitute.com.au>, Jeremy Silver <jeremy.silver@unimelb.edu.au>"
 LABEL org.opencontainers.image.vendor="The Superpower Institute"
 
 # SETUP_WRF_VERSION will be overridden in release builds with semver vX.Y.Z
@@ -101,8 +101,8 @@ COPY --from=chamber /chamber /bin/chamber
 COPY --from=builder /opt/venv /opt/venv
 
 # Copy in the WRF binaries
-# https://github.com/climate-resource/docker-wrf
-COPY --from=ghcr.io/climate-resource/wrf:4.5.1 /opt/wrf /opt/wrf
+# https://github.com/openmethane/docker-wrf
+COPY --from=ghcr.io/openmethane/wrf:4.5.1 /opt/wrf /opt/wrf
 
 # Copy the application from the builder
 COPY --from=builder --chown=nonroot:nonroot /opt/project /opt/project
