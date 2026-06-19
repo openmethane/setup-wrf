@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.8.0 (2026-06-19)
+
+### Improvements
+
+- Use openmethane/wrf base image instead of climate-resource/wrf ([#80](https://github.com/openmethane/setup-wrf/pull/80))
+
+
 ## setup-wrf v0.7.4 (2026-04-30)
 
 ### Improvements
