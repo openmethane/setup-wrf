@@ -1,8 +1,47 @@
 # Secret management
 FROM segment/chamber:2 AS chamber
 
-# First, build the application in the `/opt/project` directory
-FROM ghcr.io/astral-sh/uv:trixie-slim AS builder
+# Build wgrib2
+FROM debian:trixie-slim AS wgrib2-builder
+
+ARG WGRIB2_VERSION="3.8.0"
+
+ADD https://github.com/NOAA-EMC/wgrib2/archive/refs/tags/v${WGRIB2_VERSION}.tar.gz /tmp/wgrib2.tar.gz
+
+RUN <<EOT
+apt-get update -qy
+apt-get install -qyy \
+    -o APT::Install-Recommends=false \
+    -o APT::Install-Suggests=false \
+    ca-certificates \
+    build-essential \
+    cmake
+
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/apt-cache
+EOT
+
+# Unpack the source, build with the default (self-contained) CMake options and
+# install into /opt/wgrib2, since wgrib2 isn't available as a debian package
+RUN <<EOT
+mkdir -p /opt/wgrib2-src
+tar -xzf /tmp/wgrib2.tar.gz -C /opt/wgrib2-src --strip-components=1
+rm /tmp/wgrib2.tar.gz
+
+cmake \
+    -S /opt/wgrib2-src \
+    -B /opt/wgrib2-src/build \
+    -DCMAKE_INSTALL_PREFIX=/opt/wgrib2 \
+    -G "Unix Makefiles"
+make -C /opt/wgrib2-src/build -j"$(nproc)"
+make -C /opt/wgrib2-src/build install
+
+rm -rf /opt/wgrib2-src
+EOT
+
+# Fetch python dependencies and build the application in the `/app` directory
+FROM ghcr.io/astral-sh/uv:trixie-slim AS uv-builder
+
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
 
 # Configure the Python directory so it is consistent
@@ -65,6 +104,10 @@ WORKDIR /app
 # Secret management
 COPY --from=chamber /chamber /bin/chamber
 
+# wgrib2
+COPY --from=wgrib2-builder /opt/wgrib2 /opt/wgrib2
+ENV PATH="/opt/wgrib2/bin:$PATH"
+
 # Copy the Python version
 COPY --from=builder --chown=python:python /python /python
 
@@ -73,7 +116,7 @@ ENV PYTHONFAULTHANDLER=1 \
   PYTHONHASHSEED=random
 
 # Copy the application from the builder
-COPY --from=builder --chown=nonroot:nonroot /app /app
+COPY --from=uv-builder --chown=nonroot:nonroot /app /app
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
