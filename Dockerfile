@@ -28,14 +28,15 @@ COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --no-dev
 
-# Then, use a final image without uv for our runtime environment
-FROM debian:trixie-slim
+# Use a final image set up for WRF for our runtime environment
+# https://github.com/openmethane/docker-wrf
+FROM ghcr.io/openmethane/wrf:4.5.1
 
 # Setup a non-root user
 RUN groupadd --system --gid 1000 app \
  && useradd --system --gid 1000 --uid 1000 --create-home app
 
-# Install the bare minimum software requirements on top of trixie-slim
+# Install the bare minimum software requirements on top of the WRF image
 RUN <<EOT
 apt-get update -qy
 apt-get install -qyy \
@@ -47,11 +48,9 @@ apt-get install -qyy \
     bzip2 \
     file \
     make \
+    nco \
     rsync \
-    wget \
-    libnetcdff7 \    # WRF dependency
-    libpng16-16t64 \ # WRF dependency
-    mpich            # WRF dependency
+    wget
 
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -65,10 +64,6 @@ WORKDIR /app
 
 # Secret management
 COPY --from=chamber /chamber /bin/chamber
-
-# Copy in the WRF binaries
-# https://github.com/openmethane/docker-wrf
-COPY --from=ghcr.io/openmethane/wrf:4.5.1 /opt/wrf /opt/wrf
 
 # Copy the Python version
 COPY --from=builder --chown=python:python /python /python
@@ -102,4 +97,4 @@ ENV SETUP_WRF_VERSION=$SETUP_WRF_VERSION
 
 LABEL org.opencontainers.image.version="${SETUP_WRF_VERSION}"
 
-CMD ["/bin/bash"]
+CMD ["bash"]
