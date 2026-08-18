@@ -29,8 +29,8 @@ build:  ## Build the docker container locally
 
 .PHONY: run
 run: build  ## Run the required steps for the test domain
-	docker run --rm -it -v $(PWD):/opt/project setup-wrf python scripts/setup_for_wrf.py -c config/config.docker.json
-	docker run --rm -it -v $(PWD):/opt/project setup-wrf /opt/project/data/runs/aust-test/main.sh
+	docker run --rm -it -v $(PWD):/app setup-wrf python scripts/setup_for_wrf.py -c config/config.docker.json
+	docker run --rm -it -v $(PWD):/app setup-wrf /app/data/runs/aust-test/main.sh
 
 .PHONY: test
 test:  ## Run the tests

@@ -110,7 +110,7 @@ jobs:
       - name: Run pytest
         run: |
           # GHA sets a random work directory, so we need to change to the project directory
-          cd /opt/project
+          cd /app
           # Run the unit tests
           python -m pytest -v tests/unit
 
@@ -130,21 +130,21 @@ jobs:
         id: cache-geog
         uses: actions/cache@v4
         with:
-          path: /opt/project/data/geog
-          key: geog-data-${{ hashFiles('/opt/project/scripts/download-geog.sh') }}
+          path: /app/data/geog
+          key: geog-data-${{ hashFiles('/app/scripts/download-geog.sh') }}
       - name: Download and extract geography data
         if: steps.cache-geog.outputs.cache-hit != 'true'
         run: |
-          cd /opt/project
+          cd /app
           ./scripts/download-geog.sh --low-res
       - name: Cache FNL data
         uses: actions/cache@v4
         with:
-          path: /opt/project/data/fnl
-          key: fnl-data-${{ hashFiles('/opt/project/src/setup_runs/wrf/fetch_fnl.py') }}
+          path: /app/data/fnl
+          key: fnl-data-${{ hashFiles('/app/src/setup_runs/wrf/fetch_fnl.py') }}
       - name: Run WRF
         run: |
-          cd /opt/project
+          cd /app
           
           # Update the namelist.wps file to use the low resolution data
           sed -i "s/geog_data_res.*/geog_data_res = 'usgs_10m+lowres',/g" domains/aust-test/namelist.wps
@@ -154,7 +154,7 @@ jobs:
           bash data/runs/aust-test/main.sh
       - name: Run pytest integration tests
         run: |
-          cd /opt/project
+          cd /app
           
           # Run the integration tests which rely on WRF output already being available
           python -m pytest -v tests/integration
@@ -162,7 +162,7 @@ jobs:
       - name: Zip WRF artifacts
         if: ${{ always() }}
         run: |
-          tar -cvzf results.tar.gz /opt/project/data/runs
+          tar -cvzf results.tar.gz /app/data/runs
       - name: Upload WRF artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v4

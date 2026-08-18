@@ -34,12 +34,12 @@ ENV VIRTUAL_ENV=/opt/venv \
 RUN ln -s /opt/venv/lib/libnetcdf.so /opt/venv/lib/libnetcdf.so.13
 
 # Install pyproject.toml dependencies into the venv using uv
-WORKDIR /opt/project
+WORKDIR /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --active --no-install-project
-COPY . /opt/project
+COPY . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --locked --active
 
@@ -98,8 +98,8 @@ EOT
 # Use the non-root user to run our application
 USER app
 
-# /opt/project is chosen because pycharm will automatically mount to this directory
-WORKDIR /opt/project
+# Set the application folder as the working directory
+WORKDIR /app
 
 # Secret management
 COPY --from=chamber /chamber /bin/chamber
@@ -112,6 +112,6 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --from=ghcr.io/openmethane/wrf:4.5.1 /opt/wrf /opt/wrf
 
 # Copy the application from the builder
-COPY --from=builder --chown=nonroot:nonroot /opt/project /opt/project
+COPY --from=builder --chown=nonroot:nonroot /app /app
 
 CMD ["/bin/bash"]

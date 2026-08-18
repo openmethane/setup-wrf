@@ -1,6 +1,6 @@
 {
-  "project_root": "/opt/project",
-  "setup_root": "/opt/project",
+  "project_root": "/app",
+  "setup_root": "/app",
   "run_name": "aust-test",
   "target": "docker",
   "start_date": "2022-07-22 00:00:00 UTC",
@@ -12,7 +12,7 @@
   "submit_wrf_now": "false",
   "submit_wps_component": "false",
   "environment_variables_for_substitutions": "HOME",
-  "run_dir": "/opt/project/data/runs/${run_name}",
+  "run_dir": "/app/data/runs/${run_name}",
   "run_script_template": "${target_dir}/run_script_template.sh",
   "cleanup_script_template": "${target_dir}/cleanup_script_template.sh",
   "main_script_template": "${target_dir}/main_script_template.sh",
@@ -29,7 +29,7 @@
   "metem_dir": "${run_dir}/metem",
   "namelist_wps": "${nml_dir}/namelist.wps",
   "namelist_wrf": "${nml_dir}/namelist.wrf",
-  "geog_data_path": "/opt/project/data/geog/WPS_GEOG",
+  "geog_data_path": "/app/data/geog/WPS_GEOG",
   "geogrid_tbl": "${wps_dir}/geogrid/GEOGRID.TBL",
   "geogrid_exe": "${wps_dir}/geogrid.exe",
   "ungrib_exe": "${wps_dir}/ungrib.exe",
@@ -51,5 +51,5 @@
   "analysis_vtable": "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
   "wrf_run_dir": "${wrf_dir}/run",
   "wrf_run_tables_pattern": "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)",
-  "met_source_dir" : "/opt/project/data/fnl"
+  "met_source_dir" : "/app/data/fnl"
 }
