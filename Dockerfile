@@ -50,10 +50,11 @@ ENV UV_PYTHON_INSTALL_DIR=/python
 # Only use the managed Python version
 ENV UV_PYTHON_PREFERENCE=only-managed
 
-# Install Python before the project for caching
-RUN uv python install 3.12
-
 WORKDIR /app
+
+# Install Python before the project for caching
+RUN --mount=type=bind,source=.python-version,target=.python-version \
+    uv python install
 
 # install dependencies from pyproject.toml without the app, to create a
 # cacheable layer that changes less frequently than the app code
@@ -109,7 +110,7 @@ COPY --from=wgrib2-builder /opt/wgrib2 /opt/wgrib2
 ENV PATH="/opt/wgrib2/bin:$PATH"
 
 # Copy the Python version
-COPY --from=builder --chown=python:python /python /python
+COPY --from=uv-builder --chown=python:python /python /python
 
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
