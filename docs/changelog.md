@@ -19,6 +19,19 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.9.0 (2026-09-01)
+
+### ⚠️ Breaking Changes  ⚠️
+
+- Updates required python version from 3.11 to 3.12 ([#82](https://github.com/openmethane/setup-wrf/pull/82))
+- Project is moved from `/opt/project` to `/app` in the docker image, to ensure no downstream breakage:
+  - data directory should now be mounted under `/app/data`
+  - external references to `/opt/project` should be replaced with `/app`
+
+  ([#83](https://github.com/openmethane/setup-wrf/pull/83))
+- Replace conda-based Docker image with debian packages and uv ([#84](https://github.com/openmethane/setup-wrf/pull/84))
+
+
 ## setup-wrf v0.8.0 (2026-06-19)
 
 ### Improvements
