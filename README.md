@@ -108,14 +108,14 @@ Once the static geography data has been extracted,
 the docker container containing the project dependencies can be run:
 
 ```
-docker run --rm -it -v $(PWD):/opt/project setup-wrf
+docker run --rm -it -v $(PWD):/app setup-wrf
 ```
 
-The root project directory is also mounted to `/opt/project` in the docker container.
+The root project directory is also mounted to `/app` in the docker container.
 This allows for any changes made to this directory (or child directories) to be reflected
 after the container is destroyed.
 
-The `data` directory is mounted to `/opt/project/data` in the container.
+The `data` directory is mounted to `/app/data` in the container.
 This is where all outputs from the run process will be stored.
 
 Inside the container, the WRF setup process can be run using the following command

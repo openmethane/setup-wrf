@@ -1,6 +1,6 @@
 {
-  "project_root": "/opt/project",
-  "setup_root": "/opt/project",
+  "project_root": "/app",
+  "setup_root": "/app",
   "run_name": "${DOMAIN_NAME}",
   "target": "docker",
   "start_date": "${START_DATE} 00:00:00 UTC",
@@ -19,8 +19,8 @@
   "check_wrfout_in_background_script": "${setup_root}/scripts/check_wrfout_in_background.py",
   "only_edit_namelists": "false",
   "use_high_res_sst_data": "true",
-  "wps_dir": "/opt/wrf/WPS",
-  "wrf_dir": "/opt/wrf/WRF",
+  "wps_dir": "/opt/wps",
+  "wrf_dir": "/opt/wrf",
   "nml_dir": "${setup_root}/domains/${DOMAIN_NAME}",
   "target_dir": "${setup_root}/targets/${target}",
   "scripts_to_copy_from_nml_dir": "add_remove_var.txt",
@@ -29,7 +29,7 @@
   "metem_dir": "${run_dir}/metem",
   "namelist_wps": "${nml_dir}/namelist.wps",
   "namelist_wrf": "${nml_dir}/namelist.wrf",
-  "geog_data_path": "/opt/project/data/geog/WPS_GEOG",
+  "geog_data_path": "/app/data/geog/WPS_GEOG",
   "geogrid_tbl": "${wps_dir}/geogrid/GEOGRID.TBL",
   "geogrid_exe": "${wps_dir}/geogrid.exe",
   "ungrib_exe": "${wps_dir}/ungrib.exe",
@@ -51,5 +51,5 @@
   "analysis_vtable": "${wps_dir}/ungrib/Variable_Tables/Vtable.GFS",
   "wrf_run_dir": "${wrf_dir}/run",
   "wrf_run_tables_pattern": "(DAT|formatted|CAM|asc|TBL|dat|tbl|txt|tr)",
-  "met_source_dir" : "/opt/project/data/fnl"
+  "met_source_dir" : "/app/data/fnl"
 }

@@ -15,7 +15,7 @@ export DOMAIN_VERSION=${DOMAIN_VERSION:-v1}
 export START_DATE=${START_DATE:-2022-07-22}
 
 # Root directory for storing output, will have "wrf/${DOMAIN_NAME}" appended
-export STORE_PATH=${STORE_PATH:-/opt/project/data}
+export STORE_PATH=${STORE_PATH:-/app/data}
 # Checkpoint dir, used for high I/O workloads
 export CHK_PATH=${CHK_PATH:-/mnt/scratch}
 # Note that currently the full docker config is the only one that supports `STORE_PATH`

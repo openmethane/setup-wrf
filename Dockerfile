@@ -1,50 +1,131 @@
 # Secret management
 FROM segment/chamber:2 AS chamber
 
-# Build the required dependencies
-FROM continuumio/miniconda3 as builder
+# Build wgrib2
+FROM debian:trixie-slim AS wgrib2-builder
 
-# Install and package up the conda environment
-# Creates a standalone environment in /opt/venv
-COPY environment.yml /opt/environment.yml
-RUN conda env create -f /opt/environment.yml
-RUN conda install -c conda-forge conda-pack
-RUN conda-pack -n setup_wrf -o /tmp/env.tar && \
-  mkdir /opt/venv && cd /opt/venv && \
-  tar xf /tmp/env.tar && \
-  rm /tmp/env.tar
+ARG WGRIB2_VERSION="3.8.0"
 
-# We've put venv in same path it'll be in final image,
-# so now fix up paths:
-RUN /opt/venv/bin/conda-unpack
+ADD https://github.com/NOAA-EMC/wgrib2/archive/refs/tags/v${WGRIB2_VERSION}.tar.gz /tmp/wgrib2.tar.gz
 
-# Install the python dependencies using uv
-COPY --from=ghcr.io/astral-sh/uv:0.9 /uv /uvx /bin/
-ENV UV_PYTHON_DOWNLOADS=0 \
-    UV_SYSTEM_PYTHON=1 \
-    UV_COMPILE_BYTECODE=1
+RUN <<EOT
+apt-get update -qy
+apt-get install -qyy \
+    -o APT::Install-Recommends=false \
+    -o APT::Install-Suggests=false \
+    ca-certificates \
+    build-essential \
+    cmake
 
-# This is deliberately outside of the work directory
-# so that the local directory can be mounted as a volume of testing
-ENV VIRTUAL_ENV=/opt/venv \
-    PATH="/opt/venv/bin:$PATH"
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/apt-cache
+EOT
 
-# wgrib2 dependency isn't solvable with libraries needed by WRF, but does work
-# with the newer version of libnetcdf.so that is installed in our environment
-RUN ln -s /opt/venv/lib/libnetcdf.so /opt/venv/lib/libnetcdf.so.13
+# Unpack the source, build with the default (self-contained) CMake options and
+# install into /opt/wgrib2, since wgrib2 isn't available as a debian package
+RUN <<EOT
+mkdir -p /opt/wgrib2-src
+tar -xzf /tmp/wgrib2.tar.gz -C /opt/wgrib2-src --strip-components=1
+rm /tmp/wgrib2.tar.gz
 
-# Install pyproject.toml dependencies into the venv using uv
-WORKDIR /opt/project
+cmake \
+    -S /opt/wgrib2-src \
+    -B /opt/wgrib2-src/build \
+    -DCMAKE_INSTALL_PREFIX=/opt/wgrib2 \
+    -G "Unix Makefiles"
+make -C /opt/wgrib2-src/build -j"$(nproc)"
+make -C /opt/wgrib2-src/build install
+
+rm -rf /opt/wgrib2-src
+EOT
+
+# Fetch python dependencies and build the application in the `/app` directory
+FROM ghcr.io/astral-sh/uv:trixie-slim AS uv-builder
+
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+
+# Configure the Python directory so it is consistent
+ENV UV_PYTHON_INSTALL_DIR=/python
+
+# Only use the managed Python version
+ENV UV_PYTHON_PREFERENCE=only-managed
+
+WORKDIR /app
+
+# Install Python before the project for caching
+RUN --mount=type=bind,source=.python-version,target=.python-version \
+    uv python install
+
+# install dependencies from pyproject.toml without the app, to create a
+# cacheable layer that changes less frequently than the app code
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --locked --active --no-install-project
-COPY . /opt/project
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --active
+    uv sync --locked --no-install-project --no-dev
 
-# Then, use a final image without uv for our runtime environment
-FROM debian:trixie-slim
+# install the app + dependencies using the uv cache from the previous step
+COPY . /app
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev
+
+# Use a final image set up for WRF for our runtime environment
+# https://github.com/openmethane/docker-wrf
+FROM ghcr.io/openmethane/wrf:4.5.1
+
+# Setup a non-root user
+RUN groupadd --system --gid 1000 app \
+ && useradd --system --gid 1000 --uid 1000 --create-home app
+
+# Install the bare minimum software requirements on top of the WRF image
+RUN <<EOT
+apt-get update -qy
+apt-get install -qyy \
+    -o APT::Install-Recommends=false \
+    -o APT::Install-Suggests=false \
+    ca-certificates \
+    csh \
+    bc \
+    bzip2 \
+    file \
+    make \
+    nco \
+    rsync \
+    wget
+
+apt-get clean
+rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+EOT
+
+# Use the non-root user to run our application
+USER app
+
+# Set the application folder as the working directory
+WORKDIR /app
+
+# Secret management
+COPY --from=chamber /chamber /bin/chamber
+
+# wgrib2
+COPY --from=wgrib2-builder /opt/wgrib2 /opt/wgrib2
+ENV PATH="/opt/wgrib2/bin:$PATH"
+
+# Copy the Python version
+COPY --from=uv-builder --chown=python:python /python /python
+
+ENV PYTHONFAULTHANDLER=1 \
+  PYTHONUNBUFFERED=1 \
+  PYTHONHASHSEED=random
+
+# Copy the application from the builder
+COPY --from=uv-builder --chown=nonroot:nonroot /app /app
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+# Place the package root in the python import path so files in scripts/ can resolve
+ENV PYTHONPATH="/app/src"
+
+# Use `/app` as the working directory
+WORKDIR /app
 
 # These will be overwritten in GHA due to https://github.com/docker/metadata-action/issues/295
 # These must be duplicated in .github/workflows/build_docker.yaml
@@ -60,51 +141,4 @@ ENV SETUP_WRF_VERSION=$SETUP_WRF_VERSION
 
 LABEL org.opencontainers.image.version="${SETUP_WRF_VERSION}"
 
-# Configure Python
-ENV PYTHONFAULTHANDLER=1 \
-  PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random
-
-# This is deliberately outside of the work directory
-# so that the local directory can be mounted as a volume of testing
-ENV VIRTUAL_ENV=/opt/venv \
-    PATH="/opt/venv/bin:$PATH"
-
-# Preference the environment libraries over the system libraries
-ENV LD_LIBRARY_PATH="/opt/venv/lib:${LD_LIBRARY_PATH}"
-
-# Install the bare minimum software requirements on top of bookworm-slim
-RUN <<EOT
-apt-get update -qy
-apt-get install -qyy \
-    -o APT::Install-Recommends=false \
-    -o APT::Install-Suggests=false \
-    csh \
-    bc \
-    file \
-    make \
-    ca-certificates \
-    wget \
-    rsync
-
-apt-get clean
-rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-EOT
-
-# /opt/project is chosen because pycharm will automatically mount to this directory
-WORKDIR /opt/project
-
-# Secret management
-COPY --from=chamber /chamber /bin/chamber
-
-# Copy across the virtual environment
-COPY --from=builder /opt/venv /opt/venv
-
-# Copy in the WRF binaries
-# https://github.com/openmethane/docker-wrf
-COPY --from=ghcr.io/openmethane/wrf:4.5.1 /opt/wrf /opt/wrf
-
-# Copy the application from the builder
-COPY --from=builder --chown=nonroot:nonroot /opt/project /opt/project
-
-CMD ["/bin/bash"]
+CMD ["bash"]
