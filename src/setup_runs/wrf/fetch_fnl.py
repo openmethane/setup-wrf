@@ -88,18 +88,37 @@ def download_file(
         Path to the downloaded file
     """
     filename = target_dir / os.path.basename(url)
+    # download to a temporary file so an interrupted download never leaves a
+    # truncated file at the final path, which would be treated as complete
+    # and reused by subsequent runs
+    partial_filename = filename.with_name(filename.name + ".part")
 
     try:
         with session.get(url, stream=True) as r:
             r.raise_for_status()
-            with open(filename, "wb") as f:
+            with open(partial_filename, "wb") as f:
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
-            return filename
+
+            # Content-Length is the encoded size, so it can only be compared
+            # when the response was not compressed in transit
+            expected_size = r.headers.get("Content-Length")
+            actual_size = partial_filename.stat().st_size
+            if (
+                expected_size is not None
+                and "Content-Encoding" not in r.headers
+                and int(expected_size) != actual_size
+            ):
+                raise RuntimeError(
+                    f"Incomplete download of {url}: expected {expected_size} bytes, received {actual_size}"
+                )
+
+        os.replace(partial_filename, filename)
+        return filename
     except requests.exceptions.RequestException as e:
-        if os.path.exists(filename):
-            os.remove(filename)
         raise RuntimeError(f"Error downloading {url}") from e
+    finally:
+        partial_filename.unlink(missing_ok=True)
 
 
 def download_gdas_fnl_data(
@@ -113,7 +132,8 @@ def download_gdas_fnl_data(
 
     If any of the files fail to download (after 5 retries),
     an exception will be raised and any other downloads will be aborted.
-    If that occurs, any files being downloaded may be incomplete and should be deleted.
+    Files are only moved into target_dir once completely downloaded, so an
+    aborted download will not leave a partial file in place.
 
     We are downloading raw grib files without any subsetting.
     This operation does not require any RDA credentials.
