@@ -1,5 +1,7 @@
 import pdb
 
+import f90nml
+
 NAMELIST_PARAMS_TO_MATCH = [
     {
         "wrf_var": "max_dom",
@@ -133,3 +135,31 @@ def validate_wrf_namelists(namelist_wps, namelist_wrf):
                 ), "Mismatched values for variable {} between the WRF and WPS namelists".format(
                     param_dict["wrf_var"]
                 )
+
+
+def apply_namelist_overrides(namelist: f90nml.Namelist, overrides: str) -> f90nml.Namelist:
+    """
+    Set the values in `overrides` on a WRF namelist, adding any group or
+    variable that is not already present.
+
+    :param namelist: The namelist to change, which is modified in place
+    :param overrides: Fortran namelist text, for example
+        "&time_control history_begin_h = 12 / &namelist_quilt nio_tasks_per_group = 1 /"
+    :return: The changed namelist
+    """
+    for group, values in f90nml.reads(overrides).items():
+        if group not in namelist:
+            namelist[group] = {}
+        for name, value in values.items():
+            namelist[group][name] = value
+
+    return namelist
+
+
+def quilt_tasks(namelist: f90nml.Namelist) -> int:
+    """
+    Number of MPI tasks WRF sets aside as I/O servers, which come out of the
+    total given to mpirun rather than in addition to it.
+    """
+    quilt = namelist.get("namelist_quilt", {})
+    return quilt.get("nio_tasks_per_group", 0) * quilt.get("nio_groups", 1)

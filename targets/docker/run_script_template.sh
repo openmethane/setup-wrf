@@ -9,8 +9,11 @@ cd ${RUN_DIR} || exit 1
 python3 checkWrfoutInBackground.py --verify-steps --watch > wrf-background.log 2>&1 &
 backgroundPID=$!
 
-echo running with $NCPUS mpi ranks
-time mpirun -np $NCPUS ./wrf.exe >& wrf.log
+## extra mpirun arguments, such as "-bind-to core" when the job has the host to itself
+MPI_EXTRA_ARGS=${MPI_EXTRA_ARGS:-}
+
+echo running with $NCPUS mpi ranks ${MPI_EXTRA_ARGS}
+time mpirun $MPI_EXTRA_ARGS -np $NCPUS ./wrf.exe >& wrf.log
 
 ## give the python script a chance to finish
 sleep 30

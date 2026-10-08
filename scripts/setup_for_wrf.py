@@ -11,7 +11,11 @@ import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
 from setup_runs.wrf.mpi_tasks import safe_mpi_tasks
-from setup_runs.wrf.namelists import validate_wrf_namelists
+from setup_runs.wrf.namelists import (
+    apply_namelist_overrides,
+    quilt_tasks,
+    validate_wrf_namelists,
+)
 from setup_runs.wrf.read_config_wrf import load_wrf_config, WRFConfig
 from setup_runs.utils import compress_nc_file, run_command, purge
 import click
@@ -837,6 +841,15 @@ def run_setup_for_wrf(configfile: str) -> None:
         ## clean up the links to the met_em files regardless, as they are no longer needed
         purge(run_dir_with_date, "met_em*")
 
+        ## Apply any overrides only now, so they reach wrf.exe but not real.exe,
+        ## which reads the same namelist.input on a single rank and so cannot
+        ## set aside I/O servers.
+        namelist_overrides = os.environ.get("WRF_NAMELIST_OVERRIDES", "")
+        if namelist_overrides.strip():
+            print(f"\t\tApply WRF_NAMELIST_OVERRIDES: {namelist_overrides}")
+            apply_namelist_overrides(WRFnml, namelist_overrides)
+            WRFnml.write(os.path.join(run_dir_with_date, nmlfile), force=True)
+
         ## generate the run and cleanup scripts
         print("\t\tGenerate the run and cleanup script")
 
@@ -845,7 +858,10 @@ def run_setup_for_wrf(configfile: str) -> None:
         geo_file = os.path.join(run_dir_with_date, f"geo_em.d0{nDom}.nc")
         with netCDF4.Dataset(geo_file) as geo_nc:
             dims_y, dims_x = geo_nc.dimensions["south_north"].size, geo_nc.dimensions["west_east"].size
-            mpi_tasks = safe_mpi_tasks((dims_y, dims_x))
+            # I/O servers are taken out of the mpirun total, so decompose the
+            # domain over what is left and add them back on.
+            io_tasks = quilt_tasks(WRFnml)
+            mpi_tasks = safe_mpi_tasks((dims_y, dims_x), os.cpu_count() - io_tasks) + io_tasks
 
         ########## EDIT: the following are the substitutions used for the per-run cleanup and run scripts
         substitutions = {
