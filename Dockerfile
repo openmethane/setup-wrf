@@ -90,6 +90,7 @@ apt-get install -qyy \
     make \
     nco \
     rsync \
+    tini \
     wget
 
 apt-get clean
@@ -140,5 +141,10 @@ ARG SETUP_WRF_VERSION=development
 ENV SETUP_WRF_VERSION=$SETUP_WRF_VERSION
 
 LABEL org.opencontainers.image.version="${SETUP_WRF_VERSION}"
+
+# tini forwards signals to the entrypoint and reaps any orphaned processes.
+# The debug entrypoint is temporary, and wraps every command to log what each
+# container costs. Drop this ENTRYPOINT to remove it.
+ENTRYPOINT ["tini", "--", "/app/scripts/docker-entrypoint-debug.sh"]
 
 CMD ["bash"]
