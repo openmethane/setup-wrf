@@ -10,7 +10,7 @@ import copy
 import stat
 import netCDF4
 from setup_runs.wrf.fetch_fnl import download_gdas_fnl_data
-from setup_runs.wrf.mpi_tasks import safe_mpi_tasks
+from setup_runs.wrf.mpi_tasks import physical_cpu_count, safe_mpi_tasks
 from setup_runs.wrf.namelists import (
     apply_namelist_overrides,
     quilt_tasks,
@@ -784,6 +784,8 @@ def run_setup_for_wrf(configfile: str) -> None:
         ########## end edit section #####################################################
         ##
         WRFnml["time_control"]["restart"] = wrf_config.restart
+        ## the spin-up output is deleted unread, so don't write it
+        WRFnml["time_control"]["history_begin_h"] = [int(wrf_config.num_hours_spin_up)] * nDom
         ##
         WRFnml["domains"]["num_metgrid_levels"] = nz_metem
         WRFnml["domains"]["num_metgrid_soil_levels"] = nz_soil
@@ -861,7 +863,7 @@ def run_setup_for_wrf(configfile: str) -> None:
             # I/O servers are taken out of the mpirun total, so decompose the
             # domain over what is left and add them back on.
             io_tasks = quilt_tasks(WRFnml)
-            mpi_tasks = safe_mpi_tasks((dims_y, dims_x), os.cpu_count() - io_tasks) + io_tasks
+            mpi_tasks = safe_mpi_tasks((dims_y, dims_x), physical_cpu_count() - io_tasks) + io_tasks
 
         ########## EDIT: the following are the substitutions used for the per-run cleanup and run scripts
         substitutions = {

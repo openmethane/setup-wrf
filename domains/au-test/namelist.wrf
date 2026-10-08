@@ -34,7 +34,8 @@ io_form_auxinput2                   = 2,
 auxinput4_inname                    = "wrflowinp_d<domain>"
 io_form_auxinput4                   = 2,
 auxinput4_interval                  = 360,
-debug_level                         = 100,
+debug_level                         = 0,
+use_netcdf_classic                  = .true.,
 /
 
 &domains                 
