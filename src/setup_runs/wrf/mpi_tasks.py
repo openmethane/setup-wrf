@@ -3,7 +3,34 @@ import os
 
 WRF_MIN_PATCH_SIZE=10
 
-def safe_mpi_tasks(geo_dims: tuple[int, int], cpu_count = os.cpu_count()) -> int:
+
+def physical_cpu_count(cpuinfo: str = "/proc/cpuinfo") -> int:
+    """
+    Number of physical cores, which is half the CPUs os.cpu_count() reports
+    on a host with hyperthreading. WRF runs faster with one MPI task per
+    physical core than with one per hardware thread.
+
+    Falls back to os.cpu_count() where /proc/cpuinfo does not say which core
+    each CPU belongs to.
+    """
+    cores = set()
+    try:
+        with open(cpuinfo) as fd:
+            socket = None
+            for line in fd:
+                key, _, value = line.partition(":")
+                key = key.strip()
+                if key == "physical id":
+                    socket = value.strip()
+                elif key == "core id":
+                    cores.add((socket, value.strip()))
+    except OSError:
+        pass
+
+    return len(cores) or os.cpu_count()
+
+
+def safe_mpi_tasks(geo_dims: tuple[int, int], cpu_count: int | None = None) -> int:
     """
     Determine a reasonable default MPI task count for running WRF over the
     specified domain, with the available number of cores. This method does
@@ -17,9 +44,12 @@ def safe_mpi_tasks(geo_dims: tuple[int, int], cpu_count = os.cpu_count()) -> int
     See: https://www2.mmm.ucar.edu/wrf/site_linked_files/tutorials/wrf_computation.pdf
 
     :param geo_dims: Number of cells in the domain in (y, x)
-    :param cpu_count: Maximum number of cores to use
+    :param cpu_count: Maximum number of cores to use, by default the number
+        of physical cores
     :return: Number of MPI tasks to use when running WRF
     """
+    if cpu_count is None:
+        cpu_count = physical_cpu_count()
     geo_dims_y, geo_dims_x = geo_dims
 
     # find the largest mpi task count with "square-ish" factors
