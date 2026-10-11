@@ -780,6 +780,15 @@ def run_setup_for_wrf(configfile: str) -> None:
         ########## end edit section #####################################################
         ##
         WRFnml["time_control"]["restart"] = wrf_config.restart
+
+        ## wrf.exe output settings
+        ## - the spin-up output is never used, so don't write it
+        WRFnml["time_control"]["history_begin_h"] = [int(wrf_config.num_hours_spin_up)] * nDom
+        ## - don't compress outputs, they will be immediately decompressed and
+        ##   read to write hourly averages
+        WRFnml["time_control"]["use_netcdf_classic"] = True
+        ## - no debugging output (it isn't very useful)
+        WRFnml["time_control"]["debug_level"] = 0
         ##
         WRFnml["domains"]["num_metgrid_levels"] = nz_metem
         WRFnml["domains"]["num_metgrid_soil_levels"] = nz_soil
