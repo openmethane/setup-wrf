@@ -26,6 +26,8 @@ def test_download_file(tmp_path):
 
     assert result == tmp_path / "gdas1.fnl0p25.2022110100.f00.grib2"
     assert result.read_bytes() == b"GRIB7777"
+
+    # files has been stored in the expected location
     assert list(tmp_path.iterdir()) == [result]
 
 
@@ -35,6 +37,7 @@ def test_download_file_incomplete(tmp_path):
     with pytest.raises(RuntimeError, match="Incomplete download"):
         download_file(session, tmp_path, URL)
 
+    # no files have appeared in the target path
     assert list(tmp_path.iterdir()) == []
 
 
@@ -49,6 +52,7 @@ def test_download_file_interrupted(tmp_path):
     with pytest.raises(RuntimeError, match="Error downloading"):
         download_file(session, tmp_path, URL)
 
+    # no files have appeared in the target path
     assert list(tmp_path.iterdir()) == []
 
 
@@ -65,4 +69,5 @@ def test_download_file_killed(tmp_path):
     with pytest.raises(KeyboardInterrupt):
         download_file(session, tmp_path, URL)
 
+    # no files have appeared in the target path
     assert list(tmp_path.iterdir()) == []
