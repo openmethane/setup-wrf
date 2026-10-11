@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = "==3.12.*"
 resolution-markers = [
     "platform_machine == 'ARM64' and sys_platform == 'win32'",
@@ -398,8 +398,9 @@ wheels = [
 
 [[package]]
 name = "setup-runs"
-version = "0.9.1.dev1"
+version = "0.9.1"
 source = { editable = "." }
+default-groups = ["dev", "tests"]
 dependencies = [
     { name = "attrs" },
     { name = "click" },

@@ -19,6 +19,17 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.9.1 (2026-10-11)
+
+### Improvements
+
+- WRF now skips writing spin-up output, writes uncompressed history frames, drops debug logging, and runs one MPI rank per physical core by default, roughly halving `wrf-run` time for aust10km. ([#92](https://github.com/openmethane/setup-wrf/pull/92))
+
+### Bug Fixes
+
+- Fixed interrupted FNL downloads leaving truncated files behind, which caused `wgrib2` to fail on subsequent runs. ([#87](https://github.com/openmethane/setup-wrf/pull/87))
+
+
 ## setup-wrf v0.9.0 (2026-09-01)
 
 ### ⚠️ Breaking Changes  ⚠️
