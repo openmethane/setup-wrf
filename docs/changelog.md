@@ -19,6 +19,13 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.9.2 (2026-10-28)
+
+### Bug Fixes
+
+- The image no longer trusts the CA roots involved in the October 2026 eMudhra key compromise (`emSign ECC Root CA - G3`, `AAA Certificate Services`): certifi was bumped to 2026.10.23, and `ca-certificates` is now reinstalled on every code change so builds pick up the current trust store. ([#93](https://github.com/openmethane/setup-wrf/pull/93))
+
+
 ## setup-wrf v0.9.1 (2026-10-11)
 
 ### Improvements
