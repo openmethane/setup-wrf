@@ -37,6 +37,8 @@ default-groups = [
     "tests",
     "dev",
 ]
+# certifi before 2026.10.18 trusts the compromised eMudhra emSign ECC Root CA - G3
+constraint-dependencies = ["certifi>=2026.10.18"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src/setup_runs"]
