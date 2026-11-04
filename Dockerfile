@@ -1,6 +1,3 @@
-# Secret management
-FROM segment/chamber:2 AS chamber
-
 # Build wgrib2
 FROM debian:trixie-slim AS wgrib2-builder
 
@@ -101,9 +98,6 @@ USER app
 
 # Set the application folder as the working directory
 WORKDIR /app
-
-# Secret management
-COPY --from=chamber /chamber /bin/chamber
 
 # wgrib2
 COPY --from=wgrib2-builder /opt/wgrib2 /opt/wgrib2
