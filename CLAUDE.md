@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-setup-wrf generates the namelists, shell scripts and input data needed to run WRF (via WPS: geogrid → ungrib → metgrid → real.exe) for a domain and date range, and runs it. It is the meteorology stage of Open Methane. Production runs the Docker image (built on `ghcr.io/openmethane/wrf:4.5.1`; CI pushes it to GHCR and ECR).
+setup-wrf generates the namelists, shell scripts and input data needed to run WRF (via WPS: geogrid → ungrib → metgrid → real.exe) for a domain and date range, and runs it. It is the meteorology stage of Open Methane: its output becomes CMAQ's meteorological inputs through MCIP. Production runs the Docker image (built on `ghcr.io/openmethane/wrf:4.5.1`; CI pushes it to GHCR and ECR).
 
 ## Commands
 
@@ -51,5 +51,47 @@ The Docker configs set `geo_em_dir` to `${run_dir}`, so geogrid always runs (the
 
 ## Conventions
 
-- Every PR needs a towncrier fragment in `changelog/` named `<PR number>.<type>.md` (types: breaking, deprecation, feature, improvement, fix, docs, trivial), written in past tense for users; use `trivial` for internal changes. Fill in `.github/pull_request_template.md`.
+- Every PR needs a towncrier fragment in `changelog/` named `<PR number>.<type>.md` (types: breaking, deprecation, feature, improvement, fix, docs, trivial), written in past tense for users; use `trivial` for internal changes. Fill in `.github/pull_request_template.md`, starting with the **Review:** line; "Code review" in `docs/development.md` explains how to decide whether a PR needs review.
 - Releases are cut by the "Create release" GitHub Action (see `docs/development.md`), which bumps the version, compiles `docs/changelog.md` and tags `vX.Y.Z`; don't bump versions by hand.
+
+## Before opening a pull request
+
+For any change that isn't mechanical (see "Code review" in
+`docs/development.md`), review it from a fresh context before opening the
+pull request, and again after reworking it substantially. Skip this for
+formatter runs, dependency bumps and experiments not for merge, or if the
+operator asks you to.
+
+Launch the `reviewer` subagent (`.claude/agents/reviewer.md`). Give it:
+
+- the goal of the change and the diff range (e.g. `main...HEAD`)
+- the numbers of any issues the change addresses
+- any constraints the operator set during the task, such as an approach to use
+  or avoid, or something to leave unchanged
+
+Don't give it your reasoning or your view of whether the change is correct,
+because it will tend to confirm what it's told.
+
+Independent reviews of the same change find different problems. When a change
+both alters the WRF output or what production runs do, and touches error
+handling, downloads, the Docker image, or several modules, offer the operator
+a second review, run in parallel with the same brief. Each review costs tens
+of thousands of tokens, so run the second only if the operator agrees. Merge
+the two reports, counting a finding both raised once, before dealing with
+them.
+
+Deal with each item it reports:
+
+- **Wrong, with a clear fix:** fix it, if the fix stays within the scope of the
+  task and doesn't go against the operator's instructions or the project's
+  guidance.
+- **Needs the operator's decision:** ask the operator, with the options and
+  your recommendation. This includes items with an obvious fix that would
+  change the WRF output or methodology, widen the change beyond what was
+  asked, or make the pull request need human review when it otherwise
+  wouldn't.
+- **Not a problem:** dismiss it, but list it in one line to the operator with
+  your reason, because you're judging criticism of your own work.
+
+This review is part of preparing the change. Don't mention it or its findings
+in the pull request description or comments.
