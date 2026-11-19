@@ -14,9 +14,8 @@ where the various input files are located, where the
 output files should be stored, and how the WRF model should be run.
 See [Input files](#input-files) for more information about how the configuration file is used.
 
-`config/wrf/config.nci.json` will be used as the default configuration file,
-but this can be overriden using the `-c` command line argument.
-An example config file `config/config.docker.json` that targets running WRF using docker.
+Pass the configuration file with the `-c` command line argument.
+`config/config.docker.json` is an example that targets running WRF using docker.
 
 The `setup_for_wrf.py` script does the following:
 
@@ -29,15 +28,15 @@ The `setup_for_wrf.py` script does the following:
 * Loop over the required WRF jobs, performing the following:
     * Check if the WRF input files for this run are available (`wrfinput_d01`). If not, perform the following:
         * Check that the geogrid files are available (copies should be found in the directory given by the config
-          variable `nml_dir`). If not available, configure the [WRF Pre-Processing System (WPS)](https://github.com/wrf-model/WPS) namelist and run `geogrid.exe` to produce them.
+          variable `geo_em_dir`). If not available, configure the [WRF Pre-Processing System (WPS)](https://github.com/wrf-model/WPS) namelist and run `geogrid.exe` to produce them.
         * Check if the `met_em` files for this run are available. If not, perform the following:
             * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the high-resolution SST files (
               RTG) - this is optional
             * If using the NCEP FNL analysis (available from 2015-07-09), download and subset the grib files
             * Run `link_grib.csh`, configure the WPS namelist and run `ungrib.exe` for the analysis files (ERA Interim
               or FNL)
-            * Run `metgrid.exe` to produce the `met_em` files, moves these to a directory (`METEM`)
-        * Link to the `met_em` files (in the `METEM` directory), configure the WRF namelist, run `real.exe`
+            * Run `metgrid.exe` to produce the `met_em` files, moves these to the directory given by `metem_dir`
+        * Link to the `met_em` files (in `metem_dir`), configure the WRF namelist, run `real.exe`
     * Configure the daily "run" and "cleanup" scripts
 
 After the `setup_for_wrf.py` script has been run successfully,
@@ -46,19 +45,19 @@ For each job, `main.sh` runs `run.sh`, which runs WRF for the given time and dom
 
 ## Getting started
 
-This repository supports two target environments to run.
+This repository has two target environments: docker, which is supported, and NCI, which is not.
 
 ### NCI (National Computational Infrastructure Australia)
 
-**Updated to run on Gadi: these scripts no longer work on Raijin**
+**The NCI target is no longer supported and is expected to be deprecated.
+These instructions are kept for reference and may be out of date.**
 
 Procedure to run these scripts:
 
 0. [Apply for membership](https://my.nci.org.au/) to the 'sx70' NCI group to use the `WPS_GEOG` dataset. If you also
    want to use the ERAI analyses, you will need to apply for access to the 'ua8' and 'ub4' NCI groups.
 1. Edit the above scripts,
-   particularly `config/wrf/config.nci.json`, `namelist.wrf`, `namelist.wps`, `load_wrf_env.sh` (and possibly
-   also `load_conda_env.sh`).
+   particularly `config/config.nci.json`, `namelist.wrf`, `namelist.wps` and `load_wrf_env.sh`.
 2. Either submit the setup via `qsub submit_setup.sh` *or* do the following:
    ..a. Log into one of the `copyq` nodes in interactive mode (
    via `qsub -I -q copyq -l wd,walltime=2:00:00,ncpus=1,mem=6GB -l storage=scratch/${PROJECT}+gdata/sx70+gdata/hh5`, for
@@ -108,8 +107,11 @@ Once the static geography data has been extracted,
 the docker container containing the project dependencies can be run:
 
 ```
-docker run --rm -it -v $(PWD):/app setup-wrf
+docker run --rm -it -v $(PWD):/app -v /app/.venv setup-wrf
 ```
+
+The `-v /app/.venv` volume stops the mounted project directory
+from hiding the Python environment installed in the image.
 
 The root project directory is also mounted to `/app` in the docker container.
 This allows for any changes made to this directory (or child directories) to be reflected
@@ -159,11 +161,11 @@ There are a number of files that are copied from various locations into the run 
 | `add_remove_var.txt`         | List of variables to add/remove to the standard WRF output stream              | No        |
 
 The non-templated files are copied from either the `nml_dir` or `target_dir` directories (as defined
-in `config/wrf/config.*.json`).
-The location of the non-templated files is define using the `scripts_to_copy_from_nml_dir` and
-`scripts_to_copy_from_nml_dir` configuration values.
+in `config/config.*.json`).
+Which files are copied from each is defined by the `scripts_to_copy_from_nml_dir` and
+`scripts_to_copy_from_target_dir` configuration values.
 
-The templated files are configured based on the results of `config/wrf/config.*.json`
+The templated files are configured based on the results of `config/config.*.json`
 The tokens to replace are identified with the following format: `${keyword}`.
 Generally speaking, the values for substitution are defined within the python script (`scripts/setup_for_wrf.py`).
 To change the substitutions, edit the python script in the sections between the lines bounded by `## EDIT:`
@@ -175,10 +177,10 @@ It is assumed that you have compiled with MPI (i.e. 'distributed memory').
 ## Analysis inputs
 
 This script will either use the ERA Interim reanalyses available on NCI or download NCEP FNL 0.25 analyses. This is set
-in `config/wrf/config.*.json`. If switching between the FNL and ERA Interim reanalyses, you will
-need to change the Vtable file used (set in `config.*.json`), and also the number of vertical levels (set
-in `namelist.wrf` file). Also the merger of the RTG SSTs is only done for the ERA Interim analysis, and this step is
-optional (set in `config.*.json`).
+by `analysis_source` (`ERAI` or `FNL`) in `config/config.*.json`. If switching between the FNL and ERA Interim reanalyses,
+you will need to change the Vtable file used (`analysis_vtable`). The number of vertical levels is read from the
+`met_em` files, so it doesn't need to be set in `namelist.wrf`. The merger of the RTG SSTs is only done for the
+ERA Interim analysis, and this step is optional (`use_high_res_sst_data`).
 
 ## Output
 
@@ -187,12 +189,12 @@ optional (set in `config.*.json`).
 All the main WRF output will be produced within subfolders of the directory given by variable `run_dir` in the config
 file. It will have the following substructure:
 
-* `${run_dir}/metem`: contains any `met_em` files produced (once the `wrfinput_d0?` files have been created,
+* `metem_dir` (`${run_dir}/metem` in the example configs): contains any `met_em` files produced (once the `wrfinput_d0?` files have been created,
   these `met_em` files can be deleted).
 * `${run_dir}/${YYYYMMDDHH}`: One folder per WRF run, where `${YYYYMMDDHH}` is the (UTC) date-stamp of the starting time
   of the corresponding WRF run (n.b. this run may actually start earlier if spinup is requested.
   One exception to this is that the GEOGRID output files (`geo_em.d0?.nc`) are moved to the directory given by the
-  variable `nml_dir` in the config file.
+  variable `geo_em_dir` in the config file.
 
 The `scripts/check_wrfout_in_background.py` script averages the output values over a time period and removes the
 original file,

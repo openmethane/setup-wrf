@@ -8,9 +8,9 @@ The following table lists the software and versions that are required to run the
 
 | Software | Version | Installation Method                              |
 |----------|---------|--------------------------------------------------|
-| Python   | 3.11    | docker container                                 |
-| WRF      | 4.5.1   | docker container (ghcr.io/openmethane/wrf:4.5.1) |
-| wgrib2   | 2.0.8   | conda                                            |
-| csh      | *       | conda                                            |
-| mpich    | 4.2.1   | conda                                            |
-| NCO      | *       | conda                                            |
+| Python   | 3.12    | uv, in the docker container                      |
+| WRF      | 4.5.1   | docker base image (ghcr.io/openmethane/wrf:4.5.1) |
+| MPICH    | 4.2.1   | docker base image                                |
+| wgrib2   | 3.8.0   | built from source in the Dockerfile              |
+| csh      | *       | Debian package                                   |
+| NCO      | *       | Debian package                                   |
