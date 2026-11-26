@@ -4,6 +4,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
+**This repository is deprecated and frozen.** WRF now runs from openmethane (`wrf run`, code in `src/openmethane/wrf/` of openmethane/openmethane), and production no longer uses setup-wrf. Make no changes here except fixes needed to roll production back to it; put WRF work in openmethane instead. It will be archived under openmethane/openmethane#324.
+
 setup-wrf generates the namelists, shell scripts and input data needed to run WRF (via WPS: geogrid → ungrib → metgrid → real.exe) for a domain and date range, and runs it. It is the meteorology stage of Open Methane: its output becomes CMAQ's meteorological inputs through MCIP. Production runs the Docker image (built on `ghcr.io/openmethane/wrf:4.5.1`; CI pushes it to GHCR and ECR).
 
 ## Commands
