@@ -19,6 +19,26 @@ of rst and use slightly different categories.
 
 <!-- towncrier release notes start -->
 
+## setup-wrf v0.10.0 (2026-11-26)
+
+### ⚠️ Breaking Changes  ⚠️
+
+- Removed `chamber` from the Docker image, since setup-wrf no longer needs any secrets. Commands can no longer be wrapped in `chamber exec` when using this image. ([#94](https://github.com/openmethane/setup-wrf/pull/94))
+
+### Deprecations
+
+- Deprecated setup-wrf. Open Methane now runs WRF with the `wrf run` command in the [openmethane](https://github.com/openmethane/openmethane) image, and production no longer uses this repository. Production last ran setup-wrf 0.9.2. This is the last planned release: only fixes needed to roll production back will be made, and the repository will be archived ([openmethane#324](https://github.com/openmethane/openmethane/issues/324)). ([#104](https://github.com/openmethane/setup-wrf/pull/104))
+
+### Improved Documentation
+
+- Added guidance on deciding whether a pull request needs review, and a review line at the top of the pull request template. ([#98](https://github.com/openmethane/setup-wrf/pull/98))
+- Corrected stale paths and config names in the README and the required software list, and marked the NCI target as unsupported. ([#99](https://github.com/openmethane/setup-wrf/pull/99))
+
+### Trivial/Internal Changes
+
+- [#99](https://github.com/openmethane/setup-wrf/pull/99)
+
+
 ## setup-wrf v0.9.2 (2026-10-28)
 
 ### Bug Fixes
