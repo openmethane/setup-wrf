@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **This repository is deprecated and frozen.** WRF now runs from openmethane (`wrf run`, code in `src/openmethane/wrf/` of openmethane/openmethane), and production no longer uses setup-wrf. Make no changes here except fixes needed to roll production back to it; put WRF work in openmethane instead. It will be archived under openmethane/openmethane#324.
 
-setup-wrf generates the namelists, shell scripts and input data needed to run WRF (via WPS: geogrid → ungrib → metgrid → real.exe) for a domain and date range, and runs it. It is the meteorology stage of Open Methane: its output becomes CMAQ's meteorological inputs through MCIP. Production runs the Docker image (built on `ghcr.io/openmethane/wrf:4.5.1`; CI pushes it to GHCR and ECR).
+setup-wrf generates the namelists, shell scripts and input data needed to run WRF (via WPS: geogrid → ungrib → metgrid → real.exe) for a domain and date range, and runs it. It was the meteorology stage of Open Methane: its output becomes CMAQ's meteorological inputs through MCIP. Production ran the Docker image (built on `ghcr.io/openmethane/wrf:4.5.1`; CI pushes it to GHCR and ECR).
 
 ## Commands
 
@@ -41,7 +41,7 @@ The Docker configs set `geo_em_dir` to `${run_dir}`, so geogrid always runs (the
 
 - **`scripts/setup_for_wrf.py`** is the core: a single long click command (`-c <config.json>`; always pass it, the default path doesn't exist). It reads the config, reads the domain's template `namelist.wps`/`namelist.wrf` with `f90nml`, then for each job (`num_hours_per_run` chunks, plus `num_hours_spin_up`) creates `${run_dir}/<YYYYMMDDHH>/`, runs geogrid (unless `geo_em` files exist in `geo_em_dir`), fetches FNL analyses (`setup_runs/wrf/fetch_fnl.py`), runs ungrib/metgrid/real.exe, writes `namelist.input`, and renders `main.sh`, `run.sh`, `cleanup.sh` from templates. A `.env` file is loaded if present.
 - **Config** (`config/*.json`) is parsed into the attrs `WRFConfig` class in `src/setup_runs/wrf/read_config_wrf.py`. Values support `${var}` substitution from other config keys and from env vars listed in `environment_variables_for_substitutions`. `run_name` also selects the domain (`nml_dir = domains/${run_name}`). `config.docker.json` is the fixed aust-test case; `config.docker.full.json` is the production config, driven by `START_DATE`, `END_DATE`, `CHK_PATH`, `DOMAIN_NAME`.
-- **`scripts/run-wrf.sh`** is the production entrypoint for one day:
+- **`scripts/run-wrf.sh`** was the production entrypoint for one day:
   - It always sets `END_DATE` to `START_DATE` + 1 day, ignoring any `END_DATE` passed in.
   - It works in `${CHK_PATH}/wrf/${DOMAIN_NAME}` and pulls the published `geo_em.d01.nc` (selected by `DOMAIN_VERSION`) from S3 if available.
   - It runs `setup_for_wrf.py` and `main.sh`. An EXIT trap rsyncs the results to `${STORE_PATH}/wrf/${DOMAIN_NAME}` and then `rm -rf`s the `CHK_PATH` run directory, even on failure.
