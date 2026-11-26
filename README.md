@@ -1,5 +1,15 @@
 # WRF coordination scripts
 
+> [!WARNING]
+> **setup-wrf is deprecated.** Open Methane now runs WRF from the
+> [openmethane](https://github.com/openmethane/openmethane) repository, with
+> the `wrf run` command in the openmethane image, and production no longer
+> uses this repository. Production last ran setup-wrf 0.9.2. This is the last
+> planned release: only fixes needed to roll production back will be made
+> here, and the repository will be archived ([openmethane#324](https://github.com/openmethane/openmethane/issues/324)).
+> Make new WRF changes in openmethane, under `src/openmethane/wrf/`. The move
+> is tracked in [openmethane#316](https://github.com/openmethane/openmethane/issues/316).
+
 This repository contains the code used to generate the scripts needed to run
 the [Weather Research & Forecasting Model (WRF)](https://www.mmm.ucar.edu/models/wrf)
 according to a set of configuration.
